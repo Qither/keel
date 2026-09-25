@@ -1,0 +1,5 @@
+{{! CLAUDE.md.tmpl: the bridge keel sync writes as CLAUDE.md so that Claude Code reads the same AGENTS.md
+  as every other runtime. Claude Code reads AGENTS.md natively only in newer versions and only without a
+  CLAUDE.md (verify by probe per version), so the bridge stays. keel writes it only when no CLAUDE.md
+  exists, and reports an existing hand-written one instead of overwriting it. }}
+@AGENTS.md

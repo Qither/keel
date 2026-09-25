@@ -1,0 +1,29 @@
+{
+  "kind": "result",
+  "brief_hash": "BR-9e4c1a7b2d05",
+  "subject": "P-7F3K9Q.T2",
+  "seat": "engineer",
+  "status": "DONE",
+  "goal_echo": "G-03: users can organize notes with tags; this task stores each tag once, normalized.",
+  "summary": "Added normalizeTag and TagStore.addTag in src/store/tags.ts, exported TagStore from src/store/index.ts, and made NoteStore.load default a missing tags array to an empty list. Both frozen tag tests pass locally.",
+  "rulings": [
+    {
+      "clause": "ADR-7KQ2B.O1",
+      "what": "Lowercase with String.prototype.toLowerCase after NFC normalization, not toLocaleLowerCase.",
+      "why": "A locale-dependent lowercase would store different tags on machines with different locales, for example the Turkish dotted I.",
+      "cost_if_wrong": "low",
+      "reversible": true
+    }
+  ],
+  "questions": [],
+  "blocker": null,
+  "handoff": {
+    "notes": "normalizeTag is internal to src/store/; core calls TagStore.addTag only.",
+    "not_tested": [
+      "Concurrent addTag calls on the same note (the store is single-writer)."
+    ],
+    "concerns": [],
+    "next": null
+  },
+  "files": []
+}

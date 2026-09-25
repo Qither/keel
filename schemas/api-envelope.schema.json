@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/api-envelope.schema.json",
+  "title": "keel CLI JSON envelope",
+  "description": "The envelope every keel verb prints with --json, including keel api. It carries the exit code, the command-specific data (the same model the dashboard and MCP use) and diagnostics. $defs also define the keel api op names and the outbox drops a seat can write (O_EXCL files <seq>-<kind>.json in <workspace_root>/_runs/<RUN>/outbox/), which the Steward validates at ingest.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M1a",
+  "type": "object",
+  "properties": {
+    "v": { "const": 1 },
+    "ok": { "type": "boolean" },
+    "command": {
+      "description": "Verb and mode, for example 'check' or 'api ack'.",
+      "type": "string",
+      "minLength": 1
+    },
+    "subject": {
+      "description": "What the command was about (an id, a path, file:line or a symbol), or null.",
+      "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+    },
+    "exit_code": { "$ref": "#/$defs/exitCode" },
+    "data": {
+      "description": "Command-specific payload, or null.",
+      "type": ["object", "array", "null"]
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/diagnostic" }
+    },
+    "next": {
+      "description": "Legal next actions as copyable keel commands.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "freshness": {
+      "description": "What the answer was computed from, or null for commands that compute no state.",
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/freshness" }, { "type": "null" }]
+    }
+  },
+  "required": ["v", "ok", "command", "exit_code", "data", "diagnostics", "next"],
+  "additionalProperties": false,
+  "$defs": {
+    "exitCode": {
+      "description": "0 ok, 1 gate failed, 2 usage, 3 needs a human, 4 claim conflict, 5 stale state or dirty checked-out trunk, 6 environment (including an agent-loaded signer key).",
+      "enum": [0, 1, 2, 3, 4, 5, 6]
+    },
+    "diagnostic": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "A check id (<gate>.<name>, common.schema.json#/$defs/checkId) or a refusal code.",
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": ["error", "warning", "info"]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "subject": {
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "hint": {
+          "description": "Success-shaped guidance, for example after a first ACK mismatch.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": ["code", "severity", "message", "subject", "hint"],
+      "additionalProperties": false
+    },
+    "apiOp": {
+      "description": "keel api operations. Each writes only to the run outbox (context reads).",
+      "enum": ["ack", "ask", "rule", "submit", "context"]
+    },
+    "outboxDrop": {
+      "description": "One outbox drop, <seq>-<kind>.json with kind ack, ask, rule, result, verdict or triage. Ack, result and verdict payloads carry the same kind field; a planner triage record (triage.schema.json) has none, so its file name alone carries the kind; ask and rule drops wrap their payload. Hook-journal drops (<seq>-hook.json) are defined with the hook runner in M2.",
+      "anyOf": [
+        { "$ref": "ack.schema.json" },
+        { "$ref": "result.schema.json" },
+        { "$ref": "verdict.schema.json" },
+        { "$ref": "triage.schema.json" },
+        { "$ref": "#/$defs/askDrop" },
+        { "$ref": "#/$defs/ruleDrop" }
+      ]
+    },
+    "askDrop": {
+      "description": "keel api ask: the question names the clause id it is about.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": ["ask"]
+        },
+        "question": { "$ref": "ack.schema.json#/$defs/question" }
+      },
+      "required": ["kind", "question"],
+      "additionalProperties": false
+    },
+    "ruleDrop": {
+      "description": "keel api rule.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": ["rule"]
+        },
+        "ruling": { "$ref": "result.schema.json#/$defs/ruling" }
+      },
+      "required": ["kind", "ruling"],
+      "additionalProperties": false
+    },
+    "contextRequest": {
+      "description": "keel api context and the MCP keel_context tool: subject is required; seat and section may be null.",
+      "type": "object",
+      "properties": {
+        "subject": {
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/proposalId" },
+            { "$ref": "common.schema.json#/$defs/taskId" }
+          ]
+        },
+        "seat": {
+          "description": "The seat whose brief sections are returned, or null for the seat of the run bound by KEEL_RUN_ID. Without a bound run, seat is required in practice and a null seat is refused.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/seat" }, { "type": "null" }]
+        },
+        "section": {
+          "description": "A single brief section, or null for the whole brief.",
+          "anyOf": [{ "$ref": "brief.schema.json#/$defs/sectionId" }, { "type": "null" }]
+        }
+      },
+      "required": ["subject", "seat", "section"],
+      "additionalProperties": false
+    }
+  }
+}

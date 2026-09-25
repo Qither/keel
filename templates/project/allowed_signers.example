@@ -1,0 +1,29 @@
+# .keel/board/allowed_signers: the Board's signing identities, in the OpenSSH allowed_signers format
+# (see the ALLOWED SIGNERS section of ssh-keygen(1)).
+#
+# This .example file shows the format only. `keel init` writes the real file from your public key with
+# your quoted consent (trust on first use), and pins the root signer's fingerprint in the signed charter.
+# Later changes must be signed by an existing signer:
+#   keel approve --doc .keel/board/allowed_signers
+# keel verifies every approval against this file as it stood at the last Board-signed trunk revision,
+# never against a working-tree copy.
+#
+# Line format:
+#   <principal>[,<principal>...] [options] <key-type> <base64-public-key> [comment]
+#
+# Options keel expects:
+#   namespaces="keel-approval"   limit the key to keel approvals (ssh-keygen -Y sign -n keel-approval)
+#   valid-after="YYYYMMDD"       optional start of validity
+#   valid-before="YYYYMMDD"      optional end of validity, for rotation
+#
+# Key hygiene (fail closed): keel approve, keel run and keel land exit 6 while any key listed here is
+# loaded in a reachable ssh-agent (SSH_AUTH_SOCK or the Windows OpenSSH agent pipe), unless it is a FIDO2
+# security key (-sk). -sk keys are recommended on Windows; -sk support in the Windows and Git for Windows
+# builds of ssh-keygen is to be verified by probe (keel doctor --section signing).
+#
+# Public keys only. A private key never belongs in this repository.
+#
+# The key bodies below are fake and will not verify anything.
+
+board-owner@example.com namespaces="keel-approval" sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29t-fake-keel-example owner-security-key
+board-deputy@example.com namespaces="keel-approval",valid-before="20271231" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA-fake-keel-example deputy-passphrase-key

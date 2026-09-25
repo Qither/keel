@@ -1,0 +1,270 @@
+# test/fixtures/fake-providers.yaml: scripted loopback fake model providers for keel's end-to-end tests,
+# the direct lane and conformance plumbing (docs/10-providers.md section 7, test/README.md).
+#
+# Rules every test keeps:
+# - Fake values only: loopback 127.0.0.1, port 0 (the OS picks an ephemeral port; the harness reads it back
+#   and injects http://127.0.0.1:<port> as the base URL), keys sk-fake-keel-*, models fake-*.
+# - No test reads the user's environment or configuration. The harness strips the prefixes in
+#   env-strip.yaml first, then injects the variables listed under profiles[].inject.
+# - A fake answers from this file only. It never forwards a request, and it records header NAMES and
+#   whether the key matched, never a header value.
+#
+# The format belongs to the M2 test harness; no product schema covers it (schemas/examples.map.json lists
+# it under unmapped_ok).
+
+version: 1
+
+listen:
+  host: 127.0.0.1
+  port: 0
+
+keys:
+  - id: anthropic
+    value: sk-fake-keel-anthropic-0000
+  - id: openai
+    value: sk-fake-keel-openai-0000
+
+models:
+  - fake-frontier
+  - fake-standard
+  - fake-fast
+
+# Modes a test selects per fake instance. In every mode a request whose key differs from the fake key gets
+# the unauthorized response.
+modes:
+  - id: ok
+    description: "Answer with the next reply of the selected script."
+  - id: length-cutoff
+    description: "Answer with a truncated reply and the protocol's length stop reason; keel must treat a structured answer cut this way as a failed call."
+  - id: unauthorized-401
+    description: "Answer every request with 401 and the protocol's authentication error body (conformance scenarios provider-401-replay and provider-401-temptation)."
+
+# Routing profiles the tests sign into a scratch repository, and the variables the harness injects for
+# each. {port} is the ephemeral port of the fake that serves the profile; {tier} is frontier, standard or
+# fast.
+profiles:
+  - alias: fake-anthropic
+    protocol: anthropic-messages
+    family: anthropic
+    fake: anthropic-messages
+    key: anthropic
+    inject:
+      KEEL_PROFILE_FAKE_ANTHROPIC_BASE_URL: "http://127.0.0.1:{port}"
+      KEEL_PROFILE_FAKE_ANTHROPIC_API_KEY: sk-fake-keel-anthropic-0000
+      KEEL_PROFILE_FAKE_ANTHROPIC_MODEL_FRONTIER: fake-frontier
+      KEEL_PROFILE_FAKE_ANTHROPIC_MODEL_STANDARD: fake-standard
+      KEEL_PROFILE_FAKE_ANTHROPIC_MODEL_FAST: fake-fast
+  - alias: fake-openai-chat
+    protocol: openai-chat
+    family: other
+    fake: openai-chat
+    key: openai
+    inject:
+      KEEL_PROFILE_FAKE_OPENAI_CHAT_BASE_URL: "http://127.0.0.1:{port}"
+      KEEL_PROFILE_FAKE_OPENAI_CHAT_API_KEY: sk-fake-keel-openai-0000
+      KEEL_PROFILE_FAKE_OPENAI_CHAT_MODEL_FRONTIER: fake-frontier
+      KEEL_PROFILE_FAKE_OPENAI_CHAT_MODEL_STANDARD: fake-standard
+      KEEL_PROFILE_FAKE_OPENAI_CHAT_MODEL_FAST: fake-fast
+  - alias: fake-openai-responses
+    protocol: openai-responses
+    family: openai
+    fake: openai-responses
+    key: openai
+    inject:
+      KEEL_PROFILE_FAKE_OPENAI_RESPONSES_BASE_URL: "http://127.0.0.1:{port}"
+      KEEL_PROFILE_FAKE_OPENAI_RESPONSES_API_KEY: sk-fake-keel-openai-0000
+      KEEL_PROFILE_FAKE_OPENAI_RESPONSES_MODEL_FRONTIER: fake-frontier
+      KEEL_PROFILE_FAKE_OPENAI_RESPONSES_MODEL_STANDARD: fake-standard
+      KEEL_PROFILE_FAKE_OPENAI_RESPONSES_MODEL_FAST: fake-fast
+
+# One fake per protocol shape. {model} echoes the requested model; {text} is the next scripted reply.
+fakes:
+  - id: anthropic-messages
+    protocol: anthropic-messages
+    method: POST
+    path: /v1/messages
+    key: anthropic
+    # Either header may carry the key.
+    auth_headers:
+      - x-api-key
+      - authorization
+    require_headers:
+      - anthropic-version
+    responses:
+      ok:
+        status: 200
+        body:
+          id: msg_fake_0001
+          type: message
+          role: assistant
+          model: "{model}"
+          content:
+            - type: text
+              text: "{text}"
+          stop_reason: end_turn
+          stop_sequence: null
+          usage:
+            input_tokens: 120
+            output_tokens: 40
+      length-cutoff:
+        status: 200
+        body:
+          id: msg_fake_0002
+          type: message
+          role: assistant
+          model: "{model}"
+          content:
+            - type: text
+              text: "{\"kind\": \"ver"
+          stop_reason: max_tokens
+          stop_sequence: null
+          usage:
+            input_tokens: 120
+            output_tokens: 8
+      unauthorized-401:
+        status: 401
+        body:
+          type: error
+          error:
+            type: authentication_error
+            message: "fake provider: key rejected"
+
+  - id: openai-chat
+    protocol: openai-chat
+    method: POST
+    path: /v1/chat/completions
+    key: openai
+    auth_headers:
+      - authorization
+    require_headers: []
+    responses:
+      ok:
+        status: 200
+        body:
+          id: chatcmpl-fake-0001
+          object: chat.completion
+          created: 0
+          model: "{model}"
+          choices:
+            - index: 0
+              message:
+                role: assistant
+                content: "{text}"
+              finish_reason: stop
+          usage:
+            prompt_tokens: 120
+            completion_tokens: 40
+            total_tokens: 160
+      length-cutoff:
+        status: 200
+        body:
+          id: chatcmpl-fake-0002
+          object: chat.completion
+          created: 0
+          model: "{model}"
+          choices:
+            - index: 0
+              message:
+                role: assistant
+                content: "{\"kind\": \"ver"
+              finish_reason: length
+          usage:
+            prompt_tokens: 120
+            completion_tokens: 8
+            total_tokens: 128
+      unauthorized-401:
+        status: 401
+        body:
+          error:
+            message: "fake provider: key rejected"
+            type: invalid_request_error
+            param: null
+            code: invalid_api_key
+
+  - id: openai-responses
+    protocol: openai-responses
+    method: POST
+    path: /v1/responses
+    key: openai
+    auth_headers:
+      - authorization
+    require_headers: []
+    responses:
+      ok:
+        status: 200
+        body:
+          id: resp_fake_0001
+          object: response
+          created_at: 0
+          status: completed
+          incomplete_details: null
+          model: "{model}"
+          output:
+            - type: message
+              id: msg_fake_0001
+              status: completed
+              role: assistant
+              content:
+                - type: output_text
+                  text: "{text}"
+                  annotations: []
+          usage:
+            input_tokens: 120
+            output_tokens: 40
+            total_tokens: 160
+      length-cutoff:
+        status: 200
+        body:
+          id: resp_fake_0002
+          object: response
+          created_at: 0
+          status: incomplete
+          incomplete_details:
+            reason: max_output_tokens
+          model: "{model}"
+          output:
+            - type: message
+              id: msg_fake_0002
+              status: incomplete
+              role: assistant
+              content:
+                - type: output_text
+                  text: "{\"kind\": \"ver"
+                  annotations: []
+          usage:
+            input_tokens: 120
+            output_tokens: 8
+            total_tokens: 128
+      unauthorized-401:
+        status: 401
+        body:
+          error:
+            message: "fake provider: key rejected"
+            type: invalid_request_error
+            param: null
+            code: invalid_api_key
+
+# Scripted replies. A test names a script; each call takes the next reply, and a call past the end fails
+# the test.
+scripts:
+  - id: plain-text
+    replies:
+      - "fake reply"
+  - id: verdict-approve
+    # A strict-subset verdict (schemas/verdict.schema.json) for a direct-lane lens test.
+    replies:
+      - "{\"kind\":\"verdict\",\"lens\":\"blind-diff\",\"subject\":\"P-7F3K9Q.T2\",\"brief_hash\":\"BR-7f9b1d3e5a68\",\"commit\":\"3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493\",\"diff_digest\":\"ce9b8ca9f55e304b83e4c9dd94c7a1204ee3605b74ba38396d5cd531621487f6\",\"contract_hash\":\"e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea\",\"spec_verdict\":\"meets\",\"readings\":[],\"findings\":[],\"declined\":[],\"recommendation\":\"approve\",\"summary\":\"fake verdict\"}"
+  - id: invalid-json-then-valid
+    # The first reply fails schema validation; keel retries exactly once and accepts the second.
+    replies:
+      - "not json"
+      - "{\"kind\":\"verdict\",\"lens\":\"blind-diff\",\"subject\":\"P-7F3K9Q.T2\",\"brief_hash\":\"BR-7f9b1d3e5a68\",\"commit\":\"3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493\",\"diff_digest\":\"ce9b8ca9f55e304b83e4c9dd94c7a1204ee3605b74ba38396d5cd531621487f6\",\"contract_hash\":\"e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea\",\"spec_verdict\":\"meets\",\"readings\":[],\"findings\":[],\"declined\":[],\"recommendation\":\"approve\",\"summary\":\"fake verdict after one retry\"}"
+
+# What a fake records per request, for assertions. Values of headers are never recorded.
+record:
+  - method
+  - path
+  - header_names
+  - key_matched
+  - model
+  - mode

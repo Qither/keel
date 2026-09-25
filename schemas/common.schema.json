@@ -1,0 +1,482 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/common.schema.json",
+  "title": "keel common definitions",
+  "description": "The only home of keel id patterns and shared enums. Other schemas reference these $defs and never restate a pattern or an enum. src/core/ids.ts mirrors them as TypeScript types without patterns.",
+  "$comment": "Crockford base32 alphabet: 0-9A-HJKMNP-TV-Z (no I, L, O, U). ULIDs are 26 Crockford characters whose first character is 0-7.",
+  "$defs": {
+    "crockford5": {
+      "description": "Five Crockford base32 characters, minted without coordination.",
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{5}$"
+    },
+    "crockford6": {
+      "description": "Six Crockford base32 characters, minted without coordination.",
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{6}$"
+    },
+    "ulid": {
+      "description": "A 26-character ULID in Crockford base32.",
+      "type": "string",
+      "pattern": "^[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "slug": {
+      "description": "Lowercase kebab-case slug, as in <P>-<slug> or ADR-<5>-<slug>.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "areaSlug": {
+      "description": "Living-spec area, as in .keel/specs/<area>/spec.yaml and R-<area>-<5>.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "goalId": {
+      "description": "Goal id G-nn, serialized by the Board.",
+      "type": "string",
+      "pattern": "^G-[0-9]{2}$"
+    },
+    "invId": {
+      "description": "Charter invariant id INV-nn, serialized by the Board.",
+      "type": "string",
+      "pattern": "^INV-[0-9]{2}$"
+    },
+    "reqId": {
+      "description": "Requirement id R-<area>-<5 Crockford base32>.",
+      "type": "string",
+      "pattern": "^R-[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[0-9A-HJKMNP-TV-Z]{5}$"
+    },
+    "scenarioRef": {
+      "description": "Scenario reference R-<area>-<5>#S<n>.",
+      "type": "string",
+      "pattern": "^R-[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[0-9A-HJKMNP-TV-Z]{5}#S[1-9][0-9]*$"
+    },
+    "scenarioLocalId": {
+      "description": "Scenario id S<n> inside one requirement.",
+      "type": "string",
+      "pattern": "^S[1-9][0-9]*$"
+    },
+    "adrId": {
+      "description": "Project decision id ADR-<5 Crockford base32>. keel's own design ADRs (docs/adr/ADR-0001...) are a separate sequence and do not use this pattern.",
+      "type": "string",
+      "pattern": "^ADR-[0-9A-HJKMNP-TV-Z]{5}$"
+    },
+    "obligationId": {
+      "description": "Decision obligation id ADR-<5>.O<n>.",
+      "type": "string",
+      "pattern": "^ADR-[0-9A-HJKMNP-TV-Z]{5}\\.O[1-9][0-9]*$"
+    },
+    "archRuleId": {
+      "description": "Architecture rule id AR-<5 Crockford base32>.",
+      "type": "string",
+      "pattern": "^AR-[0-9A-HJKMNP-TV-Z]{5}$"
+    },
+    "proposalId": {
+      "description": "Proposal id P-<6 Crockford base32>.",
+      "type": "string",
+      "pattern": "^P-[0-9A-HJKMNP-TV-Z]{6}$"
+    },
+    "elementId": {
+      "description": "Architecture element id el:<dotted.slug>.",
+      "type": "string",
+      "pattern": "^el:[a-z0-9]+(?:-[a-z0-9]+)*(?:\\.[a-z0-9]+(?:-[a-z0-9]+)*)*$"
+    },
+    "taskId": {
+      "description": "Task id <P>.T<n>.",
+      "type": "string",
+      "pattern": "^P-[0-9A-HJKMNP-TV-Z]{6}\\.T[1-9][0-9]*$"
+    },
+    "taskLocalId": {
+      "description": "Task id T<n> inside one proposal (plan.yaml, workorders/T<n>.yaml).",
+      "type": "string",
+      "pattern": "^T[1-9][0-9]*$"
+    },
+    "roundId": {
+      "description": "Submit round id <P>.T<n>.r<k>, carried by the Keel-Round trailer.",
+      "type": "string",
+      "pattern": "^P-[0-9A-HJKMNP-TV-Z]{6}\\.T[1-9][0-9]*\\.r[1-9][0-9]*$"
+    },
+    "accId": {
+      "description": "Acceptance criterion id <P>#ACC-nn.",
+      "type": "string",
+      "pattern": "^P-[0-9A-HJKMNP-TV-Z]{6}#ACC-[0-9]{2}$"
+    },
+    "accLocalId": {
+      "description": "Acceptance criterion id ACC-nn inside one proposal's frozen intent.",
+      "type": "string",
+      "pattern": "^ACC-[0-9]{2}$"
+    },
+    "contentKind": {
+      "description": "Kinds of content-addressed records.",
+      "enum": ["BR", "PG", "EV", "VD", "TR", "IM", "AP", "AM", "OV", "RL", "Q"]
+    },
+    "contentId": {
+      "description": "Any content-addressed record id <KIND>-<sha12>.",
+      "type": "string",
+      "pattern": "^(?:BR|PG|EV|VD|TR|IM|AP|AM|OV|RL|Q)-[0-9a-f]{12}$"
+    },
+    "briefId": {
+      "description": "Compiled brief BR-<sha12 of the normalized body>.",
+      "type": "string",
+      "pattern": "^BR-[0-9a-f]{12}$"
+    },
+    "promptId": {
+      "description": "Prompt provenance hash PG-<sha12>.",
+      "type": "string",
+      "pattern": "^PG-[0-9a-f]{12}$"
+    },
+    "evidenceId": {
+      "description": "Runner evidence record EV-<sha12>.",
+      "type": "string",
+      "pattern": "^EV-[0-9a-f]{12}$"
+    },
+    "verdictId": {
+      "description": "Lens verdict record VD-<sha12>.",
+      "type": "string",
+      "pattern": "^VD-[0-9a-f]{12}$"
+    },
+    "triageId": {
+      "description": "Planner triage record TR-<sha12>.",
+      "type": "string",
+      "pattern": "^TR-[0-9a-f]{12}$"
+    },
+    "impactId": {
+      "description": "Impact record IM-<sha12>.",
+      "type": "string",
+      "pattern": "^IM-[0-9a-f]{12}$"
+    },
+    "approvalId": {
+      "description": "Board approval envelope AP-<sha12>.",
+      "type": "string",
+      "pattern": "^AP-[0-9a-f]{12}$"
+    },
+    "amendmentId": {
+      "description": "Amendment record AM-<sha12>.",
+      "type": "string",
+      "pattern": "^AM-[0-9a-f]{12}$"
+    },
+    "overrideId": {
+      "description": "Override record OV-<sha12>.",
+      "type": "string",
+      "pattern": "^OV-[0-9a-f]{12}$"
+    },
+    "rulingId": {
+      "description": "Ruling record RL-<sha12>.",
+      "type": "string",
+      "pattern": "^RL-[0-9a-f]{12}$"
+    },
+    "questionId": {
+      "description": "Question (ask) record Q-<sha12>.",
+      "type": "string",
+      "pattern": "^Q-[0-9a-f]{12}$"
+    },
+    "runId": {
+      "description": "Run id RUN-<ulid>.",
+      "type": "string",
+      "pattern": "^RUN-[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "eventId": {
+      "description": "Ledger event id EVT-<ulid>.",
+      "type": "string",
+      "pattern": "^EVT-[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "sha256": {
+      "description": "Lowercase hex SHA-256 digest.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sha12": {
+      "description": "First 12 lowercase hex characters of a SHA-256 digest.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{12}$"
+    },
+    "gitOid": {
+      "description": "Full git object id: 40 hex characters (SHA-1 repositories) or 64 (SHA-256 repositories).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"
+    },
+    "semver": {
+      "description": "Semantic version, as used by charter_version.",
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "envVarName": {
+      "description": "An environment variable NAME. keel stores names only, never values.",
+      "type": "string",
+      "pattern": "^[A-Z_][A-Z0-9_]*$"
+    },
+    "envPlaceholder": {
+      "description": "A ${ENV:NAME} placeholder, the only form in which records mention an environment variable.",
+      "type": "string",
+      "pattern": "^\\$\\{ENV:[A-Z_][A-Z0-9_]*\\}$"
+    },
+    "profileAlias": {
+      "description": "A routing profile alias chosen by the user (the key under routing.yaml profiles).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "repoPath": {
+      "description": "Repository-relative path with forward slashes: no leading / or ./, no .. segment, no backslash, colon or glob character.",
+      "type": "string",
+      "pattern": "^(?!/)(?!\\./)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\:*?\"<>|]+$"
+    },
+    "repoGlob": {
+      "description": "Repository-relative glob with forward slashes, matched by keel's own glob matcher (a leading ! negates).",
+      "type": "string",
+      "pattern": "^[^\\\\]+$"
+    },
+    "sshFingerprint": {
+      "description": "OpenSSH SHA256 key fingerprint, as printed by ssh-keygen -l.",
+      "type": "string",
+      "pattern": "^SHA256:[A-Za-z0-9+/]{43}$"
+    },
+    "checkId": {
+      "description": "A gate check id <gate>.<name>, for example submit.scope or land.re-execution, as catalogued in docs/11-verification.md. The prefix is the gate; the namespace is separate from ledger event types.",
+      "type": "string",
+      "pattern": "^(?:frame|plan|submit|verify|land)\\.[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "isoDateTime": {
+      "description": "RFC 3339 date-time.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "placeholderUrl": {
+      "description": "A documentation placeholder URL on a .invalid host, for example https://provider.example.invalid/v1. Real provider hosts never appear in keel files.",
+      "type": "string",
+      "pattern": "^https://(?:[a-z0-9-]+\\.)*invalid(?::[0-9]{1,5})?(?:/[^\\s]*)?$"
+    },
+    "loopbackUrl": {
+      "description": "A loopback URL for fake providers in tests.",
+      "type": "string",
+      "pattern": "^http://127\\.0\\.0\\.1(?::[0-9]{1,5})?(?:/[^\\s]*)?$"
+    },
+    "protocol": {
+      "description": "Provider wire protocol. The single protocol enum.",
+      "enum": ["anthropic-messages", "openai-chat", "openai-responses", "google"]
+    },
+    "family": {
+      "description": "Declared model family, a Board-signed routing declaration.",
+      "enum": ["anthropic", "openai", "google", "alibaba", "moonshot", "zhipu", "other"]
+    },
+    "seat": {
+      "description": "LLM seat.",
+      "enum": ["product", "architect", "planner", "engineer", "reviewer"]
+    },
+    "track": {
+      "description": "Right-sizing track.",
+      "enum": ["spike", "patch", "feature", "system"]
+    },
+    "tier": {
+      "description": "Model tier.",
+      "enum": ["frontier", "standard", "fast"]
+    },
+    "runtimeId": {
+      "description": "Runtime descriptor id (runtimes/<id>.yaml).",
+      "enum": ["claude-code", "codex", "gemini-cli", "qwen-code", "kimi-code", "opencode", "direct"]
+    },
+    "authMode": {
+      "description": "How a routing profile authenticates.",
+      "enum": ["env", "runtime-login", "runtime-profile"]
+    },
+    "gate": {
+      "description": "Phase gate.",
+      "enum": ["frame", "plan", "submit", "verify", "land"]
+    },
+    "approvalStage": {
+      "description": "Board stage checkpoint.",
+      "enum": ["contract", "plan", "land", "receipt"]
+    },
+    "ruleKind": {
+      "description": "Board ruling kind (keel approve --rule).",
+      "enum": ["answer", "budget", "track", "override", "dismiss", "degraded", "unverified", "abandon"]
+    },
+    "lens": {
+      "description": "Reviewer lens (templates/prompts/lens-<lens>.md).",
+      "enum": ["spec", "blind-diff", "edge-case", "verification-gap", "intent-alignment", "architecture", "audit"]
+    },
+    "obligationLevel": {
+      "description": "ADR obligation and charter invariant level. must and must_not ids join the ACK id set; should is advisory.",
+      "enum": ["must", "must_not", "should"]
+    },
+    "findingSeverity": {
+      "description": "Review finding severity.",
+      "enum": ["critical", "important", "minor"]
+    },
+    "recommendation": {
+      "description": "Lens verdict recommendation.",
+      "enum": ["approve", "revise", "reject"]
+    },
+    "resultStatus": {
+      "description": "Seat result status.",
+      "enum": ["DONE", "DONE_WITH_CONCERNS", "BLOCKED", "NEEDS_CONTEXT"]
+    },
+    "executionClass": {
+      "description": "Seat execution class.",
+      "enum": ["none", "read-only", "code-executing"]
+    },
+    "submitChannel": {
+      "description": "How a seat returns ACKs and results.",
+      "enum": ["final-message", "mcp", "outbox"]
+    },
+    "blockReason": {
+      "description": "Reason in blocked(<reason>).",
+      "enum": ["ack_mismatch", "non_convergence", "track_raised", "budget", "runtime_unavailable", "reserved_op"]
+    },
+    "toolEnvExposure": {
+      "description": "doctor tool_env_exposure.",
+      "enum": ["scrubbed", "exposed", "unknown"]
+    },
+    "toolFileExposure": {
+      "description": "doctor tool_file_exposure ('none' is tested with stat only, never by opening a file).",
+      "enum": ["none", "blocked", "exposed", "unknown"]
+    },
+    "controlPlaneExposure": {
+      "description": "doctor control_plane_exposure.",
+      "enum": ["sandboxed", "exposed"]
+    },
+    "checkStatus": {
+      "description": "Status written by every check (fail closed, with denominators).",
+      "enum": ["pass", "fail", "not_run", "unknown", "waived"]
+    },
+    "provenance": {
+      "description": "Provenance of a derived architecture edge.",
+      "enum": ["scip", "tree-sitter", "heuristic", "llm"]
+    },
+    "evidenceMode": {
+      "description": "Evidence mode of an acceptance criterion.",
+      "enum": ["test", "command", "review", "manual", "unobservable"]
+    },
+    "verificationStatus": {
+      "description": "Verification status of a runtime or CLI fact.",
+      "enum": ["documented", "probed", "verified", "unverified"]
+    },
+    "conformanceStatus": {
+      "description": "Conformance status per (seat, runtime, alias, revision).",
+      "enum": ["verified", "failed", "unverified"]
+    },
+    "rung": {
+      "description": "Degradation rung per runtime and mode.",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "stopClass": {
+      "description": "Stop classes that always force an ask to the Board and are never settled by a ruling.",
+      "enum": ["irreversible_or_destructive", "security_sensitive", "side_effect_outside_workspace", "every_path_a_guess"]
+    },
+    "trailers": {
+      "description": "Commit trailers as parsed from a Steward commit: either round trailers or governance trailers. Multi-valued trailers are arrays here and repeated trailer lines in the commit message.",
+      "anyOf": [{ "$ref": "#/$defs/roundTrailers" }, { "$ref": "#/$defs/governanceTrailers" }]
+    },
+    "governanceTrailers": {
+      "description": "Trailers of a Steward governance commit, which brings a Board-signed document to trunk.",
+      "type": "object",
+      "properties": {
+        "Keel-Doc": { "$ref": "#/$defs/repoPath" },
+        "Keel-Approval": { "$ref": "#/$defs/approvalId" }
+      },
+      "required": ["Keel-Doc", "Keel-Approval"],
+      "additionalProperties": false
+    },
+    "roundTrailers": {
+      "description": "Trailers of a Steward round commit on keel/<P>/t/<n>. Keel-Ruling and Not-tested are optional.",
+      "type": "object",
+      "properties": {
+        "Keel-Round": { "$ref": "#/$defs/roundId" },
+        "Keel-Req": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "anyOf": [{ "$ref": "#/$defs/reqId" }, { "$ref": "#/$defs/scenarioRef" }] }
+        },
+        "Keel-Acc": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/accId" }
+        },
+        "Keel-Seat": { "$ref": "#/$defs/seat" },
+        "Keel-Run": { "$ref": "#/$defs/runId" },
+        "Keel-Runtime": {
+          "description": "<runtimeId>@<version>.",
+          "type": "string",
+          "pattern": "^(?:claude-code|codex|gemini-cli|qwen-code|kimi-code|opencode|direct)@[0-9A-Za-z][0-9A-Za-z.+-]*$"
+        },
+        "Keel-Brief": { "$ref": "#/$defs/briefId" },
+        "Keel-Prompt": { "$ref": "#/$defs/promptId" },
+        "Keel-Charter": { "$ref": "#/$defs/semver" },
+        "Keel-Ruling": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/rulingId" }
+        },
+        "Not-tested": {
+          "description": "What the round did not test, one entry per trailer line.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "required": [
+        "Keel-Round",
+        "Keel-Req",
+        "Keel-Acc",
+        "Keel-Seat",
+        "Keel-Run",
+        "Keel-Runtime",
+        "Keel-Brief",
+        "Keel-Prompt",
+        "Keel-Charter"
+      ],
+      "additionalProperties": false
+    },
+    "sourceStateBinding": {
+      "description": "Evidence source-state binding. Recorded fields say where evidence was taken; evidence is reused only when every match field is equal.",
+      "type": "object",
+      "properties": {
+        "recorded": {
+          "type": "object",
+          "properties": {
+            "commit": { "$ref": "#/$defs/gitOid" },
+            "tree": { "$ref": "#/$defs/gitOid" }
+          },
+          "required": ["commit", "tree"],
+          "additionalProperties": false
+        },
+        "match": {
+          "type": "object",
+          "properties": {
+            "source_tree": {
+              "description": "sha256 of `git ls-tree -r -z --full-tree <commit>`, filtered in-process to exclude .keel/**.",
+              "$ref": "#/$defs/sha256"
+            },
+            "workorder_hash": { "$ref": "#/$defs/sha256" },
+            "contract_hash": {
+              "description": "Frozen at contract approval and never recomputed after archive.",
+              "$ref": "#/$defs/sha256"
+            },
+            "charter_version": { "$ref": "#/$defs/semver" },
+            "env_fp": {
+              "description": "Fingerprint of the runner environment (toolchain versions, OS); never contains env values.",
+              "$ref": "#/$defs/sha256"
+            }
+          },
+          "required": ["source_tree", "workorder_hash", "contract_hash", "charter_version", "env_fp"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["recorded", "match"],
+      "additionalProperties": false
+    },
+    "freshness": {
+      "description": "Freshness stamp on briefs and derived answers: what they were computed against.",
+      "type": "object",
+      "properties": {
+        "computed_at": { "$ref": "#/$defs/isoDateTime" },
+        "head_commit": { "$ref": "#/$defs/gitOid" },
+        "index_commit": {
+          "description": "Commit of the derived index used (IndexProvider), or null when no index was used.",
+          "anyOf": [{ "$ref": "#/$defs/gitOid" }, { "type": "null" }]
+        },
+        "charter_version": { "$ref": "#/$defs/semver" }
+      },
+      "required": ["computed_at", "head_commit", "index_commit", "charter_version"],
+      "additionalProperties": false
+    }
+  }
+}

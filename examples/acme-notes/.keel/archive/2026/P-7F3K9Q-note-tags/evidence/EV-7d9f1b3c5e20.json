@@ -1,0 +1,74 @@
+{
+  "subject": "P-7F3K9Q.T1",
+  "binding": {
+    "recorded": {
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": "64a63c3b92f2585b9239995980c12749632f8fce"
+    },
+    "match": {
+      "source_tree": "12551c8359fcb79ab084ecfb4bd41d195d614a3474007eedec25cb12d72bf402",
+      "workorder_hash": "cfd4797fc7dd9c5aff5e5e49c3b7b4944ff29fde37bc9475a8952a21ab1c188a",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "env_fp": "ebe6d6e28cde342ee2e6efe0693d8ec1413de6ec3a10830ca27c8bfa4c4f73c0"
+    }
+  },
+  "taken_at": "2026-09-22T08:31:50Z",
+  "checkout": "detached-sparse",
+  "runner": {
+    "keel_version": "0.3.0",
+    "os": "win32",
+    "node": "22.13.1"
+  },
+  "commands": [
+    {
+      "command": {
+        "argv": [
+          "npm",
+          "test"
+        ],
+        "junit": "reports/junit.xml",
+        "timeout_seconds": 600
+      },
+      "exit_code": 1,
+      "status": "fail",
+      "duration_ms": 7390,
+      "stdout_sha256": "dcc1723b3ce1508161cc0fda80f8574a27fe23783d86a8043826f7665ac7b4b1",
+      "stderr_sha256": "46fc42708599c338093e9f4c030e1513f705e6d4dbbd2e09a4a5ba08d2e787fa"
+    }
+  ],
+  "rows": [
+    {
+      "name": "addTag stores a trimmed lowercase tag [R-notes-4QX7B#S1]",
+      "scenarios": [
+        "R-notes-4QX7B#S1"
+      ],
+      "status": "failed"
+    },
+    {
+      "name": "addTag keeps one copy of a tag typed in another case [R-notes-4QX7B#S2]",
+      "scenarios": [
+        "R-notes-4QX7B#S2"
+      ],
+      "status": "failed"
+    }
+  ],
+  "acceptance": [
+    {
+      "acc": "P-7F3K9Q#ACC-01",
+      "evidence_mode": "test",
+      "status": "fail",
+      "passed": 0,
+      "total": 1
+    },
+    {
+      "acc": "P-7F3K9Q#ACC-02",
+      "evidence_mode": "test",
+      "status": "fail",
+      "passed": 0,
+      "total": 1
+    }
+  ],
+  "not_run": [],
+  "red_green": null
+}

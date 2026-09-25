@@ -1,0 +1,139 @@
+# runtimes/direct.yaml: descriptor for keel's own direct lane (schemas/runtime-descriptor.schema.json).
+#
+# The direct lane (M6) is a separate, tool-less child process that keel spawns like any other runtime; the
+# Steward process itself never calls a model. The child builds the request in memory
+# (src/direct/client.ts) and unwraps the routed profile's values from an opaque env-policy handle at call
+# time. It serves only tool-less, read-only work: review lenses and the intent auditor.
+#
+# Facts here are keel's own design (documented in docs/09-runtimes.md and docs/10-providers.md), tested
+# only against the loopback fake providers; the descriptor stays unverified until the M6 lane exists and
+# its plumbing conformance passes.
+
+id: direct
+display_name: keel direct lane
+kind: direct
+verification_status: unverified
+tested_version: null
+min_version: null
+
+binary:
+  name: null
+  windows_resolution: keel-child
+  shell: false
+  verification_status: documented
+
+git_required: false
+
+instruction_files: []
+
+skills:
+  dirs: []
+  agent_files: []
+  verification_status: documented
+
+# The brief or lens prompt, with the diff inline within the brief budget, is the whole request; it reaches
+# the child on stdin and never travels in argv. Diffs over the budget split the review.
+prompt_channel:
+  kind: stdin
+  fixed_prompt: null
+  flag: null
+  verification_status: documented
+
+# OpenAI json_schema response format (openai-chat) or text.format (openai-responses). Anthropic
+# output_config.format is a capability that stays off for compatible endpoints until its probe passes.
+# Fallback: a JSON-only instruction plus schema validation with exactly one retry.
+structured_output:
+  mechanism: native-schema
+  schema_flag: null
+  output_flag: null
+  verification_status: documented
+
+schema_flag_takes: null
+
+# rung is null: the direct lane sits outside the A-D ladder because it has no tools and nothing to
+# prevent; its only channel is the schema-validated response.
+modes:
+  - id: tool-less
+    execution_class: none
+    argv: []
+    submit_channel: final-message
+    rung: null
+    seats:
+      - reviewer
+    verification_status: documented
+
+parser: direct-response
+
+cwd: workspace
+
+budget_flags: []
+
+exit_codes:
+  - code: 0
+    outcome: completed
+  - code: 1
+    outcome: failed
+  - code: 143
+    outcome: killed
+    posix_only: true
+
+# No tool subprocess exists, so nothing can see provider variables.
+env_scrub:
+  control: null
+  expected: scrubbed
+  verification_status: documented
+
+# The request builder receives an opaque handle; no native variable names are mapped. The google
+# protocol is served only by hosts (gemini-cli, kimi-code), never by the direct lane.
+provider:
+  protocols:
+    - anthropic-messages
+    - openai-chat
+    - openai-responses
+  auth_modes:
+    - env
+  native_env: []
+
+# Tool-less: nothing in the child can open a path, so the set is empty and tool_file_exposure is none.
+provider_path_set:
+  home_env: []
+  paths: []
+  dotenv: false
+
+permissions:
+  mechanism: none
+  deny_read: false
+  never_generate: []
+  verification_status: documented
+
+bypass_equivalent: false
+
+trust:
+  project_layers: none
+  override_flags: []
+  verification_status: documented
+
+hooks:
+  delivery: none
+  blocking_exit_code: null
+  verification_status: documented
+
+control_plane_exposure: sandboxed
+
+capability_probes:
+  - id: anthropic-output-format
+    claim: Anthropic output_config.format is honoured by the routed compatible endpoint; until then the lane uses the JSON-only instruction plus validation with one retry.
+    verification_status: unverified
+    min_version: null
+  - id: loopback-translation
+    claim: Request, response, error and stop translation for anthropic-messages, openai-chat and openai-responses passes against the loopback fakes, including the 401 mode.
+    verification_status: unverified
+    min_version: null
+  - id: length-cutoff-fails
+    claim: A length cut-off on a structured answer is reported as a failed call, never as a partial result.
+    verification_status: unverified
+    min_version: null
+
+notes:
+  - Authentication failures translate to a typed kind and block the run with blocked(runtime_unavailable), pointing at keel doctor --section providers; the free-text error body is never persisted or printed.
+  - Gemini-family models reached through a user-set OpenAI-compatible endpoint (declared family google, protocol openai-chat) can serve as a diverse reviewer family here.

@@ -1,0 +1,90 @@
+# examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/workorders/T1.yaml
+# (schemas/workorder.schema.json), written by the planner seat. The engineer never reads this file: keel
+# compiles it into the task's brief. Hash values are illustrative.
+#
+# T1 is the test-first task. The signed seats.engineer.test_route sends it to the glm-main alias on
+# opencode (declared family zhipu), a declared family different from T2's builder (anthropic), and it
+# lands on keel/P-7F3K9Q/main before T2 starts. Its tests then become T2's frozen_tests
+# (plan.test-independence).
+id: P-7F3K9Q.T1
+title: "Write the tag acceptance tests"
+kind: test
+objective: "Write one acceptance test per scenario of R-notes-4QX7B, each named with its scenario tag, against the TagStore.addTag interface, so that the tests fail before the build and pass once tags are stored as the requirement says."
+charter_version: "1.0.0"
+
+covers:
+  acc:
+    - P-7F3K9Q#ACC-01
+    - P-7F3K9Q#ACC-02
+  requirements:
+    - R-notes-4QX7B#S1
+    - R-notes-4QX7B#S2
+
+after: []
+
+write_set:
+  paths:
+    - tests/notes/tags.test.ts
+  symbols: []
+
+# T1 writes the frozen tests; it has none of its own.
+frozen_tests: []
+
+interfaces:
+  consumes: []
+  produces:
+    - name: "tag acceptance tests"
+      contract: "tests/notes/tags.test.ts with one row tagged [R-notes-4QX7B#S1] and one tagged [R-notes-4QX7B#S2], calling TagStore.addTag(noteId: string, tag: string): Promise<string[]>"
+
+acceptance:
+  - acc: P-7F3K9Q#ACC-01
+    evidence_mode: test
+    commands:
+      - argv: ["npm", "test"]
+        junit: reports/junit.xml
+    rows:
+      - R-notes-4QX7B#S1
+  - acc: P-7F3K9Q#ACC-02
+    evidence_mode: test
+    commands:
+      - argv: ["npm", "test"]
+        junit: reports/junit.xml
+    rows:
+      - R-notes-4QX7B#S2
+
+global_constraints:
+  - "Keep notes saved before this change loadable: a note without a `tags` array loads with no tags."
+  - "Never write tag values to logs or telemetry."
+
+review_focus:
+  - "Exactly one test row per scenario, named with its scenario tag."
+  - "Each test fails at the base commit because the behaviour is missing, and would pass against a correct TagStore.addTag."
+  - "The tests assert the stored tags, never log output or internal helpers."
+
+stop_classes:
+  - class: irreversible_or_destructive
+    examples:
+      - "Deleting or rewriting existing test fixtures of other areas."
+  - class: security_sensitive
+    examples:
+      - "Tests that need real user data or real credentials."
+  - class: side_effect_outside_workspace
+    examples:
+      - "Installing a new test dependency."
+  - class: every_path_a_guess
+    examples:
+      - "The scenarios of R-notes-4QX7B cannot be expressed through TagStore.addTag."
+
+route_hint:
+  seat: engineer
+  tier: standard
+
+budget:
+  usd: 4
+  runs: 3
+
+derived_from:
+  contract_hash: "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea"
+  ".keel/specs/notes/spec.yaml": "9c0d3d92cdb08e257f40485f4efa91eb63a16463d84ffbc42a617f3a936f1409"
+
+notes: "Name each test with its scenario tag, for example 'addTag stores a trimmed lowercase tag [R-notes-4QX7B#S1]', so the runner maps the JUnit row to the scenario."

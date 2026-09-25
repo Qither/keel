@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/reserved-actions.schema.json",
+  "title": "keel reserved actions",
+  "description": "The canonical reserved-action table, org/reserved-actions.yaml. Detection is the guarantee on plain git; prevention is best-effort and reported per runtime. A reserved-operation diff at ingest sets blocked(reserved_op) and becomes a Board item. Every action here always applies; a charter may add project actions of the same shape.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M2",
+  "type": "object",
+  "properties": {
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" },
+      "minItems": 1
+    }
+  },
+  "required": ["actions"],
+  "additionalProperties": false,
+  "$defs": {
+    "actionId": {
+      "description": "Reserved-action id, for example push-remote.",
+      "$ref": "common.schema.json#/$defs/slug"
+    },
+    "action": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/actionId" },
+        "summary": { "type": "string", "minLength": 1 },
+        "stop_class": {
+          "description": "Stop class the action falls under, if any.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/stopClass" }, { "type": "null" }]
+        },
+        "patterns": {
+          "description": "Command shapes that perform the action, for example 'git push'. They feed generated permission rules; detection does not depend on them.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "detect": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/detection" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "prevent": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/prevention" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["id", "summary", "stop_class", "detect", "prevent"],
+      "additionalProperties": false
+    },
+    "detection": {
+      "description": "Detection sources: for-each-ref snapshots, worktree HEADs, reflog tails, read-only ls-remote, the jj op log (jj only), ingested tool events and the submit scope check.",
+      "enum": [
+        "ref-snapshot",
+        "worktree-head",
+        "reflog",
+        "ls-remote",
+        "jj-op-log",
+        "tool-events",
+        "scope-check"
+      ]
+    },
+    "prevention": {
+      "description": "Best-effort prevention mechanisms.",
+      "enum": ["permission-rules", "pretooluse-hook", "env-hardening", "advisory-shim", "sparse-checkout"]
+    }
+  }
+}

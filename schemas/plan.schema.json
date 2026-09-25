@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/plan.schema.json",
+  "title": "keel plan",
+  "description": "The .keel/proposals/<P>-<slug>/plan.yaml written by the planner (L6). It lists tasks; each task's details live in its own work order, the single home for covers, after, write sets and acceptance. The Steward computes waves from the work orders and the plan gate returns PASS, CONCERNS or FAIL. Plan approval signs this file, the work orders and routing.snapshot.yaml. The campaign kind is a deferred stub (M8).",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M2",
+  "anyOf": [{ "$ref": "#/$defs/standard" }, { "$ref": "#/$defs/campaign" }],
+  "$defs": {
+    "standard": {
+      "description": "A standard plan.",
+      "type": "object",
+      "properties": {
+        "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+        "kind": { "const": "standard" },
+        "charter_version": { "$ref": "common.schema.json#/$defs/semver" },
+        "derived_from": { "$ref": "plan.schema.json#/$defs/derivedFrom" },
+        "max_width": {
+          "description": "Widest wave the planner intends (default 1). Above 1 on the feature track, plan approval is required.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "budget": { "$ref": "goals.schema.json#/$defs/budget" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/task" },
+          "minItems": 1
+        },
+        "risks": {
+          "description": "Risks the planner sees, for the Board's plan review.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "required": ["proposal", "kind", "charter_version", "derived_from", "budget", "tasks"],
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/taskLocalId" },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": {
+          "description": "Must equal the work order's kind.",
+          "$ref": "workorder.schema.json#/$defs/taskKind"
+        },
+        "workorder": {
+          "description": "Work order path relative to the proposal folder, workorders/T<n>.yaml.",
+          "$ref": "common.schema.json#/$defs/repoPath"
+        }
+      },
+      "required": ["id", "title"],
+      "additionalProperties": false
+    },
+    "campaign": {
+      "description": "Deferred to M8: a campaign plan. Only the minimal shape is checked.",
+      "type": "object",
+      "properties": {
+        "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+        "kind": { "const": "campaign" },
+        "charter_version": { "$ref": "common.schema.json#/$defs/semver" },
+        "on": {
+          "description": "Element query, for example tag:layer:web; the Steward expands one work order per matching element.",
+          "type": "string",
+          "minLength": 1
+        },
+        "template": {
+          "description": "Work order template that the expansion instantiates.",
+          "$ref": "common.schema.json#/$defs/repoPath"
+        },
+        "budget": { "$ref": "goals.schema.json#/$defs/budget" },
+        "derived_from": { "$ref": "plan.schema.json#/$defs/derivedFrom" }
+      },
+      "required": ["proposal", "kind", "charter_version", "on"],
+      "additionalProperties": false,
+      "x-keel-status": "stub",
+      "x-keel-milestone": "M8"
+    },
+    "derivedFrom": {
+      "description": "Hashes of the inputs an artifact was derived from, keyed by input: contract_hash, a repository path at the approved commit, or a record id. An upstream change marks the artifact stale, and stale work cannot land.",
+      "type": "object",
+      "propertyNames": { "type": "string", "minLength": 1 },
+      "additionalProperties": { "$ref": "common.schema.json#/$defs/sha256" },
+      "minProperties": 1
+    }
+  }
+}

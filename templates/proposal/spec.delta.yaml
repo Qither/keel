@@ -1,0 +1,51 @@
+# .keel/proposals/<P>-<slug>/spec.delta.yaml (schemas/spec-delta.schema.json), written by the product
+# seat. keel fills proposal_id and charter_version at `keel new`; replace every other {{token}}.
+#
+# A delta targets requirements by id, never by heading text. MODIFIED and REMOVED carry the
+# base_rev_hash of the requirement as the brief shows it (sha256 of the normalized requirement). At land
+# the archive commit applies the delta to .keel/specs/<area>/spec.yaml, setting status and since itself,
+# and refuses on a base mismatch, showing the base, current and proposed texts. This file is part of the
+# contract hash.
+proposal: "{{proposal_id}}"
+charter_version: "{{charter_version}}"
+
+ops:
+  # A new requirement. Mint a fresh id R-<area>-<5 Crockford base32 characters> (digits and A-Z without
+  # I, L, O, U); the area selects the target spec file, and the frame gate checks uniqueness.
+  - op: ADDED
+    requirement:
+      id: "R-{{area}}-{{new_id}}"
+      title: "{{requirement_title}}"
+      # EARS pattern: ubiquitous | event-driven | state-driven | unwanted | optional | complex
+      kind: event-driven
+      # One EARS statement, e.g. "When <trigger>, the <system> shall <response>."
+      statement: "{{ears_statement}}"
+      goals:
+        - "{{goal_id}}"
+      # Elements expected to realize the requirement (el:<dotted.slug>).
+      realized_in:
+        - "el:{{element}}"
+      scenarios:
+        - id: S1
+          given: "{{given}}"
+          when: "{{when}}"
+          then: "{{then}}"
+
+  # A changed requirement: the full replacement, bound to the base it was written against.
+  # - op: MODIFIED
+  #   id: "R-{{area}}-{{existing_id}}"
+  #   base_rev_hash: "{{base_rev_hash}}"
+  #   requirement:
+  #     id: "R-{{area}}-{{existing_id}}"
+  #     kind: event-driven
+  #     statement: "{{ears_statement}}"
+  #     goals: ["{{goal_id}}"]
+  #     realized_in: ["el:{{element}}"]
+  #     scenarios:
+  #       - {id: S1, given: "{{given}}", when: "{{when}}", then: "{{then}}"}
+
+  # A removed requirement.
+  # - op: REMOVED
+  #   id: "R-{{area}}-{{existing_id}}"
+  #   base_rev_hash: "{{base_rev_hash}}"
+  #   reason: "{{removal_reason}}"

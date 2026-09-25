@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/governance-record.schema.json",
+  "title": "keel governance record",
+  "description": "Governance records derived by the Steward: seat rulings (RL-<sha12>), questions (Q-<sha12>), amendments (AM-<sha12>), overrides with expiry (OV-<sha12>; waivers are overrides), and per-change acknowledgements of degraded independence or of an unverified judge seat (projections of the Board's --rule degraded and --rule unverified approvals). Content-addressed records never contain their own id.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M1b",
+  "anyOf": [
+    { "$ref": "#/$defs/ruling" },
+    { "$ref": "#/$defs/question" },
+    { "$ref": "#/$defs/amendment" },
+    { "$ref": "#/$defs/override" },
+    { "$ref": "#/$defs/laneAck" }
+  ],
+  "$defs": {
+    "ruling": {
+      "type": "object",
+      "properties": {
+        "record": { "const": "ruling" },
+        "subject": {
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/proposalId" },
+            { "$ref": "common.schema.json#/$defs/taskId" }
+          ]
+        },
+        "run": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/runId" }, { "type": "null" }]
+        },
+        "seat": { "$ref": "common.schema.json#/$defs/seat" },
+        "ruling": { "$ref": "result.schema.json#/$defs/ruling" },
+        "within_boundaries": { "type": "boolean" },
+        "stop_class": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/stopClass" }, { "type": "null" }]
+        },
+        "flagged": {
+          "description": "True when the ruling is outside the decision boundaries or on a stop class; flagged rulings are Board items.",
+          "type": "boolean"
+        },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": [
+        "record",
+        "subject",
+        "run",
+        "seat",
+        "ruling",
+        "within_boundaries",
+        "stop_class",
+        "flagged",
+        "recorded_at"
+      ],
+      "additionalProperties": false
+    },
+    "question": {
+      "description": "An ask; the task parks until it is answered (Board asks: keel approve Q-<sha12> --rule answer).",
+      "type": "object",
+      "properties": {
+        "record": { "const": "question" },
+        "subject": {
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/proposalId" },
+            { "$ref": "common.schema.json#/$defs/taskId" }
+          ]
+        },
+        "run": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/runId" }, { "type": "null" }]
+        },
+        "seat": {
+          "description": "Asking seat, or null when a gate raised the question.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/seat" }, { "type": "null" }]
+        },
+        "question": { "$ref": "ack.schema.json#/$defs/question" },
+        "routed_to": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/seat" }, { "const": "board" }]
+        },
+        "stop_class": {
+          "description": "Set when the question is a stop-class ask, which always goes to the Board.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/stopClass" }, { "type": "null" }]
+        },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": ["record", "subject", "run", "seat", "question", "routed_to", "stop_class", "recorded_at"],
+      "additionalProperties": false
+    },
+    "amendment": {
+      "description": "An amendment, derived from git when the frozen block or an ACC changes after contract approval.",
+      "type": "object",
+      "properties": {
+        "record": { "const": "amendment" },
+        "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+        "original": {
+          "description": "The original frozen text, verbatim from the signed blob.",
+          "type": "string",
+          "minLength": 1
+        },
+        "replacement": { "type": "string", "minLength": 1 },
+        "changed_ids": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/accId" },
+              { "$ref": "common.schema.json#/$defs/reqId" },
+              { "$ref": "common.schema.json#/$defs/scenarioRef" }
+            ]
+          },
+          "minItems": 1
+        },
+        "reason": { "type": "string", "minLength": 1 },
+        "invalidates": {
+          "description": "Contract and plan approvals the amendment invalidates.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/approvalId" }
+        },
+        "authority": {
+          "description": "The new contract approval that accepts the amendment; null until signed.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/approvalId" }, { "type": "null" }]
+        },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": [
+        "record",
+        "proposal",
+        "original",
+        "replacement",
+        "changed_ids",
+        "reason",
+        "invalidates",
+        "authority",
+        "recorded_at"
+      ],
+      "additionalProperties": false
+    },
+    "override": {
+      "description": "An expiring override (waivers are overrides). UNOBSERVABLE evidence needs one with a reason and an expiry.",
+      "type": "object",
+      "properties": {
+        "record": { "const": "override" },
+        "subject": {
+          "description": "Proposal, task or commit the override applies to.",
+          "type": "string",
+          "minLength": 1
+        },
+        "check": { "$ref": "common.schema.json#/$defs/checkId" },
+        "reason": { "type": "string", "minLength": 1 },
+        "until": { "$ref": "#/$defs/until" },
+        "approval": { "$ref": "common.schema.json#/$defs/approvalId" },
+        "adopts_commit": {
+          "description": "A human commit adopted into the trace by this override, or null.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/gitOid" }, { "type": "null" }]
+        },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": [
+        "record",
+        "subject",
+        "check",
+        "reason",
+        "until",
+        "approval",
+        "adopts_commit",
+        "recorded_at"
+      ],
+      "additionalProperties": false
+    },
+    "laneAck": {
+      "description": "A per-change Board acknowledgement of a single-family review lane (degraded) or of a judge seat whose conformance status is unverified.",
+      "type": "object",
+      "properties": {
+        "record": {
+          "enum": ["degraded-ack", "unverified-ack"]
+        },
+        "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+        "seat": { "$ref": "common.schema.json#/$defs/seat" },
+        "route": { "$ref": "routing.schema.json#/$defs/route" },
+        "approval": { "$ref": "common.schema.json#/$defs/approvalId" },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": ["record", "proposal", "seat", "route", "approval", "recorded_at"],
+      "additionalProperties": false
+    },
+    "until": {
+      "description": "Expiry (keel approve --until): a date or date-time, 'land', or 'commit-touching:<path>'.",
+      "anyOf": [
+        { "type": "string", "format": "date" },
+        { "type": "string", "format": "date-time" },
+        { "const": "land" },
+        { "type": "string", "pattern": "^commit-touching:.+$" }
+      ]
+    }
+  }
+}

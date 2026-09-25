@@ -1,0 +1,240 @@
+{
+  "proposal": "P-7F3K9Q",
+  "slug": "note-tags",
+  "title": "Note tags",
+  "track": "feature",
+  "origin": "contract-approved",
+  "charter_version": "1.0.0",
+  "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+  "integrated_commit": "3e22fba13b188278ab2eaf241f8a171de14f42a8",
+  "expected_trunk_tip": "3c92a83801e21ff2840baa3b2eb7f43ea69c6a17",
+  "trunk": "main",
+  "tasks": [
+    {
+      "task": "P-7F3K9Q.T1",
+      "rounds": [
+        {
+          "round": "P-7F3K9Q.T1.r1",
+          "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1"
+        }
+      ]
+    },
+    {
+      "task": "P-7F3K9Q.T2",
+      "rounds": [
+        {
+          "round": "P-7F3K9Q.T2.r1",
+          "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493"
+        }
+      ]
+    }
+  ],
+  "acceptance": [
+    {
+      "acc": "P-7F3K9Q#ACC-01",
+      "evidence_mode": "test",
+      "commands": [
+        {
+          "argv": [
+            "npm",
+            "test"
+          ],
+          "junit": "reports/junit.xml"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "acc": "P-7F3K9Q#ACC-02",
+      "evidence_mode": "test",
+      "commands": [
+        {
+          "argv": [
+            "npm",
+            "test"
+          ],
+          "junit": "reports/junit.xml"
+        }
+      ],
+      "status": "pass"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence": "EV-7d9f1b3c5e20",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "status": "fail",
+      "expect": "red"
+    },
+    {
+      "evidence": "EV-3a9c0e1b2d4f",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "status": "pass",
+      "expect": "green"
+    }
+  ],
+  "land_reexecution": {
+    "status": "pass",
+    "passed": 2,
+    "total": 2
+  },
+  "verdicts": [
+    {
+      "verdict": "VD-1f3a5c7e9b20",
+      "lens": "spec",
+      "recommendation": "approve",
+      "declared_family": "google",
+      "open_findings": 0
+    },
+    {
+      "verdict": "VD-8d0f2b4c6e71",
+      "lens": "verification-gap",
+      "recommendation": "approve",
+      "declared_family": "google",
+      "open_findings": 0
+    },
+    {
+      "verdict": "VD-4e6a8c0b2d19",
+      "lens": "verification-gap",
+      "recommendation": "approve",
+      "declared_family": "google",
+      "open_findings": 0
+    },
+    {
+      "verdict": "VD-5b1d2e3f4a6c",
+      "lens": "blind-diff",
+      "recommendation": "approve",
+      "declared_family": "google",
+      "open_findings": 0
+    },
+    {
+      "verdict": "VD-6c2e3f4a5b7d",
+      "lens": "verification-gap",
+      "recommendation": "approve",
+      "declared_family": "google",
+      "open_findings": 0
+    }
+  ],
+  "rulings": [
+    {
+      "ruling": "RL-2c7e9a4b6d18",
+      "cost_if_wrong": "low",
+      "clause": "ADR-7KQ2B.O1",
+      "what": "Lowercase with String.prototype.toLowerCase after NFC normalization, not toLocaleLowerCase.",
+      "reversible": true
+    }
+  ],
+  "gates_not_run": [],
+  "overrides": [],
+  "deferred_minors": [
+    {
+      "verdict": "VD-5b1d2e3f4a6c",
+      "finding": "F1",
+      "title": "Duplicate check scans the whole tags array"
+    }
+  ],
+  "risks": [
+    "Lowercasing is not full case folding: tags in scripts with special case rules (for example German sharp s) stay distinct from their folded forms.",
+    "Not tested: concurrent addTag calls on the same note (the store is single-writer)."
+  ],
+  "arch_delta": null,
+  "rtm": {
+    "requirements": 1,
+    "covered": 1,
+    "verified": 1
+  },
+  "independence": {
+    "engineer": [
+      "anthropic",
+      "zhipu"
+    ],
+    "reviewer": "google",
+    "independence": "independent"
+  },
+  "conformance": [
+    {
+      "seat": "product",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "status": "verified"
+    },
+    {
+      "seat": "planner",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "status": "verified"
+    },
+    {
+      "seat": "engineer",
+      "route": {
+        "runtime": "opencode",
+        "alias": "glm-main",
+        "tier": "standard",
+        "declared_family": "zhipu",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "status": "unverified"
+    },
+    {
+      "seat": "engineer",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "standard",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "status": "verified"
+    },
+    {
+      "seat": "reviewer",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "status": "verified"
+    }
+  ],
+  "exposure": [
+    {
+      "runtime": "claude-code",
+      "profile": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "blocked",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      }
+    },
+    {
+      "runtime": "opencode",
+      "profile": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      }
+    }
+  ],
+  "approvals": [
+    "AP-2d9e4f6a8b0c"
+  ],
+  "policies": []
+}

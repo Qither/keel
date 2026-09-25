@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "payload": {
+    "kind": "stage",
+    "stage": "contract",
+    "rule": null,
+    "subject": "P-7F3K9Q",
+    "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+    "artifacts": [
+      {
+        "path": ".keel/proposals/P-7F3K9Q-note-tags/intent.md",
+        "sha256": "0d56ca86699535db5b9f4cd7cfe0c1ffc29801d7afbee585fb4e27402f6d5e64"
+      },
+      {
+        "path": ".keel/proposals/P-7F3K9Q-note-tags/spec.delta.yaml",
+        "sha256": "acf11480f415a69b1324358ede308ccf2eef18f4a9838fb59492b5c09ee3f257"
+      }
+    ],
+    "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+    "request": null,
+    "land": null,
+    "quote": "Approved as framed; tags stay local to a note.",
+    "approver": {
+      "principal": "board-owner@example.com",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000",
+      "key_type": "sk-ssh-ed25519@openssh.com"
+    },
+    "ledger_chain_head": "2786b79551090dd7e42ecee2b29fa2efc6c2ed07907ac6d3f7f9218781341645",
+    "ts": "2026-09-21T14:30:00Z",
+    "nonce": "2f0e4a5c3313fdd9c0e113e3fd9600952dbcb5c04f425d5100bb66eaea608474"
+  },
+  "signature": {
+    "namespace": "keel-approval",
+    "format": "sshsig",
+    "armored": "-----BEGIN SSH SIGNATURE-----\nFAKE-KEEL-EXAMPLE-SIGNATURE-THIS-IS-NOT-A-REAL-SSHSIG-AND-VERIFIES-NOTHING\n-----END SSH SIGNATURE-----"
+  }
+}

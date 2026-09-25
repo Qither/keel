@@ -1,0 +1,69 @@
+# org/seats/engineer.yaml: the engineer seat contract (schemas/seat.schema.json).
+# Canonical; docs/01-org-model.md summarizes it. Reserved actions come from org/reserved-actions.yaml.
+#
+# The engineer is the only code-executing seat: it is dispatched only on a route whose
+# tool_env_exposure is scrubbed and whose tool_file_exposure is none or blocked (docs/10-providers.md).
+# A failed exposure rule is blocked(runtime_unavailable); no ruling overrides it.
+
+seat: engineer
+duty: >-
+  Implements exactly one work order in its own sparse worktree. ACKs first; writes code, and tests where
+  the work order assigns them, red then green; does not commit; records rulings inside its decision
+  boundaries; asks when a question falls outside them; submits result.json (DONE, DONE_WITH_CONCERNS,
+  BLOCKED or NEEDS_CONTEXT, with a goal echo and the BR echo). The same seat type writes test-first
+  tasks for a different builder, on a different declared family.
+assumption: >-
+  A builder that echoes its contract before editing and works inside a fixed write_set against tests it
+  did not write stays aligned without a human watching. Measured by ACK mismatches, scope and
+  frozen-path failures, fake-completion hits and fix rounds per task; the tier per task follows these
+  numbers.
+inputs:
+  - "brief BR-* for subject P.Tn (ACK set: ACC ids, R refs, in-scope INV ids, in-scope must and must_not obligation ids)"
+  - sparse task worktree at the recorded base
+  - findings list (fix rounds)
+  - answers to its asks
+outputs:
+  - file changes inside write_set (the Steward commits them)
+  - ack
+  - rulings and asks
+  - result.json (status, goal_echo, BR echo)
+# writable.globs is the outer bound for every engineer run. Each run is narrowed to its work order's
+# write_set minus frozen_tests and protected globs; submit.scope and submit.frozen-paths enforce it.
+writable:
+  globs:
+    - "**"
+    - "!.keel/**"
+api_ops:
+  - ack
+  - ask
+  - rule
+  - submit
+  - context
+execution_class: code-executing
+ack_id_set:
+  - acceptance
+  - requirement
+  - invariant
+  - obligation
+output_schema: schemas/result.schema.json
+submit_channels:
+  - final-message
+  - mcp
+  - outbox
+default_tier: standard
+independent_of: []
+may:
+  - write files matching the work order's write_set in its own task worktree
+  - write its run outbox through keel api
+  - run the project's declared build and test commands (this produces no evidence; only the Steward runner's executions count)
+  - record rulings inside its decision boundaries, with cost-if-wrong
+  - ask the clause owner when a question falls outside them
+  - use the fast tier for mechanical transcription; move one tier up at fix round 4
+may_not:
+  - touch frozen_tests, protected globs, .keel/** or any path outside write_set
+  - commit, push, move refs, rebase, write commit trailers by hand, or run jj undo or jj op restore
+  - run any mutating keel verb (new, run, land, sync, audit, approve)
+  - claim or pick tasks, mark work done, or weaken acceptance
+  - use permission-bypass flags or spawn writing subagents
+  - open provider or credential paths (checked at ingest)
+  - take any action listed in org/reserved-actions.yaml

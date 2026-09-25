@@ -1,0 +1,250 @@
+# runtimes/claude-code.yaml: runtime descriptor for Claude Code (schemas/runtime-descriptor.schema.json).
+#
+# Written against 2.1.259, installed locally. The descriptor as a whole stays unverified until keel
+# doctor's probes pass on the installed version; each group of facts carries its own
+# verification_status, and every unverified fact is verify by probe (capability_probes below).
+# Placeholders in {braces} are filled by the dispatcher (runtimes/README.md); none ever expands to a
+# provider value, and native provider variable names appear only under provider.native_env.
+
+id: claude-code
+display_name: Claude Code
+kind: cli
+verification_status: unverified
+tested_version: "2.1.259"
+min_version: "2.1.259"
+
+binary:
+  name: claude
+  windows_resolution: npm-shim-to-script
+  shell: false
+  verification_status: unverified
+
+git_required: false
+
+instruction_files:
+  - CLAUDE.md
+
+skills:
+  dirs:
+    - .claude/skills
+  agent_files:
+    - .claude/agents/keel-*.md
+  verification_status: documented
+
+prompt_channel:
+  kind: file
+  fixed_prompt: Follow the brief provided.
+  flag: --append-system-prompt-file
+  verification_status: documented
+
+structured_output:
+  mechanism: native-schema
+  schema_flag: --json-schema
+  output_flag: null
+  verification_status: documented
+
+schema_flag_takes: inline
+
+modes:
+  - id: plan
+    execution_class: read-only
+    argv:
+      - --permission-mode
+      - plan
+      - --json-schema
+      - "{result_schema_inline}"
+    submit_channel: final-message
+    rung: A
+    seats:
+      - product
+      - architect
+      - planner
+      - reviewer
+    verification_status: documented
+  # The engineer ACKs and submits through the outbox (the run directory is added with --add-dir), so this
+  # mode passes no --json-schema.
+  - id: accept-edits
+    execution_class: code-executing
+    argv:
+      - --permission-mode
+      - acceptEdits
+    submit_channel: outbox
+    rung: A
+    seats:
+      - engineer
+    verification_status: documented
+
+argv_template:
+  - -p
+  - "{fixed_prompt}"
+  - --append-system-prompt-file
+  - "{brief_path}"
+  - --output-format
+  - stream-json
+  - --verbose
+  - --setting-sources
+  - project
+  - --settings
+  - "{run_dir}/claude-settings.json"
+  - --strict-mcp-config
+  - --mcp-config
+  - "{run_dir}/mcp.json"
+  - "{mode_argv}"
+  - --allowedTools
+  - "{allowed_tools}"
+  - --add-dir
+  - "{run_dir}"
+  - --session-id
+  - "{session_id}"
+  - "{budget_argv}"
+
+parser: claude-stream-json
+
+session:
+  id_flag: --session-id
+  resume:
+    - --resume
+    - "{session_id}"
+  fork:
+    - --resume
+    - "{session_id}"
+    - --fork-session
+  verification_status: documented
+
+cwd: workspace
+
+budget_flags:
+  - kind: usd
+    flag: --max-budget-usd
+    verification_status: documented
+  - kind: turns
+    flag: --max-turns
+    verification_status: unverified
+
+exit_codes:
+  - code: 0
+    outcome: completed
+  - code: 1
+    outcome: failed
+  - code: 143
+    outcome: killed
+    posix_only: true
+
+# The candidate control is the CLAUDE_CODE_SUBPROCESS_ENV_SCRUB toggle below (keel sets it for every run).
+# Whether it keeps every mapped name (ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, ANTHROPIC_MODEL) and every
+# KEEL_PROFILE_* name out of Bash tool subprocesses on the installed version is verify by probe: the
+# env-scrub capability probe (docs/10-providers.md section 4). Until it passes, tool_env_exposure is
+# unknown and the engineer is refused on this runtime.
+env_scrub:
+  control: CLAUDE_CODE_SUBPROCESS_ENV_SCRUB
+  expected: unknown
+  verification_status: unverified
+
+# Runtime toggles in the child environment; keel-owned values, never values from the user.
+env_toggles:
+  - name: CLAUDE_CODE_SUBPROCESS_ENV_SCRUB
+    value: "1"
+    purpose: Candidate subprocess env scrub control (env_scrub.control); its effect on each mapped name is verify by probe.
+    verification_status: unverified
+
+provider:
+  protocols:
+    - anthropic-messages
+  auth_modes:
+    - env
+    - runtime-login
+  native_env:
+    - protocol: anthropic-messages
+      from: base_url
+      name: ANTHROPIC_BASE_URL
+    - protocol: anthropic-messages
+      from: api_key
+      name: ANTHROPIC_AUTH_TOKEN
+    - protocol: anthropic-messages
+      from: model
+      name: ANTHROPIC_MODEL
+
+provider_path_set:
+  home_env:
+    - CLAUDE_CONFIG_DIR
+  paths:
+    - "{workspace_root}/_runs/*/raw/"
+    - ~/.claude/.credentials.json
+    - ~/.claude/settings.json
+    - ~/.claude/settings.local.json
+    - ~/.claude.json
+    - .claude/settings.json
+    - .claude/settings.local.json
+  dotenv: true
+
+permissions:
+  mechanism: per-run-settings
+  deny_read: true
+  never_generate:
+    - --dangerously-skip-permissions
+    - --allow-dangerously-skip-permissions
+    - bypassPermissions
+  verification_status: documented
+
+bypass_equivalent: false
+
+trust:
+  project_layers: always
+  override_flags: []
+  verification_status: documented
+
+hooks:
+  delivery: per-run-settings
+  blocking_exit_code: 2
+  verification_status: documented
+
+control_plane_exposure: exposed
+
+capability_probes:
+  - id: env-scrub
+    claim: With CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 set by keel, the env-scrub probe reports every mapped native name and every KEEL_PROFILE_* name UNSET inside Bash tool subprocesses on this version.
+    verification_status: unverified
+    min_version: null
+  - id: deny-read-provider-paths
+    claim: permissions.deny Read(...) entries plus Bash patterns in the per-run settings block the provider path set on native Windows.
+    verification_status: unverified
+    min_version: null
+  - id: force-kill-resume
+    claim: A session force-killed with taskkill /T /F can be resumed with --resume.
+    verification_status: unverified
+    min_version: null
+  - id: bare-hermetic
+    claim: --bare behaves hermetically (no user or project layers, no auto-discovered MCP or hooks); used only after conformance passes.
+    verification_status: unverified
+    min_version: null
+  - id: native-agents-md
+    claim: AGENTS.md is read natively when no CLAUDE.md exists; until verified keel keeps the CLAUDE.md bridge containing @AGENTS.md.
+    verification_status: unverified
+    min_version: "2.1.277"
+  - id: json-schema-inline
+    claim: --json-schema takes the minified schema inline and the answer arrives in .structured_output of the result event.
+    verification_status: documented
+    min_version: null
+  - id: hooks-block
+    claim: The per-run --settings file registers keel hook and exit code 2 from PreToolUse blocks the tool call.
+    verification_status: documented
+    min_version: null
+  - id: mcp-outside-sandbox
+    claim: The keel MCP server runs outside the tool permission scope, so keel_submit works in plan mode.
+    verification_status: unverified
+    min_version: null
+  - id: windows-resolution
+    claim: The claude launcher resolves to its node entry script (npm install) or to claude.exe (native installer) without a shell; doctor records which.
+    verification_status: unverified
+    min_version: null
+  - id: shim-coverage
+    claim: The advisory git and jj shims placed first on PATH are reached from the Bash tool (Git Bash) on Windows.
+    verification_status: unverified
+    min_version: null
+
+notes:
+  - Rung A for both modes. Read-only seats ACK through the structured final message of a short pre-run or through MCP; the engineer ACKs through the outbox (run directory added with --add-dir) or MCP.
+  - The brief travels through --append-system-prompt-file; argv carries only the fixed prompt, paths and the inline minified result schema, far below the Windows command-line limits.
+  - "Auth env maps the routed profile's names to ANTHROPIC_* in memory. Auth runtime-login keeps the credential in a file, so the route serves only tool-less seats and seats whose file exposure is verified blocked; doctor reports the auth mode without reading any credential file."
+  - On native Windows there is no OS read sandbox; deny rules are the only prevention and Bash patterns are weak, so doctor usually reports tool_file_exposure exposed for runtime-login routes.
+  - GLM through an Anthropic-protocol endpoint (declared family zhipu) is possible on this host but not supported by Anthropic; doctor notes it and asserts no plan terms.

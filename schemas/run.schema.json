@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/run.schema.json",
+  "title": "keel run record",
+  "description": "A run record, .git/keel/runs/<RUN>/run.json, with argv.redacted.json and events.jsonl beside it. The route, the exposure profile and the conformance status are frozen at dispatch. Persisted stream data passes a typed-field whitelist: no free-text provider or runtime error bodies, and no model field unless routing policy record_model_names is true. Raw streams stay in the ephemeral run directory and are deleted at close.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M2",
+  "type": "object",
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/runId" },
+    "subject": {
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/proposalId" },
+        { "$ref": "common.schema.json#/$defs/taskId" }
+      ]
+    },
+    "seat": { "$ref": "common.schema.json#/$defs/seat" },
+    "mode": { "description": "Descriptor mode id.", "$ref": "common.schema.json#/$defs/slug" },
+    "route": { "$ref": "routing.schema.json#/$defs/route" },
+    "runtime_version": { "type": "string", "minLength": 1 },
+    "brief": { "$ref": "common.schema.json#/$defs/briefId" },
+    "prompt": {
+      "description": "Prompt provenance hash of the seat contract, skill, overlays, descriptor and keel version.",
+      "$ref": "common.schema.json#/$defs/promptId"
+    },
+    "exposure": { "$ref": "#/$defs/exposureProfile" },
+    "conformance_status": { "$ref": "common.schema.json#/$defs/conformanceStatus" },
+    "submit_channel": { "$ref": "common.schema.json#/$defs/submitChannel" },
+    "rung": {
+      "description": "The rung of the mode used; null for the direct lane, which sits outside the A-D ladder.",
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/rung" }, { "type": "null" }]
+    },
+    "argv": { "$ref": "#/$defs/argvRedacted" },
+    "started_at": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+    "ended_at": {
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/isoDateTime" }, { "type": "null" }]
+    },
+    "outcome": {
+      "description": "null while the run is active.",
+      "anyOf": [{ "$ref": "#/$defs/outcome" }, { "type": "null" }]
+    },
+    "exit_code": {
+      "anyOf": [{ "type": "integer" }, { "type": "null" }]
+    },
+    "budget": {
+      "anyOf": [{ "$ref": "goals.schema.json#/$defs/budget" }, { "type": "null" }]
+    }
+  },
+  "required": [
+    "id",
+    "subject",
+    "seat",
+    "mode",
+    "route",
+    "runtime_version",
+    "brief",
+    "prompt",
+    "exposure",
+    "conformance_status",
+    "submit_channel",
+    "rung",
+    "argv",
+    "started_at",
+    "ended_at",
+    "outcome",
+    "exit_code"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "argvRedacted": {
+      "description": "argv.redacted.json: the argv as spawned (shell:false), with every environment reference kept as ${ENV:NAME}. No route puts a model name, URL or key in argv.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "exposureProfile": {
+      "description": "The exposure profile doctor reports per runtime and OS. A code-executing seat is dispatched only on scrubbed env and none or blocked files.",
+      "type": "object",
+      "properties": {
+        "tool_env_exposure": { "$ref": "common.schema.json#/$defs/toolEnvExposure" },
+        "tool_file_exposure": { "$ref": "common.schema.json#/$defs/toolFileExposure" },
+        "control_plane_exposure": { "$ref": "common.schema.json#/$defs/controlPlaneExposure" },
+        "shim_coverage": {
+          "description": "Coverage of the advisory git/jj shims in the runtime's shell.",
+          "enum": ["full", "partial", "none", "unknown"]
+        }
+      },
+      "required": ["tool_env_exposure", "tool_file_exposure", "control_plane_exposure", "shim_coverage"],
+      "additionalProperties": false
+    },
+    "outcome": {
+      "description": "Canonical run outcomes. killed comes from keel's own cancellation journal.",
+      "enum": [
+        "completed",
+        "failed",
+        "killed",
+        "timeout",
+        "turn_limit",
+        "budget",
+        "input_error",
+        "runtime_unavailable"
+      ]
+    },
+    "event": {
+      "description": "One line of events.jsonl.",
+      "type": "object",
+      "properties": {
+        "seq": { "type": "integer", "minimum": 0 },
+        "ts": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+        "kind": {
+          "enum": [
+            "session.init",
+            "message",
+            "tool_use",
+            "tool_result",
+            "usage",
+            "compaction",
+            "subagent",
+            "error",
+            "final"
+          ]
+        },
+        "tool": {
+          "anyOf": [
+            { "description": "Native tool name.", "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "paths": {
+          "description": "Paths a tool call touched; ingest fails the run on any path in the provider path set.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "tokens": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "input": { "type": "integer", "minimum": 0 },
+                "output": { "type": "integer", "minimum": 0 }
+              },
+              "required": ["input", "output"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "cost_usd": {
+          "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }]
+        },
+        "error_class": {
+          "description": "Error class only; never an error body.",
+          "anyOf": [
+            {
+              "enum": ["auth", "rate_limit", "network", "schema", "timeout", "other"]
+            },
+            { "type": "null" }
+          ]
+        },
+        "model": {
+          "description": "Runtime-reported model id, kept only when record_model_names is true.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": ["seq", "ts", "kind"],
+      "additionalProperties": false
+    }
+  }
+}

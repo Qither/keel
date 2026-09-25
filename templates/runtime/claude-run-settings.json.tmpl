@@ -1,0 +1,51 @@
+{{! claude-run-settings.json.tmpl: the per-run, keel-owned settings file passed to a headless Claude Code
+  seat as --settings <run>/claude-settings.json, next to --setting-sources project and
+  --strict-mcp-config. It is never merged into .claude/settings.json.
+  Rendering: scalar values are escaped for a JSON string; tokens ending in _json are inserted as JSON.
+  permission_mode is plan or acceptEdits from the seat's execution class; bypass modes are never rendered.
+  allow_rules_json comes from the seat contract (the --allowedTools list plus declared commands).
+  deny_rules_json combines Read and Edit denials for the descriptor's provider path set (names resolved to
+  paths in memory, never opened), .keel and frozen test paths for builders, and Bash patterns for the
+  reserved actions in org/reserved-actions.yaml.
+  keel_command is keel's own resolved invocation (node plus script path, never a .cmd shim).
+  Hook event names and the SessionStart compact matcher: verification_status documented. }}
+{
+  "permissions": {
+    "defaultMode": "{{permission_mode}}",
+    "allow": {{allow_rules_json}},
+    "deny": {{deny_rules_json}}
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook post-compact --runtime claude-code" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook pre-tool-use --runtime claude-code" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook post-tool-use --runtime claude-code" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook stop --runtime claude-code" }
+        ]
+      }
+    ]
+  }
+}

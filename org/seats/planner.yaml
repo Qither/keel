@@ -1,0 +1,63 @@
+# org/seats/planner.yaml: the planner seat contract (schemas/seat.schema.json).
+# Canonical; docs/01-org-model.md summarizes it. Reserved actions come from org/reserved-actions.yaml.
+
+seat: planner
+duty: >-
+  Turns an approved intent into plan.yaml and workorders/T<n>.yaml. Each work order carries covers (ACC,
+  R), after, write_set, frozen_tests, interfaces consumed and produced, the ACC to acceptance command and
+  matrix-row table, the global constraints copied verbatim, a review focus of at most 5 items, stop
+  classes, a route hint and a budget. Also writes triage records (confirm, upgrade, propose dismissal),
+  issues plan rulings and runs the BLOCKED remedy ladder.
+assumption: >-
+  A separate planner catches coverage gaps, interface mismatches and self-certifying tasks that an
+  engineer planning its own work would miss. Measured by plan-gate FAIL and CONCERNS rates and by
+  verification-gap findings on the ACC to command table; without measured yield, the Steward-derived
+  single work order of the patch track can extend to small features.
+inputs:
+  - "brief BR-* for subject P (ACK set: ACC ids, R refs)"
+  - approved frozen intent, spec delta and, on system, arch delta
+  - impact per task, series churn and hot files
+  - findings and verdicts (for triage)
+outputs:
+  - plan.yaml
+  - work orders (workorders/T<n>.yaml)
+  - triage records (TR-*, through keel api submit)
+  - rulings
+  - result.json
+writable:
+  globs:
+    - .keel/proposals/*/plan.yaml
+    - .keel/proposals/*/workorders/*.yaml
+api_ops:
+  - ack
+  - ask
+  - rule
+  - submit
+  - context
+execution_class: read-only
+ack_id_set:
+  - acceptance
+  - requirement
+output_schema: schemas/result.schema.json
+submit_channels:
+  - final-message
+  - mcp
+  - outbox
+default_tier: frontier
+independent_of: []
+may:
+  - author plan.yaml and workorders/*.yaml of its proposal, returned in the result's files; the Steward writes them into the planning worktree
+  - submit triage records (TR) through keel api submit; the Steward validates and stores them
+  - keel api ack|ask|rule|submit, and read context through keel api context or MCP keel_context
+  - issue plan rulings and run the BLOCKED remedy ladder
+  - confirm a finding, upgrade its severity or propose a dismissal, citing evidence
+may_not:
+  - edit code or tests
+  - change intent or ACC (asks go to product or the Board)
+  - dismiss an independent critical or important finding (only the Board dismisses)
+  - choose a worker's next task or claim tasks
+  - override a plan-gate FAIL
+  - approve anything, or relay an approval
+  - run a shell or declared commands (execution class read-only)
+  - take any action listed in org/reserved-actions.yaml
+  - open provider or credential paths (checked at ingest)

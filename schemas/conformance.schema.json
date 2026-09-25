@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/conformance.schema.json",
+  "title": "keel conformance (deferred stub)",
+  "description": "Deferred to M6: conformance scenarios (conformance/scenarios.yaml) and results (.git/keel/conformance/<runtime>@<ver>/<alias>@<rev>.json). Plumbing checks run against scripted fakes in CI; behaviour checks run against real routes when the user opts in. Conformance status per (seat, runtime, alias, revision) is verified, failed or unverified. Only the minimal shape below is checked; other fields are allowed until M6 fixes it.",
+  "x-keel-status": "stub",
+  "x-keel-milestone": "M6",
+  "anyOf": [{ "$ref": "#/$defs/scenarioTable" }, { "$ref": "#/$defs/result" }],
+  "$defs": {
+    "scenarioTable": {
+      "type": "object",
+      "properties": {
+        "scenarios": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/scenario" },
+          "minItems": 1
+        }
+      },
+      "required": ["scenarios"]
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/slug" },
+        "kind": {
+          "enum": ["plumbing", "behaviour"]
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "repetitions": {
+          "description": "Behaviour checks run at least 5 times, with a no-guidance control.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["id", "kind", "title"]
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "seat": { "$ref": "common.schema.json#/$defs/seat" },
+        "route": { "$ref": "routing.schema.json#/$defs/route" },
+        "runtime_version": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "common.schema.json#/$defs/conformanceStatus" },
+        "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }
+      },
+      "required": ["seat", "route", "status"]
+    }
+  }
+}

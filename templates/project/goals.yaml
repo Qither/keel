@@ -1,0 +1,19 @@
+# .keel/goals.yaml (schemas/goals.schema.json). Board-owned; takes effect only once signed:
+#   keel approve --doc .keel/goals.yaml
+# Replace every {{token}} before signing. Goal ids G-nn are serialized by the Board. Every proposal must
+# cite at least one active goal, and every brief's why-chain starts at its goal.
+# Goal progress = requirements verified at head / total.
+charter_version: "{{charter_version}}"
+goals:
+  - id: G-01
+    objective: "{{goal_objective}}"
+    # An observable signal that says the objective is met.
+    success_signal: "{{goal_success_signal}}"
+    non_goals:
+      - "{{goal_non_goal}}"
+    # Limit for all proposals citing this goal (usd, runs and/or wall_minutes), or null. keel warns at
+    # the configured percentage and blocks at 100% until `keel approve <subject> --rule budget`.
+    budget:
+      usd: 100
+    # active | paused | done | dropped. Only active goals may be cited by new proposals.
+    status: active

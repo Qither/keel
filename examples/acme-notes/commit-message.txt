@@ -1,0 +1,35 @@
+# examples/acme-notes/commit-message.txt: the Steward's round commit P-7F3K9Q.T2.r1 on branch
+# keel/P-7F3K9Q/t/2 (commit 3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493 in the ledger sample). Lines that start
+# with # are commentary; git strips them from a commit message. Ids are those of the golden example;
+# hash-derived ids (BR, PG, RL) are illustrative.
+#
+# The seat never commits and never writes trailers. The Steward commits the worktree tree when it ingests the
+# submit, and then runs the submit gate on this commit; a round whose gate fails keeps its commit on the task
+# branch and never enters verification. Multi-valued trailers repeat one line per value (arrays in JSON
+# records, see schemas/common.schema.json#/$defs/roundTrailers). Keel-Ruling and Not-tested are optional; this
+# round has one of each.
+notes: normalize and store note tags
+
+Store tags inside the note record through TagStore.addTag, trimmed,
+NFC-normalized and lowercased, at most once per note (ADR-7KQ2B).
+Notes saved without a tags array load with no tags.
+
+Keel-Round: P-7F3K9Q.T2.r1
+Keel-Req: R-notes-4QX7B#S1
+Keel-Req: R-notes-4QX7B#S2
+Keel-Acc: P-7F3K9Q#ACC-01
+Keel-Acc: P-7F3K9Q#ACC-02
+Keel-Seat: engineer
+Keel-Run: RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A
+Keel-Runtime: claude-code@2.1.259
+Keel-Brief: BR-9e4c1a7b2d05
+Keel-Prompt: PG-4d8f0b2c6a13
+Keel-Charter: 1.0.0
+Keel-Ruling: RL-2c7e9a4b6d18
+Not-tested: Concurrent addTag calls on the same note (the store is single-writer).
+# The other trailer family belongs to governance and archive commits (schemas/common.schema.json
+# #/$defs/governanceTrailers). The archive commit that landed P-7F3K9Q
+# (cd24b712d0dcd55228fcfd30be9707c5decf94fb) carries exactly these two:
+#
+#   Keel-Doc: .keel/archive/2026/P-7F3K9Q-note-tags/receipt.md
+#   Keel-Approval: AP-7a1c3e5f9b2d

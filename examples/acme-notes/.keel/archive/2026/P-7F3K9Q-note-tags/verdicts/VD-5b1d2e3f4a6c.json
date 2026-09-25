@@ -1,0 +1,27 @@
+{
+  "kind": "verdict",
+  "lens": "blind-diff",
+  "subject": "P-7F3K9Q.T2",
+  "brief_hash": "BR-7f9b1d3e5a68",
+  "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+  "diff_digest": "ce9b8ca9f55e304b83e4c9dd94c7a1204ee3605b74ba38396d5cd531621487f6",
+  "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+  "spec_verdict": "meets",
+  "readings": [],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "minor",
+      "title": "Duplicate check scans the whole tags array",
+      "detail": "addTag checks for an existing tag with Array.includes on every call. Fine for the handful of tags a note has; a Set would matter only if notes carried hundreds of tags.",
+      "location": {
+        "path": "src/store/tags.ts",
+        "line": 27
+      },
+      "clause": null
+    }
+  ],
+  "declined": [],
+  "recommendation": "approve",
+  "summary": "The diff trims, NFC-normalizes and lowercases tags before storing them and skips a tag the note already has. Old records without tags load as empty. No tag value is logged. One minor finding."
+}

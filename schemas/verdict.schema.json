@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/verdict.schema.json",
+  "title": "keel lens verdict",
+  "description": "A reviewer lens verdict (L10), captured at ingest from the child's final message, the MCP submit tool or the outbox and stored as VD-<sha12>.json. It binds the commit, the diff digest, the contract hash and the packet brief; a verdict bound to another contract hash is stale and ignored. The declared family of the lane is recorded by the Steward in the ledger, not by the seat.",
+  "$comment": "Authored in the OpenAI strict subset (every property required, additionalProperties false, null unions instead of optional fields); scripts/validate.mjs lints it. Before passing it to a runtime flag the dispatcher bundles the $refs and strips $schema, $id, $comment, title and x-keel-* annotations.",
+  "x-keel-strict-subset": true,
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M3",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "enum": ["verdict"]
+    },
+    "lens": { "$ref": "common.schema.json#/$defs/lens" },
+    "subject": {
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/proposalId" },
+        { "$ref": "common.schema.json#/$defs/taskId" }
+      ]
+    },
+    "brief_hash": {
+      "description": "BR echo of the review packet.",
+      "$ref": "common.schema.json#/$defs/briefId"
+    },
+    "commit": { "description": "The exact commit reviewed.", "$ref": "common.schema.json#/$defs/gitOid" },
+    "diff_digest": {
+      "description": "Digest of the reviewed diff, echoed from the packet.",
+      "$ref": "common.schema.json#/$defs/sha256"
+    },
+    "contract_hash": {
+      "description": "Contract hash echoed from the packet.",
+      "$ref": "common.schema.json#/$defs/sha256"
+    },
+    "spec_verdict": { "$ref": "#/$defs/specVerdict" },
+    "readings": {
+      "description": "intent-alignment lens: the defensible readings of the frozen intent and whether the diff implements each; empty for other lenses.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/reading" }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "declined": {
+      "description": "Items the lens declined to judge, with reasons.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/declinedItem" }
+    },
+    "recommendation": { "$ref": "common.schema.json#/$defs/recommendation" },
+    "summary": { "type": "string" }
+  },
+  "required": [
+    "kind",
+    "lens",
+    "subject",
+    "brief_hash",
+    "commit",
+    "diff_digest",
+    "contract_hash",
+    "spec_verdict",
+    "readings",
+    "findings",
+    "declined",
+    "recommendation",
+    "summary"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "specVerdict": {
+      "description": "Overall judgement against the lens question. intent_gap saves the patch and returns the proposal to framing; cannot_verify triggers a Steward re-run or an override.",
+      "enum": ["meets", "partial", "diverges", "intent_gap", "cannot_verify"]
+    },
+    "reading": {
+      "type": "object",
+      "properties": {
+        "reading": { "type": "string" },
+        "implemented": { "type": "boolean" }
+      },
+      "required": ["reading", "implemented"],
+      "additionalProperties": false
+    },
+    "finding": {
+      "description": "A finding. critical and important findings close only through a fix plus a scoped re-review by the same lane, or keel approve --rule dismiss.",
+      "type": "object",
+      "properties": {
+        "id": { "description": "Finding id, unique within the verdict, for example F1.", "type": "string" },
+        "severity": { "$ref": "common.schema.json#/$defs/findingSeverity" },
+        "title": { "type": "string" },
+        "detail": { "type": "string" },
+        "location": {
+          "anyOf": [{ "$ref": "#/$defs/location" }, { "type": "null" }]
+        },
+        "clause": {
+          "description": "Id of the clause the finding cites (ACC, R, INV or obligation), or null.",
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["id", "severity", "title", "detail", "location", "clause"],
+      "additionalProperties": false
+    },
+    "location": {
+      "description": "file:line of a finding.",
+      "type": "object",
+      "properties": {
+        "path": { "$ref": "common.schema.json#/$defs/repoPath" },
+        "line": {
+          "type": ["integer", "null"]
+        }
+      },
+      "required": ["path", "line"],
+      "additionalProperties": false
+    },
+    "declinedItem": {
+      "type": "object",
+      "properties": {
+        "item": { "type": "string" },
+        "reason": { "type": "string" }
+      },
+      "required": ["item", "reason"],
+      "additionalProperties": false
+    }
+  }
+}

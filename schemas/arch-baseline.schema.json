@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/arch-baseline.schema.json",
+  "title": "keel architecture baseline",
+  "description": "Frozen known violations, .keel/arch/baseline.json. The baseline shrinks freely and grows only through a contract approval.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M4",
+  "type": "object",
+  "properties": {
+    "commit": {
+      "description": "Commit the baseline was last frozen or shrunk at.",
+      "$ref": "common.schema.json#/$defs/gitOid"
+    },
+    "violations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/violation" }
+    }
+  },
+  "required": ["commit", "violations"],
+  "additionalProperties": false,
+  "$defs": {
+    "violation": {
+      "description": "A known violation.",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Stable key: the first 12 hex characters of sha256 over class, rule, from and to.",
+          "$ref": "common.schema.json#/$defs/sha12"
+        },
+        "class": { "$ref": "#/$defs/driftClass" },
+        "rule": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/archRuleId" }, { "type": "null" }]
+        },
+        "from": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/elementId" }, { "type": "null" }]
+        },
+        "to": {
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/elementId" }, { "type": "null" }]
+        },
+        "sites": {
+          "description": "Sample sites.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "$ref": "common.schema.json#/$defs/repoPath" },
+              "line": {
+                "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+              }
+            },
+            "required": ["path", "line"],
+            "additionalProperties": false
+          }
+        },
+        "provenance": { "$ref": "common.schema.json#/$defs/provenance" }
+      },
+      "required": ["key", "class", "rule", "from", "to", "sites", "provenance"],
+      "additionalProperties": false
+    },
+    "driftClass": {
+      "description": "Drift classes. Errors: undeclared-dependency, forbidden-dependency, element-cycle; warnings: unmapped-code (new unmapped files block land), ownership-gap; info: phantom-relation.",
+      "enum": [
+        "undeclared-dependency",
+        "forbidden-dependency",
+        "element-cycle",
+        "unmapped-code",
+        "phantom-relation",
+        "ownership-gap",
+        "realization-mismatch"
+      ]
+    }
+  }
+}

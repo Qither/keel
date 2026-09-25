@@ -1,0 +1,77 @@
+# .keel/config.yaml: the team layer of keel configuration (schemas/config.schema.json).
+# `keel init` copies this template and fills the {{tokens}} it knows; review it like code.
+#
+# Layering: package defaults (config/keel.defaults.yaml) -> this file -> .keel/local.yaml (gitignored,
+# personal, never secrets). Tables deep-merge, arrays keyed by id replace whole entries, unknown keys are
+# errors. Every key is optional here; leave out what the team does not change.
+#
+# Provider endpoints, API keys and model names never go here or in local.yaml. The Board-signed
+# .keel/routing.yaml names environment variables only; the values live in your own environment.
+
+vcs:
+  # auto | git | jj. auto picks jj only when every jj precondition holds and jj_opt_in is true
+  # (docs/05). git alone is fully sufficient.
+  backend: auto
+  trunk: "{{trunk}}"
+  # Remotes the Steward snapshots with a read-only `git ls-remote` before and after each run.
+  remotes:
+    - origin
+  jj_opt_in: false
+
+# Planning, task and verify worktrees plus per-run directories live outside the repository.
+# Default: ../<repo>.ws/
+workspace_root: "{{workspace_root}}"
+
+trace:
+  # Trace epoch: history before this commit is adopted, never guessed. Set once by `keel init`.
+  since: "{{trace_since_commit}}"
+
+tracks:
+  # Touching these paths raises the track and needs a per-change contract approval.
+  protected_globs: []
+
+index:
+  # codegraph | scip | heuristic | none. heuristic is advisory only and none is an honest "no index";
+  # doctor reports the architecture checks as inert with either.
+  backend: none
+
+land:
+  # Name of a Board-signed standing land policy in .keel/policies/, or null to require a land approval
+  # per change (recommended on shared trunks).
+  policy: null
+
+# Declared project commands. Seats may run them (that produces no evidence); gates run the ids listed
+# under gates; only the Steward runner's executions count. Commands run without a shell, so write them
+# as argv arrays. Example for an npm project:
+#
+# commands:
+#   - id: build
+#     purpose: build              # bootstrap | build | test | lint | typecheck | other
+#     command:
+#       argv: ["npm", "run", "build"]
+#   - id: test
+#     purpose: test
+#     command:
+#       argv: ["npm", "test"]
+#       junit: reports/junit.xml  # rows tagged [R-<area>-<5>#S<n>] map results to scenarios
+# gates:
+#   submit:
+#     commands: [build]
+#   verify:
+#     commands: [test]
+commands: []
+
+# Package defaults you may override, each with the reason next to the value
+# (config/keel.defaults.yaml documents every default and why it was chosen):
+#
+# tracks:
+#   patch: {max_sessions: 1, max_files: 5, max_loc: 100}
+# caps:
+#   max_parallel: 3
+#   fix_rounds: 5
+# brief:
+#   max_bytes: 24576             # ACC and must/must_not obligations never truncated
+# budget:
+#   warn_at_percent: 80
+# arch:
+#   unknown: block               # default | block; settings can tighten the unknown policy, never loosen it

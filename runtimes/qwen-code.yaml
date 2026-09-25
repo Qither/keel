@@ -1,0 +1,240 @@
+# runtimes/qwen-code.yaml: runtime descriptor for Qwen Code (schemas/runtime-descriptor.schema.json).
+#
+# Written against 0.21.7, installed locally, with the 0.24.x documentation. The descriptor as a whole
+# stays unverified until keel doctor's probes pass on the installed version; each group of facts carries
+# its own verification_status, and every unverified fact is verify by probe (capability_probes below).
+# Placeholders in {braces} are filled by the dispatcher (runtimes/README.md); none ever expands to a
+# provider value, and native provider variable names appear only under provider.native_env.
+
+id: qwen-code
+display_name: Qwen Code
+kind: cli
+verification_status: unverified
+tested_version: "0.21.7"
+min_version: "0.21.7"
+
+binary:
+  name: qwen
+  windows_resolution: npm-shim-to-script
+  shell: false
+  verification_status: unverified
+
+git_required: false
+
+# Default context files; nothing to set.
+instruction_files:
+  - QWEN.md
+  - AGENTS.md
+
+# Qwen scans .qwen/skills and .agents/skills with the first match winning, so keel writes no
+# .qwen/skills copy.
+skills:
+  dirs:
+    - .agents/skills
+  agent_files: []
+  verification_status: probed
+
+prompt_channel:
+  kind: stdin-with-fixed-prompt
+  fixed_prompt: Follow the brief on stdin.
+  flag: null
+  verification_status: documented
+
+structured_output:
+  mechanism: native-schema
+  schema_flag: --json-schema
+  output_flag: null
+  verification_status: documented
+
+schema_flag_takes: path
+
+# Rung C applies until the hook probe (hooks-block) passes on the installed version: hooks come only from
+# a printed snippet and new keel worktrees start untrusted, so no hook loads in a headless run. Native
+# schema output (--json-schema) is a separate capability that both modes keep. Once the probe passes, both
+# modes become rung A candidates.
+modes:
+  - id: plan
+    execution_class: read-only
+    argv:
+      - --approval-mode
+      - plan
+    submit_channel: final-message
+    rung: C
+    seats:
+      - product
+      - architect
+      - planner
+      - reviewer
+    verification_status: documented
+  - id: auto-edit
+    execution_class: code-executing
+    argv:
+      - --approval-mode
+      - auto-edit
+    submit_channel: final-message
+    rung: C
+    seats:
+      - engineer
+    verification_status: documented
+
+argv_template:
+  - -p
+  - "{fixed_prompt}"
+  - -o
+  - stream-json
+  - "{mode_argv}"
+  - --allowed-tools
+  - "{allowed_tools}"
+  - --json-schema
+  - "@{result_schema_path}"
+  - --include-directories
+  - "{run_dir}"
+  - "{budget_argv}"
+  - "{session_argv}"
+
+parser: qwen-stream-json
+
+session:
+  id_flag: null
+  resume:
+    - -r
+    - "{session_id}"
+  fork: []
+  verification_status: documented
+
+cwd: workspace
+
+budget_flags:
+  - kind: turns
+    flag: --max-session-turns
+    verification_status: probed
+  - kind: wall_time
+    flag: --max-wall-time
+    verification_status: probed
+  - kind: tool_calls
+    flag: --max-tool-calls
+    verification_status: probed
+
+exit_codes:
+  - code: 0
+    outcome: completed
+  - code: 1
+    outcome: failed
+  - code: 42
+    outcome: input_error
+  - code: 53
+    outcome: turn_limit
+  - code: 55
+    outcome: budget
+  - code: 143
+    outcome: killed
+    posix_only: true
+
+env_scrub:
+  control: null
+  expected: unknown
+  verification_status: unverified
+
+provider:
+  protocols:
+    - openai-chat
+    - anthropic-messages
+  auth_modes:
+    - env
+    - runtime-login
+  native_env:
+    - protocol: openai-chat
+      from: base_url
+      name: OPENAI_BASE_URL
+    - protocol: openai-chat
+      from: api_key
+      name: OPENAI_API_KEY
+    - protocol: openai-chat
+      from: model
+      name: OPENAI_MODEL
+    - protocol: anthropic-messages
+      from: base_url
+      name: ANTHROPIC_BASE_URL
+    - protocol: anthropic-messages
+      from: api_key
+      name: ANTHROPIC_API_KEY
+    - protocol: anthropic-messages
+      from: model
+      name: ANTHROPIC_MODEL
+
+provider_path_set:
+  home_env: []
+  paths:
+    - "{workspace_root}/_runs/*/raw/"
+    - ~/.qwen/
+    - .qwen/settings.json
+    - .qwen/.env
+  dotenv: true
+
+permissions:
+  mechanism: flags
+  deny_read: false
+  never_generate:
+    - --yolo
+    - -y
+    - yolo
+  verification_status: documented
+
+bypass_equivalent: false
+
+trust:
+  project_layers: trusted-only
+  override_flags: []
+  verification_status: documented
+
+hooks:
+  delivery: printed-snippet
+  blocking_exit_code: 2
+  verification_status: documented
+
+control_plane_exposure: exposed
+
+capability_probes:
+  - id: hooks-block
+    claim: Hooks registered with Claude-style event names block with exit code 2 (PreToolUse) in a trusted folder.
+    verification_status: unverified
+    min_version: null
+  - id: post-compact-reinject
+    claim: PostCompact exists and its output reaches the model after compaction.
+    verification_status: unverified
+    min_version: null
+  - id: per-run-settings-by-flag
+    claim: A per-run settings file (for example modelProviders entries with envKey names) can be passed by flag instead of the shared .qwen/settings.json.
+    verification_status: unverified
+    min_version: null
+  - id: anthropic-route
+    claim: The anthropic-messages route works through the ANTHROPIC_* names mapped in memory.
+    verification_status: unverified
+    min_version: null
+  - id: budget-flags
+    claim: --max-session-turns, --max-wall-time and --max-tool-calls are accepted although hidden from --help, and end the run with exit 53 or 55.
+    verification_status: probed
+    min_version: "0.21.7"
+  - id: agents-skills-dir
+    claim: Skills are discovered under .agents/skills.
+    verification_status: probed
+    min_version: "0.21.7"
+  - id: env-scrub
+    claim: Provider variables can be kept out of shell tool subprocesses, and the control that does it is identified.
+    verification_status: unverified
+    min_version: null
+  - id: mcp-outside-sandbox
+    claim: The keel MCP server runs outside the tool sandbox, so keel_submit works in plan mode.
+    verification_status: unverified
+    min_version: null
+  - id: windows-resolution
+    claim: The qwen npm shim resolves to its node entry script without a shell.
+    verification_status: unverified
+    min_version: null
+
+notes:
+  - Rung C until the hook probe passes, then a rung A candidate; native schema output holds at either rung.
+  - Stdin is appended to the -p text, so the brief reaches the model as a user message.
+  - Deny rules by path are not available; only --allowed-tools and tool exclusions restrict a seat, so tool_file_exposure is none only when no path in the provider path set exists.
+  - Routes that need a per-run settings file are refused until the per-run-settings-by-flag probe passes; keel never writes .qwen/settings.json.
+  - Can host Qwen-family models (declared family alibaba) and GLM (declared family zhipu) through openai-chat or anthropic-messages endpoints the user sets.

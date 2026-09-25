@@ -1,0 +1,47 @@
+# .keel/policies/quick-patch.yaml (schemas/policy.schema.json). A standing contract policy for small
+# patches. Board-signed and revocable: keel approve --policy quick-patch
+# Every receipt of a change made under this policy lists it.
+#
+# A change enters this path only through `keel new "<title>" --policy quick-patch`, where the Board signs
+# the verbatim request (one touch). The policy then stands in for the per-change contract approval, and
+# the Steward derives the single work order deterministically. Every predicate is checked by code, at
+# intake and again on the actual diff at submit (the track can only rise); a change that fails any
+# predicate needs a per-change contract approval instead. New acceptance criteria always do.
+#
+# Land follows the land policy named in .keel/config.yaml (land.policy). With none, the Board signs a
+# land approval per change. After a land under a land policy, the Board acknowledges the receipt:
+#   keel approve <P> --stage receipt
+id: quick-patch
+# contract: stands in for the per-change contract approval. land: stands in for the land approval.
+kind: contract
+summary: "Small, single-element patches with a Board-signed request, red/green proof and two lenses."
+charter_version: "{{charter_version}}"
+track: patch
+
+predicates:
+  max_sessions: 1
+  max_files: 5
+  max_loc: 100
+  # One architecture element, or only paths no element maps.
+  max_elements: 1
+  touches_protected_globs: false
+  touches_invariants: false
+  touches_obligations: false
+  touches_arch_rules: false
+  touches_contracts: false
+  touches_public_api: false
+  # Always false: new acceptance criteria need a per-change contract approval.
+  adds_acceptance: false
+
+requires:
+  # The Board-signed request envelope on the proposal.created event.
+  signed_request: true
+  # At least one cited scenario, or a test fixed first by a different-family test task, must fail at the
+  # base commit and pass at the change commit when the runner executes it.
+  red_green_proof: true
+  # Lens set by name; its lenses are listed only in org/seats/reviewer.yaml. It runs on a declared family
+  # different from the engineer's. Always on for changes made under this policy.
+  lens_set: policy
+
+# Date or date-time after which the policy stops applying, or null. Revoke earlier by signing a removal.
+expires: null

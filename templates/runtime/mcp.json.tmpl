@@ -1,0 +1,18 @@
+{{! mcp.json.tmpl: the per-run MCP registration, <run>/mcp.json, passed to Claude Code as
+  --strict-mcp-config --mcp-config <run>/mcp.json; runtimes with other registration formats get the same
+  server through their own per-run config. keel api mcp serves two read tools (keel_context, keel_arch)
+  and one outbox-only write tool (keel_submit), each validated by the Steward at ingest.
+  Rendering: scalar values are escaped for a JSON string; tokens ending in _json are inserted as JSON.
+  keel_command_json is keel's resolved executable; keel_args_json holds its script path (if any) followed
+  by api and mcp. mcp_env_json carries only keel's own run variables (KEEL_RUN_ID), never a provider
+  value; it is an empty object when the snippet is printed for interactive use.
+  Whether MCP servers run outside a runtime's tool sandbox: verification_status unverified. }}
+{
+  "mcpServers": {
+    "keel": {
+      "command": {{keel_command_json}},
+      "args": {{keel_args_json}},
+      "env": {{mcp_env_json}}
+    }
+  }
+}

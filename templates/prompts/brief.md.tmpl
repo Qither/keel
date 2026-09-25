@@ -1,0 +1,269 @@
+{{! brief.md.tmpl: the single brief template. `keel brief <P|P.Tn> --seat <seat>` and every dispatch render
+  it from the brief IR through the logic-less Mustache subset keel uses: values, sections that repeat per
+  item or render once when true, inverted sections that render when empty or false, and dropped comments
+  like this one. No HTML escaping. The JSON companion is schemas/brief.schema.json.
+
+  Regions:
+  - header: brief id, stamps, freshness and section input hashes. Not hashed.
+  - body: between the keel:brief:body markers. BR-<sha12> is the sha256 of the body after LF, BOM and
+    NFC normalization; the same bytes go through every channel, and the golden hash is identical on a
+    Windows CRLF checkout and on Linux. Each level-2 heading is one brief section; its id from
+    schemas/brief.schema.json is given in the header's hash list.
+  - The runtime wrapper (a fixed short instruction, an agent-file frontmatter) is added by the runtime
+    templates outside this file and is never hashed.
+
+  The compiler selects slices: the why-chain, covered requirements and ACC, INV and obligations whose
+  applies_to intersects the write set, the element brief and impact. Sections with no slice for this
+  seat and subject are omitted. A review packet never contains the engineer's transcript or rationale;
+  the intent-alignment packet holds only the frozen intent and the diff.
+  Budget: per runtime profile. ACC items and must and must_not obligations are never truncated; an over-budget brief
+  means the task must be split. Nothing here may carry a provider value; records use env NAMES only. }}
+# keel brief {{id}}
+
+<!-- keel:brief:header -->
+- Seat: {{seat}}
+- Subject: {{subject}}
+- Runtime: {{runtime}}; submit channel: {{submit_channel}}
+- Track: {{track}}; tier: {{tier}}
+- Charter version: {{freshness.charter_version}}
+{{#contract_hash}}
+- Contract hash: `{{contract_hash}}`
+{{/contract_hash}}
+- Freshness: computed {{freshness.computed_at}} at head `{{freshness.head_commit}}`
+{{#freshness.index_commit}}
+- Index commit: `{{freshness.index_commit}}`
+{{/freshness.index_commit}}
+{{^freshness.index_commit}}
+- Index commit: none
+{{/freshness.index_commit}}
+- Body: {{bytes}} of {{budget_bytes}} bytes
+- Section input hashes:
+{{#sections}}
+  - {{id}} ({{class}}): `{{sha256}}`{{#truncated}} (context truncated to budget){{/truncated}}
+{{/sections}}
+
+<!-- keel:brief:body:start -->
+{{#why_chain}}
+## Why this work exists
+
+Charter: {{charter_mission}}
+
+{{#goals}}
+Goal {{id}}: {{objective}}
+- Success signal: {{signal}}
+{{#non_goals}}
+- Non-goal: {{.}}
+{{/non_goals}}
+{{/goals}}
+{{/why_chain}}
+{{#has_requirements}}
+
+## Requirements (verbatim)
+
+{{/has_requirements}}
+{{#requirements}}
+- {{id}} (rev `{{rev_hash}}`): {{statement}}
+{{#scenarios}}
+  - {{id}}: Given {{given}}; when {{when}}; then {{then}}.
+{{/scenarios}}
+{{/requirements}}
+{{#frozen_intent}}
+
+## Frozen intent (verbatim)
+
+~~~~text
+{{frozen_intent}}
+~~~~
+{{/frozen_intent}}
+{{#work_order}}
+
+## Work order {{id}}: {{title}}
+
+- Kind: {{kind}}
+- Covers: {{covers}}
+- After: {{after}}
+{{#consumes}}
+- Consumes {{name}} from {{from}}
+{{/consumes}}
+{{#produces}}
+- Produces {{name}}: {{contract}}
+{{/produces}}
+
+Acceptance (ACC -> command). The Steward's runner executes these commands; your own runs produce no
+evidence.
+
+| ACC | Evidence mode | Commands | Rows that must pass |
+| --- | --- | --- | --- |
+{{#acceptance}}
+| {{acc}} | {{evidence_mode}} | `{{command_text}}` | {{rows}} |
+{{/acceptance}}
+
+Global constraints (verbatim):
+{{#global_constraints}}
+- {{.}}
+{{/global_constraints}}
+
+Review focus:
+{{#review_focus}}
+- {{.}}
+{{/review_focus}}
+{{#notes}}
+
+Task notes: {{notes}}
+{{/notes}}
+{{/work_order}}
+{{#packet}}
+
+## Review packet: lens {{lens}}
+
+- Task: {{task}}
+- Commit: `{{commit}}`
+- Diff digest: `{{diff_digest}}`
+- Contract hash: `{{contract_hash}}`
+{{#diff_path}}
+- Diff: `{{diff_path}}`; detached checkout of the commit: `{{checkout_path}}`
+{{/diff_path}}
+{{#evidence}}
+- Evidence {{id}}: `{{command_text}}` exited {{exit_code}} ({{status}})
+{{/evidence}}
+{{#diff_inline}}
+
+~~~~diff
+{{diff_inline}}
+~~~~
+{{/diff_inline}}
+
+Lens instructions:
+
+{{lens_instructions}}
+{{/packet}}
+{{#has_invariants}}
+
+## Invariants in scope
+
+{{/has_invariants}}
+{{#invariants}}
+- {{id}} ({{level}}): {{text}} Applies to: {{applies_to}}.{{#check_text}} Check: `{{check_text}}`.{{/check_text}}
+{{/invariants}}
+{{#has_obligations}}
+
+## Obligations in scope
+
+{{/has_obligations}}
+{{#obligations}}
+- {{id}} ({{level}}): {{text}} Applies to: {{applies_to}}.{{#check_text}} Check: `{{check_text}}`.{{/check_text}}
+{{/obligations}}
+{{#element_brief}}
+
+## Element brief
+
+{{element_brief}}
+{{/element_brief}}
+{{#impact_section}}
+
+## Impact
+
+{{#text}}
+{{text}}
+{{/text}}
+{{^text}}
+Impact is unknown (no index at this commit). The path fallback applies: the track rises if the diff
+exceeds the patch limits, touches a protected or public-api glob, or spans more than one top-level
+mapping.
+{{/text}}
+{{/impact_section}}
+
+## Write set and forbidden paths
+
+{{#write_set}}
+{{#paths}}
+- May write: `{{.}}`
+{{/paths}}
+{{#symbols}}
+- May change symbol: `{{.}}`
+{{/symbols}}
+{{/write_set}}
+{{^write_set}}
+- May write: nothing. This seat is read-only for this subject.
+{{/write_set}}
+{{#frozen_tests}}
+- Frozen test (do not touch): `{{.}}`
+{{/frozen_tests}}
+{{#forbidden}}
+- Forbidden: `{{.}}`
+{{/forbidden}}
+
+## Gates your output must pass
+
+{{#gates}}
+- {{gate}}: {{checks}}
+{{/gates}}
+
+## Precedence
+
+Board ruling > invariant (INV) > accepted ADR obligation > frozen intent (ACC, non-goals, scope) >
+requirement > plan > task notes > model preference.
+
+## Decision boundaries
+
+May decide (record a ruling for each decision):
+{{#may_decide}}
+- {{.}}
+{{/may_decide}}
+
+Must ask:
+{{#must_ask}}
+- {{.}}
+{{/must_ask}}
+
+Asks route by clause: requirements and scenarios to product; architecture and obligations to the
+architect; plan steps and interfaces to the planner; ACC, scope, non-goals, INV and goals to the Board.
+
+## Stop classes
+
+These always become an ask to the Board and are never settled by a ruling:
+- irreversible_or_destructive: an operation that cannot be undone or destroys data
+- security_sensitive: credentials, permissions, secrets, authentication or trust
+- side_effect_outside_workspace: any effect outside your worktree and run directory
+- every_path_a_guess: every way forward rests on a guess
+
+## How to ACK, ask, rule and submit
+
+{{#channel_final_message}}
+Your structured final message is the submit channel. In a read-only mode, the short pre-run's final
+message is your ACK; the main run's final message is your result, and asks and rulings go in its
+fields.
+{{/channel_final_message}}
+{{#channel_mcp}}
+Use the MCP tool `keel_submit` with `op` set to `ack`, `ask`, `rule` or `submit`. `keel_context` returns
+any brief section again; `keel_arch` answers architecture queries.
+{{/channel_mcp}}
+{{#channel_outbox}}
+Write to the run outbox through keel api, one JSON payload each: `keel api ack --input - --json`,
+`keel api ask --input - --json`, `keel api rule --input - --json`, `keel api submit --input - --json`.
+`keel api context --input - --json` returns any brief section again.
+{{/channel_outbox}}
+{{#rung_d}}
+A human pasted this brief into a chat. Reply with the ACK JSON first; the human records it with
+`keel api ack`, and later your result with `keel api submit`.
+{{/rung_d}}
+
+## Output contract
+
+ACK first, before any edit. Your ACK id set must equal exactly:
+{{#ack_id_set.ids}}
+- {{.}}
+{{/ack_id_set.ids}}
+
+The ACK (schema `schemas/ack.schema.json`) also carries this brief's id as `brief_hash`, the subject, the
+seat, the objective in your own words, the non-goals, a write set that is a subset of the one above,
+your planned steps, your assumptions and your questions. A mismatch returns guidance once; a second
+mismatch blocks the subject.
+
+Then submit one result in the shape of `{{output_schema}}`, echoing this brief's id. Every field is
+required; use null for an absent value.
+{{#output_notes}}
+
+{{output_notes}}
+{{/output_notes}}
+<!-- keel:brief:body:end -->

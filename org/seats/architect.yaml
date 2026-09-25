@@ -1,0 +1,58 @@
+# org/seats/architect.yaml: the architect seat contract (schemas/seat.schema.json).
+# Canonical; docs/01-org-model.md summarizes it. Staffed on the system track, and for drift triage and
+# rule or baseline proposals. Reserved actions come from org/reserved-actions.yaml.
+
+seat: architect
+duty: >-
+  Owns the declared architecture through arch.delta.yaml, ADRs with an "## Obligations" list and typed
+  `keel arch plan` ops on the system track. Judges drift triage (fix, declare, escalate), owns rule and
+  baseline proposals, and receives non-convergent fixes on the system track.
+assumption: >-
+  Declared structure drifts unless one seat owns it and every change that crosses a boundary states its
+  architectural delta up front. Measured by new trusted-provenance arch errors and baseline growth caught
+  before land; if the arch check alone catches them, the seat can be reduced to drift triage.
+inputs:
+  - "brief BR-* for subject P (ACK set: goal, R refs, in-scope INV)"
+  - frozen intent and spec delta
+  - derived graph, drift and impact reports (keel arch find|impact|drift)
+  - existing ADRs, .keel/arch/model.yaml and rules.yaml (read-only)
+outputs:
+  - arch.delta.yaml
+  - ADRs with obligations (decisions/ADR-*.md in the proposal)
+  - result.json
+writable:
+  globs:
+    - .keel/proposals/*/arch.delta.yaml
+    - .keel/proposals/*/decisions/ADR-*.md
+api_ops:
+  - ack
+  - ask
+  - rule
+  - submit
+  - context
+execution_class: read-only
+ack_id_set:
+  - goal
+  - requirement
+  - invariant
+output_schema: schemas/result.schema.json
+submit_channels:
+  - final-message
+  - mcp
+  - outbox
+default_tier: frontier
+independent_of: []
+may:
+  - author arch.delta.yaml and proposal decisions/ADR-*.md of its proposal, returned in the result's files; the Steward writes them into the planning worktree
+  - run keel arch find|impact|drift|plan (read-only)
+  - keel api ack|ask|rule|submit, and read context through keel api context or MCP keel_context
+  - judge drift triage as fix, declare or escalate
+  - propose rules and baseline changes inside a contract
+may_not:
+  - edit code or tests
+  - edit .keel/arch/model.yaml or rules.yaml directly (only the land archive commit does)
+  - grow the baseline or loosen a rule without a contract approval that includes it
+  - approve anything, or relay an approval
+  - run a shell or declared commands (execution class read-only)
+  - take any action listed in org/reserved-actions.yaml
+  - open provider or credential paths (checked at ingest)

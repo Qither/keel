@@ -1,0 +1,15 @@
+{
+  "kind": "verdict",
+  "lens": "spec",
+  "subject": "P-7F3K9Q",
+  "brief_hash": "BR-3b5d7f9a1c24",
+  "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+  "diff_digest": "d6619bdc82e75f02e88972136384c35378e39838343009de72acff2bf79ccc0d",
+  "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+  "spec_verdict": "meets",
+  "readings": [],
+  "findings": [],
+  "declined": [],
+  "recommendation": "approve",
+  "summary": "R-notes-4QX7B is in EARS form with two testable scenarios, both covered by ACC-01 and ACC-02 with evidence mode test. Scope stays inside note storage; the non-goals exclude the HTTP API and the web UI. No open questions."
+}

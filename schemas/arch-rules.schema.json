@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/arch-rules.schema.json",
+  "title": "keel architecture rules",
+  "description": "Executable architecture rules, .keel/arch/rules.yaml. Only new errors backed by scip or tree-sitter edges fail the arch check; heuristic and LLM edges are advisory. Tightening a rule is an ordinary delta; loosening one needs a contract approval that includes it.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M4",
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "required": ["rules"],
+  "additionalProperties": false,
+  "$defs": {
+    "rule": {
+      "description": "One rule.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/archRuleId" },
+        "kind": {
+          "enum": ["forbidden", "allowed", "required", "layers", "acyclic", "independent"]
+        },
+        "from": { "$ref": "#/$defs/selector" },
+        "to": {
+          "description": "null for kinds that take one selector (acyclic, independent).",
+          "anyOf": [{ "$ref": "#/$defs/selector" }, { "type": "null" }]
+        },
+        "severity": { "$ref": "#/$defs/severity" },
+        "adr": {
+          "description": "The decision that justifies the rule, or null.",
+          "anyOf": [{ "$ref": "common.schema.json#/$defs/adrId" }, { "type": "null" }]
+        },
+        "rationale": { "type": "string", "minLength": 1 }
+      },
+      "required": ["id", "kind", "from", "to", "severity", "adr", "rationale"],
+      "additionalProperties": false
+    },
+    "selector": {
+      "description": "Element selector: exactly one of element, tag or owner.",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "element": { "$ref": "common.schema.json#/$defs/elementId" }
+          },
+          "required": ["element"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "tag": { "description": "Element tag, for example layer:web.", "type": "string", "minLength": 1 }
+          },
+          "required": ["tag"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "owner": { "description": "Owner label.", "type": "string", "minLength": 1 }
+          },
+          "required": ["owner"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "severity": {
+      "description": "Severity of a rule or drift finding.",
+      "enum": ["error", "warn", "info"]
+    }
+  }
+}

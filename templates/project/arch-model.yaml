@@ -1,0 +1,46 @@
+# .keel/arch/model.yaml (schemas/arch-model.schema.json): the declared architecture, C4 style.
+# Changed only by an arch delta applied in a land archive commit; never edit it by hand on trunk.
+# `keel init` copies this template and fills the {{tokens}} it knows; the architect seat extends the
+# model through arch.delta.yaml.
+#
+# Element ids are el:<dotted.slug>. Each file maps to the element with the most specific matching glob;
+# unmapped files are listed, never guessed. Owner labels route reviewers from M4. Each element's `adrs` list
+# is derived from the `governs` lists of accepted decisions and refreshed by keel; do not edit it.
+
+# Layer names from top to bottom. An element joins a layer through a layer:<name> tag, and a rule of kind
+# `layers` in rules.yaml enforces the order.
+layers:
+  - "{{outer_layer}}"
+  - "{{inner_layer}}"
+
+elements:
+  - id: "el:{{system_slug}}"
+    kind: system                 # system | container | component
+    parent: null
+    title: "{{system_title}}"
+    purpose: "{{system_purpose}}"
+    paths: []
+    owner: "{{owner_label}}"
+    tags: []
+    relations: []
+    adrs: []
+
+  - id: "el:{{system_slug}}.{{container_slug}}"
+    kind: container
+    parent: "el:{{system_slug}}"
+    title: "{{container_title}}"
+    paths:
+      - "{{container_glob}}"
+    owner: "{{owner_label}}"
+    # Tags such as layer:<name>, stakes:high, public-api.
+    tags:
+      - "layer:{{outer_layer}}"
+    # Declared relations, e.g. {to: el:app.store, kind: uses}.
+    relations: []
+    adrs: []
+
+mapping:
+  # Explicit {path, element} assignments that win over glob specificity.
+  overrides: []
+  # Paths that are never mapped (generated code, vendored files).
+  ignore: []

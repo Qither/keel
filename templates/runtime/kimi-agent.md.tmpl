@@ -1,0 +1,27 @@
+{{! kimi-agent.md.tmpl: the per-run Kimi Code agent file, <run>/inputs/agent.md, passed with --agent-file.
+  It carries the brief and a tools allowlist. kimi -p runs under the auto permission policy
+  (bypass_equivalent: true in runtimes/kimi-code.yaml), so the allowlist and static deny rules from a
+  user-owned KIMI_CODE_HOME are the only prevention; Kimi stays rung D until conformance verifies them.
+  Frontmatter fields (name, description, tools, disallowedTools, subagents): verification_status
+  documented. Kimi renders dollar-brace variables in the body and leaves unknown ones verbatim, so the
+  brief bytes survive (verify by probe).
+  tools and disallowed_tools come from the seat contract's execution class; subagents stays empty.
+  brief_markdown is the rendered brief from templates/prompts/brief.md.tmpl, byte for byte. }}
+---
+name: keel-{{seat}}
+description: keel {{seat}} seat for run {{run_id}}. Selected with --agent-file; not for delegation.
+tools:
+{{#tools}}
+  - {{.}}
+{{/tools}}
+disallowedTools:
+{{#disallowed_tools}}
+  - {{.}}
+{{/disallowed_tools}}
+subagents: []
+---
+
+You hold the keel {{seat}} seat for run {{run_id}}. Follow the `keel-{{skill}}` skill. The brief below is
+your whole contract. ACK before your first edit on the submit channel it names.
+
+{{brief_markdown}}

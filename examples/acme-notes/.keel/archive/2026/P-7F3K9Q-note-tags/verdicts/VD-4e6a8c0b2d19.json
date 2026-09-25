@@ -1,0 +1,15 @@
+{
+  "kind": "verdict",
+  "lens": "verification-gap",
+  "subject": "P-7F3K9Q.T1",
+  "brief_hash": "BR-1b3d5f7a9c2e",
+  "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+  "diff_digest": "d7e98d6509c7eb736779d04eafe96e18927c32a25df05e011fa3b6ffe70006e1",
+  "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+  "spec_verdict": "meets",
+  "readings": [],
+  "findings": [],
+  "declined": [],
+  "recommendation": "approve",
+  "summary": "tests/notes/tags.test.ts has one row per scenario, each named with its scenario tag. Both rows fail at the task commit because TagStore.addTag is missing, and their assertions check the stored tags, so they would pass against an addTag that meets R-notes-4QX7B and fail against one that skips normalization or deduplication."
+}

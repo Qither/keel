@@ -1,0 +1,43 @@
+{{! gemini-settings.snippet.tmpl: printed by keel sync, never written. keel never reads, writes or hashes
+  .gemini/settings.json; the user pastes this fragment into it.
+  context.fileName makes Gemini CLI read AGENTS.md (the keel pointer block) next to GEMINI.md.
+  BeforeAgent re-injects the brief digest after compression through additionalContext; Gemini CLI has no
+  post-compression event. Hooks are skipped in untrusted folders, and keel does not rely on them.
+  Rendering: scalar values are escaped for a JSON string; tokens ending in _json are inserted as JSON.
+  Every key below: verification_status unverified (Gemini CLI is not installed locally); the doctor
+  probe confirms them. }}
+{
+  "context": {
+    "fileName": ["AGENTS.md", "GEMINI.md"]
+  },
+  "mcpServers": {
+    "keel": {
+      "command": {{keel_command_json}},
+      "args": {{keel_args_json}}
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook session-start --runtime gemini-cli" }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook post-compact --runtime gemini-cli" }
+        ]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook pre-tool-use --runtime gemini-cli" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/arch-delta.schema.json",
+  "title": "keel architecture delta",
+  "description": "The per-proposal .keel/proposals/<P>-<slug>/arch.delta.yaml, written by the architect on the system track as typed ops (keel arch plan; --suggest drafts them). The land archive commit applies it to model.yaml and rules.yaml and refuses when the base hashes no longer match. Loosening a rule or growing the baseline needs a contract approval that includes the delta; the delta blob is part of the contract_hash.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M4",
+  "type": "object",
+  "properties": {
+    "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+    "charter_version": { "$ref": "common.schema.json#/$defs/semver" },
+    "base": {
+      "description": "Base fingerprints.",
+      "type": "object",
+      "properties": {
+        "model_sha256": {
+          "description": "sha256 of the normalized model.yaml blob on trunk that the delta was written against.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "rules_sha256": {
+          "description": "sha256 of the normalized rules.yaml blob on trunk.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "baseline_sha256": {
+          "description": "sha256 of baseline.json on trunk; required when the delta grows or shrinks the baseline.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": ["model_sha256", "rules_sha256"],
+      "additionalProperties": false
+    },
+    "adrs": {
+      "description": "Decisions in the proposal's decisions/ folder that justify the ops.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/adrId" },
+      "uniqueItems": true
+    },
+    "ops": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/addElement" },
+          { "$ref": "#/$defs/removeElement" },
+          { "$ref": "#/$defs/addRelation" },
+          { "$ref": "#/$defs/removeRelation" },
+          { "$ref": "#/$defs/movePaths" },
+          { "$ref": "#/$defs/addRule" },
+          { "$ref": "#/$defs/tightenRule" },
+          { "$ref": "#/$defs/loosenRule" },
+          { "$ref": "#/$defs/baselineGrow" },
+          { "$ref": "#/$defs/baselineShrink" }
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["proposal", "charter_version", "base", "adrs", "ops"],
+  "additionalProperties": false,
+  "$defs": {
+    "addElement": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "add-element" },
+        "element": { "$ref": "arch-model.schema.json#/$defs/element" }
+      },
+      "required": ["op", "element"],
+      "additionalProperties": false
+    },
+    "removeElement": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "remove-element" },
+        "id": { "$ref": "common.schema.json#/$defs/elementId" },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "required": ["op", "id", "reason"],
+      "additionalProperties": false
+    },
+    "addRelation": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "add-relation" },
+        "from": { "$ref": "common.schema.json#/$defs/elementId" },
+        "to": { "$ref": "common.schema.json#/$defs/elementId" },
+        "kind": {
+          "description": "Relation kind, for example uses.",
+          "$ref": "common.schema.json#/$defs/slug"
+        }
+      },
+      "required": ["op", "from", "to", "kind"],
+      "additionalProperties": false
+    },
+    "removeRelation": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "remove-relation" },
+        "from": { "$ref": "common.schema.json#/$defs/elementId" },
+        "to": { "$ref": "common.schema.json#/$defs/elementId" },
+        "kind": { "$ref": "common.schema.json#/$defs/slug" }
+      },
+      "required": ["op", "from", "to", "kind"],
+      "additionalProperties": false
+    },
+    "movePaths": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "move-paths" },
+        "paths": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/repoGlob" },
+          "minItems": 1
+        },
+        "from": { "$ref": "common.schema.json#/$defs/elementId" },
+        "to": { "$ref": "common.schema.json#/$defs/elementId" }
+      },
+      "required": ["op", "paths", "from", "to"],
+      "additionalProperties": false
+    },
+    "addRule": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "add-rule" },
+        "rule": { "$ref": "arch-rules.schema.json#/$defs/rule" }
+      },
+      "required": ["op", "rule"],
+      "additionalProperties": false
+    },
+    "tightenRule": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "tighten-rule" },
+        "rule": {
+          "description": "The replacement rule; its id names the rule tightened.",
+          "$ref": "arch-rules.schema.json#/$defs/rule"
+        }
+      },
+      "required": ["op", "rule"],
+      "additionalProperties": false
+    },
+    "loosenRule": {
+      "description": "Needs a contract approval that includes it; the frame gate flags it for the Board.",
+      "type": "object",
+      "properties": {
+        "op": { "const": "loosen-rule" },
+        "rule": {
+          "description": "The replacement rule; its id names the rule loosened.",
+          "$ref": "arch-rules.schema.json#/$defs/rule"
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "required": ["op", "rule", "reason"],
+      "additionalProperties": false
+    },
+    "baselineGrow": {
+      "description": "Needs a contract approval that includes it; the frame gate flags it for the Board.",
+      "type": "object",
+      "properties": {
+        "op": { "const": "baseline-grow" },
+        "violation": { "$ref": "arch-baseline.schema.json#/$defs/violation" },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "required": ["op", "violation", "reason"],
+      "additionalProperties": false
+    },
+    "baselineShrink": {
+      "type": "object",
+      "properties": {
+        "op": { "const": "baseline-shrink" },
+        "key": { "$ref": "common.schema.json#/$defs/sha12" }
+      },
+      "required": ["op", "key"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,36 @@
+# .keel/arch/rules.yaml (schemas/arch-rules.schema.json): executable architecture rules.
+# Changed only by an arch delta applied in a land archive commit. Adding or tightening a rule is an
+# ordinary delta; loosening one, or growing .keel/arch/baseline.json, needs a contract approval that
+# includes the change.
+#
+# Rule ids are AR-<5 Crockford base32 characters>, minted by `keel arch plan`.
+# The arch check fails only on NEW violations backed by trusted-provenance edges (scip, tree-sitter);
+# heuristic and LLM edges are advisory. An `unknown` result (stale or missing index) blocks on the system
+# track, or when a rule here reaches the affected elements, unless the Board overrides it.
+#
+# kind: forbidden | allowed | required | layers | acyclic | independent
+# from / to: an element selector, exactly one of {element: el:<id>}, {tag: <tag>} or {owner: <label>};
+#   `to` is null for kinds that take one selector (layers, acyclic).
+# severity: error | warn | info
+# adr: the ADR that justifies the rule (ADR-<5>), or null
+
+rules: []
+
+# Examples (let `keel arch plan` mint real ids):
+#
+# rules:
+#   - id: AR-7M2QX
+#     kind: forbidden
+#     from: {tag: "layer:{{inner_layer}}"}
+#     to: {tag: "layer:{{outer_layer}}"}
+#     severity: error
+#     adr: null
+#     rationale: "Inner layers never depend on outer layers."
+#
+#   - id: AR-7M2QY
+#     kind: acyclic
+#     from: {element: "el:{{system_slug}}"}
+#     to: null
+#     severity: error
+#     adr: null
+#     rationale: "No dependency cycles between the system's elements."

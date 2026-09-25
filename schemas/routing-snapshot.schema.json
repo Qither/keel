@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/routing-snapshot.schema.json",
+  "title": "keel routing snapshot",
+  "description": "The per-proposal .keel/proposals/<P>-<slug>/routing.snapshot.yaml, written by the Steward at planning and signed as part of the plan approval. It freezes the resolved routes, the conformance status and the exposure profile for each seat.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M2",
+  "type": "object",
+  "properties": {
+    "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+    "routing": {
+      "type": "object",
+      "properties": {
+        "blob": {
+          "description": "sha256 of the normalized routing.yaml blob at the last Board-signed trunk revision.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "approval": {
+          "description": "The document approval that signed that blob.",
+          "$ref": "common.schema.json#/$defs/approvalId"
+        }
+      },
+      "required": ["blob", "approval"],
+      "additionalProperties": false
+    },
+    "taken_at": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+    "routes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/snapshotRoute" },
+      "minItems": 1
+    },
+    "deviations": {
+      "description": "Differences from the signed routing. On the feature track a deviation makes plan approval required.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/deviation" }
+    },
+    "independence": { "$ref": "approval.schema.json#/$defs/familyPair" }
+  },
+  "required": ["proposal", "routing", "taken_at", "routes", "deviations", "independence"],
+  "additionalProperties": false,
+  "$defs": {
+    "snapshotRoute": {
+      "type": "object",
+      "properties": {
+        "seat": { "$ref": "common.schema.json#/$defs/seat" },
+        "tasks": {
+          "description": "Tasks this route serves; empty for proposal-level seats.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/taskLocalId" }
+        },
+        "lenses": {
+          "description": "Lenses this route serves (reviewer only).",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" }
+        },
+        "route": { "$ref": "routing.schema.json#/$defs/route" },
+        "conformance_status": { "$ref": "common.schema.json#/$defs/conformanceStatus" },
+        "exposure": { "$ref": "run.schema.json#/$defs/exposureProfile" }
+      },
+      "required": ["seat", "tasks", "route", "conformance_status", "exposure"],
+      "additionalProperties": false
+    },
+    "deviation": {
+      "type": "object",
+      "properties": {
+        "seat": { "$ref": "common.schema.json#/$defs/seat" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/taskLocalId" }
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "required": ["seat", "tasks", "reason"],
+      "additionalProperties": false
+    }
+  }
+}

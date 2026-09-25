@@ -1,0 +1,83 @@
+# .keel/proposals/<P>-<slug>/workorders/T<n>.yaml (schemas/workorder.schema.json), written by the
+# planner seat. keel fills proposal_id, charter_version and contract_hash; replace every other {{token}}.
+# On the patch track the Steward derives the single work order itself from the anchors.
+#
+# The engineer never sees this file: its worktree excludes .keel/proposals/. keel compiles the work order
+# into the task's brief, and the brief is the engineer's whole contract.
+id: "{{proposal_id}}.T{{n}}"
+title: "{{task_title}}"
+# build: implement against the frozen tests. test: write acceptance tests first, routed to a declared
+# family different from the builder's, landing first. resolution: resolve an integration conflict.
+kind: build
+objective: "{{task_objective}}"
+charter_version: "{{charter_version}}"
+
+# ACC items and requirement scenarios this task satisfies.
+covers:
+  acc:
+    - "{{proposal_id}}#ACC-01"
+  requirements:
+    - "R-{{area}}-{{req_id}}#S1"
+
+# Tasks that must be verified before this one starts.
+after: []
+
+write_set:
+  paths:
+    - "{{write_glob}}"
+  # Symbols the task may change, when an index can check them.
+  symbols: []
+
+# Test paths fixed before the build. They are outside write_set; the plan gate checks.
+frozen_tests:
+  - "{{frozen_test_path}}"
+
+interfaces:
+  # e.g. - {name: TagStore.add, contract: "addTag(noteId, tag): Promise<void>", from: T1}
+  consumes: []
+  # e.g. - {name: TagStore.add, contract: "addTag(noteId, tag): Promise<void>"}
+  produces: []
+
+# ACC -> acceptance command and matrix-row table, fixed before the build. The Steward's runner executes
+# the commands (argv, no shell) in a clean sparse detached checkout; land re-runs the full matrix on the
+# integrated commit. rows are the scenarios whose tagged JUnit rows ([R-<area>-<5>#S<n>] in the test
+# name) must pass. commands is empty only for the review, manual and unobservable modes.
+acceptance:
+  - acc: "{{proposal_id}}#ACC-01"
+    evidence_mode: test          # test | command | review | manual | unobservable
+    commands:
+      - argv: ["{{acceptance_program}}", "{{acceptance_argument}}"]
+        junit: "{{junit_report_path}}"
+    rows:
+      - "R-{{area}}-{{req_id}}#S1"
+
+# Copied verbatim from the charter and the frozen intent (Always, Never, scope, in-scope INV).
+global_constraints:
+  - "{{constraint_verbatim}}"
+
+# What the reviewer lenses should look at hardest. At most five items.
+review_focus:
+  - "{{review_focus_item}}"
+
+# The four stop classes always apply and always go to the Board. List task-specific examples so the
+# engineer recognises them.
+stop_classes:
+  - class: irreversible_or_destructive
+    examples: []
+  - class: security_sensitive
+    examples: []
+  - class: side_effect_outside_workspace
+    examples: []
+  - class: every_path_a_guess
+    examples: []
+
+route_hint:
+  seat: engineer
+  tier: standard                 # frontier | standard | fast
+
+budget:
+  usd: 5
+
+# Upstream hashes this work order was derived from, keyed by input.
+derived_from:
+  contract_hash: "{{contract_hash}}"

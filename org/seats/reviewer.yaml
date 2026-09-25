@@ -1,0 +1,100 @@
+# org/seats/reviewer.yaml: the reviewer seat contract and the only lens-set table
+# (schemas/seat.schema.json). Canonical; docs/01-org-model.md summarizes the contract and
+# docs/11-verification.md explains the lenses, the synthesis rules and the fix loop.
+#
+# Execution class is read-only on CLI runtimes and none on the direct lane (tool-less, diff inline; M6):
+# the route's mode decides, never the lens.
+#
+# independent_of is checked per lens against the seat that authored the reviewed artifact, not against
+# all four at once: the spec lens against product, the architecture lens against the architect (and the
+# engineer at build), the plan-stage verification-gap lens against the planner and the test-task
+# engineer, and every build-stage lens against the engineer. A shared declared family makes the review
+# degraded, which needs `keel approve <P> --rule degraded` per change; an unavailable lane means "not
+# approved", never "skipped".
+
+seat: reviewer
+duty: >-
+  Runs read-only, context-free lenses: spec (frame stage), blind-diff, edge-case, verification-gap (which
+  also qualifies builder tests, frozen test tasks and the ACC to command table), intent-alignment
+  (verbatim frozen intent plus the diff only), architecture, and audit (plan adherence and rulings
+  against the diff, citations required). Each lens emits a verdict bound to the commit, the diff digest,
+  the contract hash and the BR id.
+assumption: >-
+  An independent model family that sees only the artifact, never the author's story, finds defects the
+  author's family would rationalize away. Measured per lens by findings that survive triage and by
+  defects found after land; a lens or a whole set with no measured yield is pruned.
+inputs:
+  - "review packet (ACK set: the packet's ids)"
+  - the diff, inline for tool-less lanes or by path otherwise
+  - the exact commit in a sparse detached checkout
+  - frozen intent, work order, element brief and runner evidence
+outputs:
+  - verdict.json (spec verdict, findings critical|important|minor with file:line, declined list, recommendation approve|revise|reject)
+writable:
+  globs: []
+api_ops:
+  - ack
+  - submit
+  - context
+execution_class: read-only
+ack_id_set:
+  - packet
+output_schema: schemas/verdict.schema.json
+submit_channels:
+  - final-message
+  - mcp
+  - outbox
+default_tier: standard
+independent_of:
+  - product
+  - architect
+  - planner
+  - engineer
+may:
+  - read the exact commit in a sparse detached checkout, the diff, the work order, the element brief and the evidence
+  - run read-only commands where the runtime allows
+  - decline to judge, with reasons
+  - use the frontier tier for the final whole-proposal review and for intent alignment on the system track
+may_not:
+  - edit anything
+  - see the engineer's transcript or treat its rationale as authority
+  - approve or land
+  - accept coaching (a controller tripwire rejects it)
+  - take any action listed in org/reserved-actions.yaml
+  - open provider or credential paths (checked at ingest)
+
+# The only lens-set table. All lenses of a set are launched before any result is read.
+# Which set applies where:
+#   frame         frame stage on the feature track
+#   frame_system  frame stage on the system track
+#   plan          plan gate on feature and system (plan.verification-gap)
+#   test_task     verify stage of a test task (work order kind test), next to verify.test-red
+#   quick         build stage on the feature track
+#   policy        every policy land (patch track under a standing policy)
+#   thorough      build stage on the system track, with a frontier-tier intent auditor
+lens_sets:
+  frame:
+    - spec
+  frame_system:
+    - spec
+    - architecture
+  plan:
+    - verification-gap
+  test_task:
+    - verification-gap
+  # The one lens of a patch outside a policy land (its per-change contract is Board-approved).
+  patch:
+    - blind-diff
+  quick:
+    - blind-diff
+    - verification-gap
+  policy:
+    - blind-diff
+    - intent-alignment
+  thorough:
+    - blind-diff
+    - edge-case
+    - verification-gap
+    - intent-alignment
+    - architecture
+    - audit

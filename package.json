@@ -1,0 +1,23 @@
+{
+  "name": "@qither/keel",
+  "version": "0.0.0",
+  "private": true,
+  "description": "keel runs a small company of multi-vendor AI coding agents with compiled intent, signed Board approvals, re-executed evidence and git-first traceability. M0: design documents and repository skeleton only.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "validate": "node scripts/validate.mjs",
+    "check": "npm run typecheck && npm run validate"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.1"
+  }
+}

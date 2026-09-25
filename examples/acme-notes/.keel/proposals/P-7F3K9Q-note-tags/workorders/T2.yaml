@@ -1,0 +1,98 @@
+# examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/workorders/T2.yaml
+# (schemas/workorder.schema.json), written by the planner seat and compiled into brief BR-9e4c1a7b2d05
+# for run RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A (workspace-root/_runs/). Hash values are illustrative.
+#
+# T2 is the build task on the signed engineer route (claude-code, anthropic-main, declared family
+# anthropic). Its frozen_tests were written by T1 on a different declared family and sit outside its
+# write_set. The ACC to command table below is fixed before the build and reappears in receipt.json.
+id: P-7F3K9Q.T2
+title: "Normalize and store note tags"
+kind: build
+objective: "Implement TagStore.addTag in src/store/tags.ts so that each tag is stored trimmed, NFC-normalized and lowercased, at most once per note, and the frozen tag tests pass."
+charter_version: "1.0.0"
+
+covers:
+  acc:
+    - P-7F3K9Q#ACC-01
+    - P-7F3K9Q#ACC-02
+  requirements:
+    - R-notes-4QX7B#S1
+    - R-notes-4QX7B#S2
+
+after:
+  - T1
+
+write_set:
+  paths:
+    - "src/store/**"
+  symbols:
+    - src/store/tags.ts#TagStore.addTag
+    - src/store/tags.ts#normalizeTag
+    - src/store/notes.ts#NoteStore.load
+
+frozen_tests:
+  - tests/notes/tags.test.ts
+
+interfaces:
+  consumes:
+    - name: "tag acceptance tests"
+      contract: "tests/notes/tags.test.ts with one row tagged [R-notes-4QX7B#S1] and one tagged [R-notes-4QX7B#S2], calling TagStore.addTag(noteId: string, tag: string): Promise<string[]>"
+      from: T1
+  produces:
+    - name: TagStore.addTag
+      contract: "addTag(noteId: string, tag: string): Promise<string[]> resolves to the note's tags after the add."
+
+acceptance:
+  - acc: P-7F3K9Q#ACC-01
+    evidence_mode: test
+    commands:
+      - argv: ["npm", "test"]
+        junit: reports/junit.xml
+    rows:
+      - R-notes-4QX7B#S1
+  - acc: P-7F3K9Q#ACC-02
+    evidence_mode: test
+    commands:
+      - argv: ["npm", "test"]
+        junit: reports/junit.xml
+    rows:
+      - R-notes-4QX7B#S2
+
+global_constraints:
+  - "Keep notes saved before this change loadable: a note without a `tags` array loads with no tags."
+  - "Never write tag values to logs or telemetry."
+  - "ADR-7KQ2B.O1 (must): Normalize every tag (trim, then NFC, then lowercase) before it is stored or compared."
+
+review_focus:
+  - "Normalization order: trim, then NFC, then a locale-independent lowercase."
+  - "Notes saved before this change, without a tags array, still load."
+  - "No tag value reaches a log call."
+
+stop_classes:
+  - class: irreversible_or_destructive
+    examples:
+      - "Rewriting stored note files to add a tags array."
+  - class: security_sensitive
+    examples:
+      - "Changing who can read or write a note."
+  - class: side_effect_outside_workspace
+    examples:
+      - "Installing a new runtime dependency, or publishing the package."
+  - class: every_path_a_guess
+    examples:
+      - "The frozen tests contradict ADR-7KQ2B.O1."
+
+route_hint:
+  seat: engineer
+  tier: standard
+
+budget:
+  usd: 8
+  runs: 5
+
+derived_from:
+  contract_hash: "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea"
+  ".keel/specs/notes/spec.yaml": "9c0d3d92cdb08e257f40485f4efa91eb63a16463d84ffbc42a617f3a936f1409"
+  ".keel/proposals/P-7F3K9Q-note-tags/workorders/T1.yaml": "cfd4797fc7dd9c5aff5e5e49c3b7b4944ff29fde37bc9475a8952a21ab1c188a"
+
+notes: "tests/notes/tags.test.ts is frozen. If a frozen test looks wrong, ask with the clause P-7F3K9Q#ACC-01 or P-7F3K9Q#ACC-02 instead of editing it."

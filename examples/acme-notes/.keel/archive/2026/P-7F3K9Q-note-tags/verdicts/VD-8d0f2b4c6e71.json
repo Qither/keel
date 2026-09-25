@@ -1,0 +1,15 @@
+{
+  "kind": "verdict",
+  "lens": "verification-gap",
+  "subject": "P-7F3K9Q",
+  "brief_hash": "BR-5d7f9b1c3e46",
+  "commit": "016d1412552b50c7612e3109872e0128f64c177a",
+  "diff_digest": "411bf12ba6fc3cbc746d54b2c8b8e50638edfafbeae8c1706b4896643a4aa7da",
+  "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+  "spec_verdict": "meets",
+  "readings": [],
+  "findings": [],
+  "declined": [],
+  "recommendation": "approve",
+  "summary": "The ACC to command table maps ACC-01 and ACC-02 to npm test rows tagged with R-notes-4QX7B#S1 and #S2. Test task T1 is defined on a declared family other than the builder's and writes exactly those two rows before T2 starts; no test has been written yet, so the frozen output is judged at T1's verify stage."
+}

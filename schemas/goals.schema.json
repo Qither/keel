@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/goals.schema.json",
+  "title": "keel goals",
+  "description": "The Board-signed .keel/goals.yaml (L1). Every proposal cites at least one active goal (frame gate), the brief's why-chain starts at the goal, budgets roll up per goal, and goal progress is the requirements verified at head over the total.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M1a",
+  "type": "object",
+  "properties": {
+    "charter_version": { "$ref": "common.schema.json#/$defs/semver" },
+    "goals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/goal" },
+      "minItems": 1
+    }
+  },
+  "required": ["charter_version", "goals"],
+  "additionalProperties": false,
+  "$defs": {
+    "goal": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/goalId" },
+        "objective": { "type": "string", "minLength": 1 },
+        "success_signal": {
+          "description": "An observable signal that says the objective is met.",
+          "type": "string",
+          "minLength": 1
+        },
+        "non_goals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "budget": {
+          "anyOf": [{ "$ref": "#/$defs/budget" }, { "type": "null" }]
+        },
+        "status": {
+          "description": "Only active goals may be cited by new proposals.",
+          "enum": ["active", "paused", "done", "dropped"]
+        }
+      },
+      "required": ["id", "objective", "success_signal", "status"],
+      "additionalProperties": false
+    },
+    "budget": {
+      "description": "A budget. A warning is raised at config budget.warn_at_percent and blocked(budget) at 100% until keel approve --rule budget.",
+      "type": "object",
+      "properties": {
+        "usd": {
+          "description": "Spend limit in US dollars, as reported by runtimes.",
+          "type": "number",
+          "minimum": 0
+        },
+        "runs": { "description": "Maximum number of runs.", "type": "integer", "minimum": 0 },
+        "wall_minutes": { "description": "Maximum wall-clock minutes.", "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    }
+  }
+}

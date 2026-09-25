@@ -1,0 +1,42 @@
+{{! qwen-settings.snippet.tmpl: printed by keel sync, never written. keel never reads, writes or hashes
+  .qwen/settings.json; the user pastes this fragment into it.
+  Qwen Code already reads QWEN.md and AGENTS.md by default, so no context file name is set, and it scans
+  .agents/skills for the keel skills.
+  Hooks use Claude-style event names. PostCompact re-injects the brief digest (verification_status
+  unverified; verify by probe). Folder trust applies: hooks are skipped in untrusted folders, and keel
+  does not rely on them.
+  Rendering: scalar values are escaped for a JSON string; tokens ending in _json are inserted as JSON.
+  Key names: verification_status documented for Qwen Code 0.24.x docs; probed against the local
+  version by doctor. }}
+{
+  "mcpServers": {
+    "keel": {
+      "command": {{keel_command_json}},
+      "args": {{keel_args_json}}
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook session-start --runtime qwen-code" }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook post-compact --runtime qwen-code" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "{{keel_command}} hook pre-tool-use --runtime qwen-code" }
+        ]
+      }
+    ]
+  }
+}

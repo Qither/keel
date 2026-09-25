@@ -1,0 +1,44 @@
+# .keel/proposals/<P>-<slug>/proposal.yaml (schemas/proposal.schema.json).
+# Written once by the Steward at `keel new`, from recorded intake signals; no seat edits it. It holds
+# intake signals only: the current track, state and claims are derived from the ledger and never stored
+# here, and the base commit is recorded on the proposal.created event. keel renders every {{token}}.
+id: "{{proposal_id}}"
+slug: "{{slug}}"
+title: "{{title}}"
+goals:
+  - "{{goal_id}}"
+charter_version: "{{charter_version}}"
+created_at: "{{created_at}}"
+
+# board-signed: started with `keel new --policy <name>`; the Board signed the verbatim request.
+# contract-approved: started without a policy; becomes dispatchable at its contract approval.
+origin: "{{origin}}"
+request:
+  # The verbatim request given to `keel new`. On the policy path the Board signs exactly these bytes.
+  text: "{{request_text}}"
+  # Standing policy cited with --policy, or null.
+  policy: null
+  # Id of the signed request envelope (AP-<sha12>) on the policy path, or null.
+  approval: null
+
+# Track requested with `keel new --track`, or null. The classifier may raise it; only
+# `keel approve <P> --rule track` lowers it.
+requested_track: null
+
+signals:
+  # What the request names. A request with no anchor goes to framing.
+  anchors:
+    requirements: []
+    elements: []
+    paths: []
+    symbols: []
+  # Predicted impact record (IM-<sha12>) computed at intake, or null without an index.
+  predicted_impact: null
+  elements_reached: []
+  # Declared element boundaries predicted to be crossed, as {from, to} element ids.
+  boundaries_crossed: []
+  protected_globs_touched: []
+  invariants_touched: []
+  obligations_touched: []
+  public_api_touched: false
+  estimated_files: null

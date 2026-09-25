@@ -1,0 +1,103 @@
+# examples/acme-notes/.keel/routing.yaml (schemas/routing.schema.json). Board-signed with
+# `keel approve --doc .keel/routing.yaml` (approval AP-4f6b8d0c2e5a in the ledger sample); dispatch refuses
+# without a valid signature.
+#
+# NAMES ONLY. Every value below is a protocol id, a declared family, an auth mode or an environment
+# variable NAME. The acme-notes owner sets the endpoints, keys and model names in their own environment
+# (examples/providers.env.example lists the names). keel reads the values only in memory at spawn.
+#
+# Declared families are the Board's declaration; receipts and the dashboard show them as "declared".
+
+profiles:
+  anthropic-main:
+    protocol: anthropic-messages
+    family: anthropic
+    auth: env
+    env:
+      base_url: KEEL_PROFILE_ANTHROPIC_MAIN_BASE_URL
+      api_key: KEEL_PROFILE_ANTHROPIC_MAIN_API_KEY
+      model:
+        frontier: KEEL_PROFILE_ANTHROPIC_MAIN_MODEL_FRONTIER
+        standard: KEEL_PROFILE_ANTHROPIC_MAIN_MODEL_STANDARD
+        fast: KEEL_PROFILE_ANTHROPIC_MAIN_MODEL_FAST
+    runtime_profile: null
+    revision: 1
+    tos_note: "Check your own plan terms for automated and headless use; keel asserts none."
+
+  # A Gemini-family model behind an OpenAI-compatible endpoint the owner runs, hosted by opencode.
+  gemini-compat:
+    protocol: openai-chat
+    family: google
+    auth: env
+    env:
+      base_url: KEEL_PROFILE_GEMINI_COMPAT_BASE_URL
+      api_key: KEEL_PROFILE_GEMINI_COMPAT_API_KEY
+      model:
+        frontier: KEEL_PROFILE_GEMINI_COMPAT_MODEL_FRONTIER
+        standard: KEEL_PROFILE_GEMINI_COMPAT_MODEL_STANDARD
+        fast: KEEL_PROFILE_GEMINI_COMPAT_MODEL_FAST
+    runtime_profile: null
+    revision: 1
+    tos_note: "Check your own plan terms for automated and headless use; keel asserts none."
+
+  # A GLM model (declared family zhipu) on its default host, opencode. seats.engineer.test_route uses it
+  # for test-first tasks such as P-7F3K9Q.T1, so the tests come from a declared family different from the
+  # builder's.
+  glm-main:
+    protocol: openai-chat
+    family: zhipu
+    auth: env
+    env:
+      base_url: KEEL_PROFILE_GLM_MAIN_BASE_URL
+      api_key: KEEL_PROFILE_GLM_MAIN_API_KEY
+      model:
+        frontier: KEEL_PROFILE_GLM_MAIN_MODEL_FRONTIER
+        standard: KEEL_PROFILE_GLM_MAIN_MODEL_STANDARD
+        fast: KEEL_PROFILE_GLM_MAIN_MODEL_FAST
+    runtime_profile: null
+    revision: 1
+    tos_note: "Check your own plan terms for automated and headless use; keel asserts none."
+
+seats:
+  product:
+    runtime: claude-code
+    profile: anthropic-main
+    tier: frontier
+    independent_of: []
+  architect:
+    runtime: claude-code
+    profile: anthropic-main
+    tier: frontier
+    independent_of: []
+  planner:
+    runtime: claude-code
+    profile: anthropic-main
+    tier: frontier
+    independent_of: []
+  engineer:
+    runtime: claude-code
+    profile: anthropic-main
+    tier: standard
+    independent_of: []
+    # Test-first tasks (work order kind test) run here: zhipu differs from the builder's anthropic
+    # (plan.test-independence).
+    test_route:
+      runtime: opencode
+      profile: glm-main
+      tier: standard
+  reviewer:
+    # Checked per lens against the seat that wrote the reviewed artifact (org/seats/reviewer.yaml):
+    # google differs from anthropic (product, architect, planner, engineer) and from zhipu (the T1 tests).
+    runtime: opencode
+    profile: gemini-compat
+    tier: standard
+    independent_of:
+      - product
+      - architect
+      - planner
+      - engineer
+
+policy:
+  no_silent_fallback: true
+  record_model_names: false
+  allow_degraded: true

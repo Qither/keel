@@ -1,0 +1,79 @@
+# examples/acme-notes/.keel/config.yaml: the team layer of the golden example project acme-notes
+# (schemas/config.schema.json). Keys left out here come from config/keel.defaults.yaml; a personal
+# .keel/local.yaml (gitignored) may override them again.
+#
+# acme-notes is a fictional TypeScript notes service. The golden path in this example is proposal
+# P-7F3K9Q (note tags). Commit ids and hashes in these files are illustrative (see test/README.md).
+#
+# No provider endpoint, key or model name appears in any configuration layer. The Board-signed
+# .keel/routing.yaml names environment variables only.
+
+vcs:
+  # git is fully sufficient; jj stays off until the Board opts in.
+  backend: git
+  trunk: main
+  remotes:
+    - origin
+  jj_opt_in: false
+
+# Planning, task and verify worktrees plus the per-run directories live next to the repository.
+workspace_root: ../acme-notes.ws/
+
+trace:
+  # Trace epoch written by keel init: the trunk tip when acme-notes adopted keel.
+  since: "6411b381f395f4745aa8a1f345959a5a42178749"
+
+tracks:
+  # Touching these raises the track and needs a per-change contract approval.
+  protected_globs:
+    - "migrations/**"
+    - "src/web/auth/**"
+
+# Declared project commands, run without a shell. Seats may run them in their worktree (no evidence);
+# the gates below run them through the Steward's runner.
+commands:
+  - id: build
+    purpose: build
+    command:
+      argv: ["npm", "run", "build"]
+  - id: typecheck
+    purpose: typecheck
+    command:
+      argv: ["npm", "run", "typecheck"]
+  - id: test
+    purpose: test
+    command:
+      argv: ["npm", "test"]
+      # Test names carry scenario tags such as [R-notes-4QX7B#S1]; the runner maps rows to scenarios.
+      junit: reports/junit.xml
+      timeout_seconds: 600
+  - id: check-tags
+    purpose: lint
+    command:
+      # The same script is the check command in the Check column of obligation ADR-7KQ2B.O1; as an
+      # obligation check it runs through verify.obligations, never through gates.<gate>.commands. It is
+      # declared here only so seats can run it in their worktree.
+      argv: ["node", "scripts/check-tag-normalization.mjs"]
+
+# Each gate records its declared commands as one check with a denominator: submit.commands and
+# verify.commands (docs/11-verification.md).
+gates:
+  submit:
+    commands:
+      - build
+      - typecheck
+  verify:
+    commands:
+      - test
+    timeout_seconds: 900
+
+index:
+  # A codegraph index makes the architecture checks active (docs/07).
+  backend: codegraph
+
+arch:
+  unknown: default
+
+land:
+  # No standing land policy: every land needs a land approval from the Board.
+  policy: null

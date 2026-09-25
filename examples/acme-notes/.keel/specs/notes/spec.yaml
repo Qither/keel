@@ -1,0 +1,67 @@
+# examples/acme-notes/.keel/specs/notes/spec.yaml (schemas/spec.schema.json): the living spec of the
+# notes area, written only by land archive commits.
+#
+# Shown as it stands on trunk after the land of P-7F3K9Q: its archive commit applied the MODIFIED op of
+# .keel/proposals/P-7F3K9Q-note-tags/spec.delta.yaml to R-notes-4QX7B. Before that land the requirement
+# was the one-line stub adopted at the trace epoch ("The notes service shall let a user label a note."),
+# with no realizing element. Verification status is computed from events and never stored here.
+area: notes
+charter_version: "1.0.0"
+requirements:
+  - id: R-notes-2HD8K
+    title: "Create a note"
+    kind: event-driven
+    statement: "When a user saves a new note, the notes service shall store it and return its id."
+    goals:
+      - G-01
+    realized_in:
+      - el:notes.core
+      - el:notes.store
+    scenarios:
+      - id: S1
+        title: "New note is stored"
+        given: "an authenticated user with no notes"
+        when: "the user saves a note titled \"Groceries\""
+        then: "the service returns a new note id and lists one note titled \"Groceries\""
+    status: active
+    since: null
+
+  - id: R-notes-4QX7B
+    title: "Tag notes"
+    kind: event-driven
+    statement: "When a user adds a tag to a note, the notes service shall store the tag trimmed, NFC-normalized and lowercased, at most once per note."
+    goals:
+      - G-03
+    realized_in:
+      - el:notes.store
+    scenarios:
+      - id: S1
+        title: "Tag is stored normalized"
+        given: "a note without tags"
+        when: "the user adds the tag \" Work \""
+        then: "the note lists exactly one tag, \"work\""
+      - id: S2
+        title: "Same tag in another letter case"
+        given: "a note tagged \"work\""
+        when: "the user adds the tag \"WORK\""
+        then: "the note still lists exactly one tag, \"work\""
+    status: active
+    # Adopted as a stub at the trace epoch; P-7F3K9Q modified it, which does not change since.
+    since: null
+
+  - id: R-notes-9MZ3P
+    title: "Find notes by text"
+    kind: event-driven
+    statement: "When a user searches for a term, the notes service shall return every note of that user whose title or body contains the term, within two seconds."
+    goals:
+      - G-02
+    realized_in:
+      - el:notes.core
+    scenarios:
+      - id: S1
+        title: "Search finds a note by a word in its body"
+        given: "a user with 10,000 notes, one of which contains \"invoice\""
+        when: "the user searches for \"invoice\""
+        then: "that note is returned within two seconds"
+    status: active
+    since: null

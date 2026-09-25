@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/brief.schema.json",
+  "title": "keel brief metadata",
+  "description": "The JSON companion of a compiled brief, .git/keel/briefs/BR-<sha12>.json (L7); the body is BR-<sha12>.md. The Steward compiles it deterministically per seat and subject from canonical documents and the proposal branch at the approved commit. Hashing uses LF-normalized, BOM-stripped, NFC bytes, and the runtime wrapper sits outside the hashed body.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M1a",
+  "type": "object",
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/briefId" },
+    "subject": {
+      "description": "The proposal (product, architect, planner) or task (engineer, reviewer packet).",
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/proposalId" },
+        { "$ref": "common.schema.json#/$defs/taskId" }
+      ]
+    },
+    "seat": { "$ref": "common.schema.json#/$defs/seat" },
+    "runtime": {
+      "description": "Runtime profile whose byte budget the brief was checked against.",
+      "$ref": "common.schema.json#/$defs/runtimeId"
+    },
+    "freshness": { "$ref": "common.schema.json#/$defs/freshness" },
+    "body_sha256": {
+      "description": "sha256 of the normalized body; the id is BR- plus its first 12 hex characters.",
+      "$ref": "common.schema.json#/$defs/sha256"
+    },
+    "bytes": { "type": "integer", "minimum": 0 },
+    "budget_bytes": { "type": "integer", "minimum": 1 },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/section" },
+      "minItems": 1
+    },
+    "ack_id_set": { "$ref": "#/$defs/ackIdSet" },
+    "write_set": {
+      "description": "The task's write_set, or null for seats that write no code.",
+      "anyOf": [{ "$ref": "workorder.schema.json#/$defs/writeSet" }, { "type": "null" }]
+    },
+    "forbidden": {
+      "description": "Forbidden paths: frozen tests, protected globs and .keel/**.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/repoGlob" }
+    },
+    "submit_channel": { "$ref": "common.schema.json#/$defs/submitChannel" },
+    "output_schema": { "$ref": "common.schema.json#/$defs/repoPath" },
+    "derived_from": { "$ref": "plan.schema.json#/$defs/derivedFrom" }
+  },
+  "required": [
+    "id",
+    "subject",
+    "seat",
+    "runtime",
+    "freshness",
+    "body_sha256",
+    "bytes",
+    "budget_bytes",
+    "sections",
+    "ack_id_set",
+    "write_set",
+    "forbidden",
+    "submit_channel",
+    "output_schema",
+    "derived_from"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "section": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/sectionId" },
+        "class": {
+          "description": "A change in a contract section (requirements, ACC, must and must_not obligations) makes a run stale_contract, which needs a re-ACK and re-review; a context change only adds an annotation.",
+          "enum": ["contract", "context"]
+        },
+        "sha256": {
+          "description": "sha256 of the normalized section body.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "inputs": { "description": "Section input hashes.", "$ref": "plan.schema.json#/$defs/derivedFrom" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "truncated": { "description": "ACC and must and must_not obligations are never truncated.", "type": "boolean" }
+      },
+      "required": ["id", "class", "sha256", "inputs", "bytes", "truncated"],
+      "additionalProperties": false
+    },
+    "sectionId": {
+      "description": "Brief sections, rendered through the single template templates/prompts/brief.md.tmpl.",
+      "enum": [
+        "why-chain",
+        "requirements",
+        "frozen-intent",
+        "work-order",
+        "invariants",
+        "obligations",
+        "element-brief",
+        "impact",
+        "write-set",
+        "gates",
+        "precedence",
+        "decision-boundaries",
+        "stop-classes",
+        "submit",
+        "output-contract",
+        "review-packet"
+      ]
+    },
+    "ackIdKind": {
+      "description": "Id kinds in ACK id sets. Product: goal, requirement, invariant; planner: acceptance, requirement; engineer: acceptance, requirement, obligation (must and must_not); reviewer: packet.",
+      "enum": ["goal", "requirement", "invariant", "acceptance", "obligation", "packet"]
+    },
+    "ackId": {
+      "description": "A member of an ACK id set. Packet ids are the task id and the content ids of the packet items.",
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/goalId" },
+        { "$ref": "common.schema.json#/$defs/reqId" },
+        { "$ref": "common.schema.json#/$defs/scenarioRef" },
+        { "$ref": "common.schema.json#/$defs/invId" },
+        { "$ref": "common.schema.json#/$defs/accId" },
+        { "$ref": "common.schema.json#/$defs/obligationId" },
+        { "$ref": "common.schema.json#/$defs/taskId" },
+        { "$ref": "common.schema.json#/$defs/contentId" }
+      ]
+    },
+    "ackIdSet": {
+      "description": "The exact id set the seat's ACK must echo.",
+      "type": "object",
+      "properties": {
+        "kinds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ackIdKind" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ackId" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["kinds", "ids"],
+      "additionalProperties": false
+    }
+  }
+}

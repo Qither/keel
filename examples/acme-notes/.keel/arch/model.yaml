@@ -1,0 +1,75 @@
+# examples/acme-notes/.keel/arch/model.yaml (schemas/arch-model.schema.json): the declared architecture
+# of acme-notes. Changed only by an arch delta applied in a land archive commit. This is the model written
+# at adoption; P-7F3K9Q (feature track) carried no arch delta, so it is also the model the proposal was
+# planned against. Each element's `adrs` list is a derived projection of the `governs` lists of accepted
+# decisions (ADR-7KQ2B governs el:notes.store and el:notes.web), refreshed by the governance commit that
+# accepted ADR-7KQ2B and by every archive commit; `governs` is the single source.
+layers:
+  - web
+  - core
+  - store
+
+elements:
+  - id: el:notes
+    kind: system
+    parent: null
+    title: "Acme Notes"
+    purpose: "Personal notes service: HTTP API, note logic and storage."
+    paths: []
+    owner: notes-team
+    tags: []
+    relations: []
+    adrs: []
+
+  - id: el:notes.web
+    kind: container
+    parent: el:notes
+    title: "HTTP API"
+    purpose: "Authenticates requests and maps HTTP routes to note operations."
+    paths:
+      - "src/web/**"
+    owner: web
+    tags:
+      - "layer:web"
+      - "public-api"
+    relations:
+      - to: el:notes.core
+        kind: uses
+    adrs:
+      - ADR-7KQ2B
+
+  - id: el:notes.core
+    kind: container
+    parent: el:notes
+    title: "Note logic"
+    purpose: "Validates note operations and coordinates storage."
+    paths:
+      - "src/core/**"
+    owner: core
+    tags:
+      - "layer:core"
+    relations:
+      - to: el:notes.store
+        kind: uses
+    adrs: []
+
+  - id: el:notes.store
+    kind: container
+    parent: el:notes
+    title: "Note storage"
+    purpose: "Stores note records, including their tags, as JSON documents."
+    paths:
+      - "src/store/**"
+    owner: storage
+    tags:
+      - "layer:store"
+      - "stakes:high"
+    relations: []
+    adrs:
+      - ADR-7KQ2B
+
+mapping:
+  overrides: []
+  # Build output is never mapped. Tests under tests/ stay unmapped and are listed as such, never guessed.
+  ignore:
+    - "dist/**"

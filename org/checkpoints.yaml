@@ -1,0 +1,145 @@
+# org/checkpoints.yaml: the four Board stage checkpoints and what each asks the Board to read.
+#
+# No schema in M0: this is the fixed four-stage table of docs/01-org-model.md (the stage ids are the
+# common approvalStage enum). `keel approve <subject> --stage <stage>` prints the `read` list of its stage,
+# verbatim, before asking for the typed confirmation and the key's passphrase or touch. Board commentary
+# goes into the signed quote (--quote); receipt.md is never edited after signing.
+#
+# required_on values per track:
+#   always | never
+#   unless-policy-path     required unless the change runs on the policy path (signed request plus a
+#                          signed standing policy)
+#   wider-wave-or-routing-deviation
+#                          required only when a wave is wider than 1 or routing deviates from the
+#                          signed routing
+#   per-land-policy        the signed land policy decides; without one, a land approval is required
+#   after-policy-land      due after every land made under a standing policy
+
+stages:
+  - stage: contract
+    command: keel approve <P> --stage contract
+    binds:
+      - the frozen block of intent.md and spec.delta.yaml, plus arch.delta.yaml on the system track, as contract_hash
+      - the keel/<P>/main commit
+      - the ledger chain head
+    required_on:
+      spike: never
+      patch: unless-policy-path
+      feature: always
+      system: always
+    blocking: true
+    read:
+      - the frozen block of intent.md
+      - the spec-delta diff
+      - on the system track, arch.delta.yaml and the new ADRs with their obligations
+    ask_yourself:
+      - Is this the problem I meant?
+      - Are the non-goals and decision boundaries right?
+      - Does every ACC say how it will be proven?
+    do_not_sign_when:
+      - open questions remain
+      - an ACC has no feasible evidence mode
+      - scope is wider than the goal needs
+
+  - stage: plan
+    command: keel approve <P> --stage plan
+    binds:
+      - plan.yaml
+      - the work orders
+      - routing.snapshot.yaml
+      - the budget
+      - the ledger chain head
+    required_on:
+      spike: never
+      patch: never
+      feature: wider-wave-or-routing-deviation
+      system: always
+    blocking: true
+    read:
+      - the task table (covers, write sets, frozen tests, waves)
+      - the seat to runtime, alias, declared family and tier table
+      - the budget
+      - the plan gate result, including any CONCERNS
+    ask_yourself:
+      - Are tests fixed before the build, or written by another declared family?
+      - Does each reviewer's declared family differ from the engineer's?
+    do_not_sign_when:
+      - a test-mode ACC has no frozen test and no test task
+      - the plan gate reported CONCERNS you do not accept
+
+  - stage: land
+    command: keel approve <P> --stage land
+    binds:
+      - the receipt draft, which names the integrated commit and the expected trunk tip
+      - the ledger chain head
+    required_on:
+      spike: never
+      patch: per-land-policy
+      feature: always
+      system: always
+    blocking: true
+    read:
+      - receipt.md, with the integrated commit and the expected trunk tip
+      - evidence and verdicts
+      - rulings by cost-if-wrong
+      - gates not run
+      - remaining risks
+      - the ACC to command table
+      - the declared engineer families (build and test routes) and the reviewer family
+      - seat conformance status
+      - the exposure profile
+    ask_yourself:
+      - Did every ACC run, on the integrated commit?
+      - What was not run, and why?
+      - Which rulings would be expensive if wrong?
+    do_not_sign_when:
+      - an ACC shows not_run without an override you issued
+      - independence is degraded without your ruling
+
+  - stage: receipt
+    command: keel approve <P> --stage receipt
+    binds:
+      - receipt.md of a change that landed under a standing policy
+      - the ledger chain head
+    required_on:
+      spike: never
+      patch: after-policy-land
+      feature: never
+      system: never
+    blocking: false
+    blocks_next: an unacknowledged receipt blocks the next change that touches the same elements, or the same path globs when the paths are unmapped
+    read:
+      - receipt.md of the change that landed under the standing policy
+    ask_yourself:
+      - Should the policy stay as it is?
+    do_not_sign_when: []
+
+# Signatures that are not stage checkpoints. keel approve prints these reading lists too.
+other_signatures:
+  - kind: request
+    command: keel new "<title>" --policy <name>
+    read:
+      - the verbatim request you are about to sign
+    do_not_sign_when:
+      - you did not write the request yourself
+  - kind: doc
+    command: keel approve --doc <path>
+    read:
+      - the diff of the charter, goals, routing or allowed_signers
+      - for routing, each alias's declared family
+    do_not_sign_when:
+      - the diff contains anything you did not intend
+  - kind: policy
+    command: keel approve --policy <name>
+    read:
+      - the diff of .keel/policies/<name>.yaml
+      - every predicate of the policy, and whether it also covers land (a land policy)
+    do_not_sign_when:
+      - a predicate is wider than the changes you are willing to see land without reading each one
+  - kind: rule
+    command: keel approve <subject> --rule answer|budget|track|override|dismiss|degraded|unverified|abandon [--limit <usd|runs|wall_minutes>=<n>] [--to <track>]
+    read:
+      - the item (question, finding, budget or track change) with its evidence
+      - what it costs if this ruling is wrong, and whether it can be reversed
+    do_not_sign_when:
+      - the item asks you to act on a stop class without the facts

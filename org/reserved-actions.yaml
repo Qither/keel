@@ -1,0 +1,233 @@
+# org/reserved-actions.yaml: the canonical reserved-action table (schemas/reserved-actions.schema.json).
+#
+# A reserved action is one only the Board may take or authorize. Every action here always applies; a
+# charter may add project actions of the same shape (templates/project/charter.md). Seat contracts refer
+# to this table instead of repeating it.
+#
+# Detection is the guarantee on plain git: ref snapshots (git for-each-ref), worktree HEADs, reflog tails
+# and a read-only git ls-remote of the configured remotes before and after each run, plus the jj op log
+# when JjBackend is enabled. A change keel did not make sets blocked(reserved_op) at ingest and becomes a
+# Board item (docs/05-vcs.md). Prevention is best-effort and differs per runtime and rung
+# (docs/09-runtimes.md); every prevention entry is verify by probe on the installed runtime version.
+#
+# patterns are command shapes. They feed the generated per-run deny rules (Claude settings, the Gemini
+# policy file, opencode permission blocks), PreToolUse guards and the advisory shims; detection never
+# depends on them.
+
+actions:
+  - id: push-remote
+    summary: Push commits, branches or tags to any remote. The Board pushes; keel and seats never do.
+    stop_class: side_effect_outside_workspace
+    patterns:
+      - git push
+      - git send-pack
+      - jj git push
+    detect:
+      - ls-remote
+      - ref-snapshot
+      - tool-events
+      - jj-op-log
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - env-hardening
+      - advisory-shim
+
+  - id: fetch-remote
+    summary: Fetch or pull from a remote. It moves remote-tracking refs, which the ref snapshot covers, and reaches the network.
+    stop_class: side_effect_outside_workspace
+    patterns:
+      - git fetch
+      - git pull
+      - git remote update
+      - jj git fetch
+    detect:
+      - ref-snapshot
+      - reflog
+      - tool-events
+      - jj-op-log
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - env-hardening
+      - advisory-shim
+
+  - id: move-ref
+    summary: Create, move or delete a branch, tag or other ref, or move a worktree HEAD, outside the Steward's own recorded operations.
+    stop_class: null
+    patterns:
+      - git branch
+      - git tag
+      - git update-ref
+      - git symbolic-ref
+      - git reset
+      - git checkout -b
+      - git checkout -B
+      - git switch -c
+      - git switch -C
+      - git worktree add
+      - jj bookmark
+      - jj tag
+    detect:
+      - ref-snapshot
+      - worktree-head
+      - reflog
+      - tool-events
+      - jj-op-log
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - advisory-shim
+
+  - id: rewrite-history
+    summary: Rewrite existing commits (rebase, amend, filter, replace). Seats never rebase; the Steward restacks only keel/* task rounds and never rewrites landed history.
+    stop_class: irreversible_or_destructive
+    patterns:
+      - git rebase
+      - git commit --amend
+      - git filter-branch
+      - git filter-repo
+      - git replace
+      - jj rebase
+      - jj squash
+      - jj abandon
+    detect:
+      - ref-snapshot
+      - worktree-head
+      - reflog
+      - tool-events
+      - jj-op-log
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - advisory-shim
+
+  - id: prune-history-data
+    summary: Expire reflogs, prune objects or remove worktrees. It destroys the data that detection and recovery rely on.
+    stop_class: irreversible_or_destructive
+    patterns:
+      - git reflog expire
+      - git reflog delete
+      - git gc
+      - git prune
+      - git worktree remove
+      - git worktree prune
+    detect:
+      - reflog
+      - worktree-head
+      - ref-snapshot
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - advisory-shim
+
+  - id: jj-op-rewind
+    summary: Undo or restore jj operations, or abandon them from the op log (jj undo, jj op restore, jj op abandon).
+    stop_class: irreversible_or_destructive
+    patterns:
+      - jj undo
+      - jj op restore
+      - jj op revert
+      - jj op abandon
+    detect:
+      - jj-op-log
+      - ref-snapshot
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - advisory-shim
+
+  - id: jj-ignore-immutable
+    summary: Rewrite immutable jj revisions, such as landed trunk history, with --ignore-immutable.
+    stop_class: irreversible_or_destructive
+    patterns:
+      - --ignore-immutable
+    detect:
+      - jj-op-log
+      - ref-snapshot
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - advisory-shim
+
+  - id: change-git-config
+    summary: Change repository git configuration, remotes, credential helpers or git hooks (for example remote URLs, pushurl, core.hooksPath).
+    stop_class: security_sensitive
+    patterns:
+      - git config
+      - git remote add
+      - git remote set-url
+      - git remote remove
+      - git remote rename
+      - git credential
+    detect:
+      - tool-events
+      - ref-snapshot
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - env-hardening
+      - advisory-shim
+
+  - id: write-control-plane
+    summary: Write keel's control plane or canonical files (.git/keel/**, refs/keel/*, .keel/**) other than through the Steward.
+    stop_class: security_sensitive
+    patterns:
+      - git update-ref refs/keel/
+      - git update-ref -d refs/keel/
+    detect:
+      - ref-snapshot
+      - scope-check
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - sparse-checkout
+
+  - id: mutating-keel-verb
+    summary: Run a mutating keel verb (new, run, land, sync, audit, approve). Every such verb refuses under KEEL_RUN or KEEL_RUN_ID and when an ancestor process is a registered keel run.
+    stop_class: null
+    patterns:
+      - keel new
+      - keel run
+      - keel land
+      - keel sync
+      - keel audit
+      - keel approve
+    detect:
+      - tool-events
+      - ref-snapshot
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - env-hardening
+
+  - id: board-signature
+    summary: Produce or relay a Board signature (ssh-keygen -Y sign with a Board key). SSH_AUTH_SOCK and KEEL_BOARD_* never reach a seat.
+    stop_class: security_sensitive
+    patterns:
+      - ssh-keygen -Y sign
+      - ssh-add
+    detect:
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook
+      - env-hardening
+
+  - id: publish-package
+    summary: Publish a package, image or release, or deploy to a real environment.
+    stop_class: side_effect_outside_workspace
+    patterns:
+      - npm publish
+      - pnpm publish
+      - yarn npm publish
+      - gh release create
+    detect:
+      - tool-events
+    prevent:
+      - permission-rules
+      - pretooluse-hook

@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/receipt.schema.json",
+  "title": "keel receipt",
+  "description": "The receipt projection, .keel/archive/<yyyy>/<P>-<slug>/receipt.json (L11); receipt.md renders it for the Board. The signed draft names the integrated commit and the expected trunk tip; the landed commit goes in the land.completed event, and receipt.md is never edited after signing. Projections are never trusted as input.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M3",
+  "type": "object",
+  "properties": {
+    "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
+    "slug": { "$ref": "common.schema.json#/$defs/slug" },
+    "title": { "type": "string", "minLength": 1 },
+    "track": { "$ref": "common.schema.json#/$defs/track" },
+    "origin": { "$ref": "proposal.schema.json#/$defs/origin" },
+    "charter_version": { "$ref": "common.schema.json#/$defs/semver" },
+    "contract_hash": { "$ref": "intent.schema.json#/$defs/contractHash" },
+    "integrated_commit": { "$ref": "common.schema.json#/$defs/gitOid" },
+    "expected_trunk_tip": { "$ref": "common.schema.json#/$defs/gitOid" },
+    "trunk": { "type": "string", "minLength": 1 },
+    "tasks": {
+      "description": "The task, round and commit map.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/taskRounds" },
+      "minItems": 1
+    },
+    "acceptance": {
+      "description": "The ACC to command table.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/accRow" },
+      "minItems": 1
+    },
+    "evidence": {
+      "description": "Runner evidence per round. status is the evidence record's own result; expect says what the gate required: green for verify.evidence, red for a test task judged by verify.test-red.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "evidence": { "$ref": "common.schema.json#/$defs/evidenceId" },
+          "commit": { "$ref": "common.schema.json#/$defs/gitOid" },
+          "status": { "$ref": "common.schema.json#/$defs/checkStatus" },
+          "expect": { "enum": ["green", "red"] }
+        },
+        "required": ["evidence", "commit", "status", "expect"],
+        "additionalProperties": false
+      }
+    },
+    "land_reexecution": {
+      "description": "The full acceptance matrix re-run in-process on the integrated commit.",
+      "type": "object",
+      "properties": {
+        "status": { "$ref": "common.schema.json#/$defs/checkStatus" },
+        "passed": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["status", "passed", "total"],
+      "additionalProperties": false
+    },
+    "verdicts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/verdictRow" }
+    },
+    "rulings": {
+      "description": "Sorted by cost if wrong, highest first.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/rulingRow" }
+    },
+    "gates_not_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "check": { "$ref": "common.schema.json#/$defs/checkId" },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "required": ["check", "reason"],
+        "additionalProperties": false
+      }
+    },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "override": { "$ref": "common.schema.json#/$defs/overrideId" },
+          "check": { "$ref": "common.schema.json#/$defs/checkId" },
+          "until": { "$ref": "governance-record.schema.json#/$defs/until" },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "required": ["override", "check", "until", "reason"],
+        "additionalProperties": false
+      }
+    },
+    "deferred_minors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "verdict": { "$ref": "common.schema.json#/$defs/verdictId" },
+          "finding": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 }
+        },
+        "required": ["verdict", "finding", "title"],
+        "additionalProperties": false
+      }
+    },
+    "risks": {
+      "description": "Remaining risks.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "arch_delta": {
+      "description": "The arch delta applied, or null.",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sha256": { "$ref": "common.schema.json#/$defs/sha256" },
+            "ops": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["sha256", "ops"],
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    },
+    "rtm": {
+      "description": "RTM summary with denominators.",
+      "type": "object",
+      "properties": {
+        "requirements": { "type": "integer", "minimum": 0 },
+        "covered": { "type": "integer", "minimum": 0 },
+        "verified": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["requirements", "covered", "verified"],
+      "additionalProperties": false
+    },
+    "independence": { "$ref": "approval.schema.json#/$defs/familyPair" },
+    "conformance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "seat": { "$ref": "common.schema.json#/$defs/seat" },
+          "route": { "$ref": "routing.schema.json#/$defs/route" },
+          "status": { "$ref": "common.schema.json#/$defs/conformanceStatus" }
+        },
+        "required": ["seat", "route", "status"],
+        "additionalProperties": false
+      }
+    },
+    "exposure": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "runtime": { "$ref": "common.schema.json#/$defs/runtimeId" },
+          "profile": { "$ref": "run.schema.json#/$defs/exposureProfile" }
+        },
+        "required": ["runtime", "profile"],
+        "additionalProperties": false
+      }
+    },
+    "approvals": {
+      "description": "The approvals that existed before land: contract, plan, request and rulings. The land approval is never listed: it signs the receipt draft, and its id is a hash over an envelope that contains the draft hash, so the draft cannot name it. receipt.md shows the land approval in its Signed quote section, which the archive commit fills from the land envelope.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/approvalId" }
+    },
+    "policies": {
+      "description": "Standing policies used, listed so they can be revoked.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/slug" }
+    }
+  },
+  "required": [
+    "proposal",
+    "slug",
+    "title",
+    "track",
+    "origin",
+    "charter_version",
+    "contract_hash",
+    "integrated_commit",
+    "expected_trunk_tip",
+    "trunk",
+    "tasks",
+    "acceptance",
+    "evidence",
+    "land_reexecution",
+    "verdicts",
+    "rulings",
+    "gates_not_run",
+    "overrides",
+    "deferred_minors",
+    "risks",
+    "arch_delta",
+    "rtm",
+    "independence",
+    "conformance",
+    "exposure",
+    "approvals",
+    "policies"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "taskRounds": {
+      "type": "object",
+      "properties": {
+        "task": { "$ref": "common.schema.json#/$defs/taskId" },
+        "rounds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "round": { "$ref": "common.schema.json#/$defs/roundId" },
+              "commit": { "$ref": "common.schema.json#/$defs/gitOid" }
+            },
+            "required": ["round", "commit"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["task", "rounds"],
+      "additionalProperties": false
+    },
+    "accRow": {
+      "type": "object",
+      "properties": {
+        "acc": { "$ref": "common.schema.json#/$defs/accId" },
+        "evidence_mode": { "$ref": "common.schema.json#/$defs/evidenceMode" },
+        "commands": {
+          "type": "array",
+          "items": { "$ref": "evidence.schema.json#/$defs/command" }
+        },
+        "status": { "$ref": "common.schema.json#/$defs/checkStatus" }
+      },
+      "required": ["acc", "evidence_mode", "commands", "status"],
+      "additionalProperties": false
+    },
+    "verdictRow": {
+      "type": "object",
+      "properties": {
+        "verdict": { "$ref": "common.schema.json#/$defs/verdictId" },
+        "lens": { "$ref": "common.schema.json#/$defs/lens" },
+        "recommendation": { "$ref": "common.schema.json#/$defs/recommendation" },
+        "declared_family": { "$ref": "common.schema.json#/$defs/family" },
+        "open_findings": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["verdict", "lens", "recommendation", "declared_family", "open_findings"],
+      "additionalProperties": false
+    },
+    "rulingRow": {
+      "type": "object",
+      "properties": {
+        "ruling": { "$ref": "common.schema.json#/$defs/rulingId" },
+        "cost_if_wrong": { "$ref": "result.schema.json#/$defs/cost" },
+        "clause": { "type": "string", "minLength": 1 },
+        "what": { "type": "string", "minLength": 1 },
+        "reversible": { "type": "boolean" }
+      },
+      "required": ["ruling", "cost_if_wrong", "clause", "what", "reversible"],
+      "additionalProperties": false
+    }
+  }
+}

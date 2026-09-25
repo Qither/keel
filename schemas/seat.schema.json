@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/seat.schema.json",
+  "title": "keel seat contract",
+  "description": "A seat contract in org/seats/<seat>.yaml. It lists inputs and outputs, writable globs and fields, allowed keel api ops, the execution class, the per-seat ACK id set, the output schema and submit channels, the default tier, the independence rule and the assumption the seat encodes, so the seat can be retired with evidence. org/seats/reviewer.yaml also holds the only lens-set table.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M1a",
+  "type": "object",
+  "properties": {
+    "seat": { "$ref": "common.schema.json#/$defs/seat" },
+    "duty": { "type": "string", "minLength": 1 },
+    "assumption": {
+      "description": "The assumption this seat encodes; measured yield can retire it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "writable": {
+      "type": "object",
+      "properties": {
+        "globs": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/repoGlob" }
+        },
+        "fields": {
+          "description": "Writable fields inside shared files, if any.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "required": ["globs"],
+      "additionalProperties": false
+    },
+    "api_ops": {
+      "type": "array",
+      "items": { "$ref": "api-envelope.schema.json#/$defs/apiOp" },
+      "uniqueItems": true
+    },
+    "execution_class": { "$ref": "common.schema.json#/$defs/executionClass" },
+    "ack_id_set": {
+      "description": "Id kinds in this seat's ACK id set.",
+      "type": "array",
+      "items": { "$ref": "brief.schema.json#/$defs/ackIdKind" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "output_schema": {
+      "description": "Schema the seat's result conforms to, for example schemas/result.schema.json.",
+      "$ref": "common.schema.json#/$defs/repoPath"
+    },
+    "submit_channels": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/submitChannel" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "default_tier": { "$ref": "common.schema.json#/$defs/tier" },
+    "independent_of": {
+      "description": "Seats whose declared family must differ from this seat's.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/seat" },
+      "uniqueItems": true
+    },
+    "may": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "may_not": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "lens_sets": { "$ref": "#/$defs/lensSets" }
+  },
+  "required": [
+    "seat",
+    "duty",
+    "assumption",
+    "inputs",
+    "outputs",
+    "writable",
+    "api_ops",
+    "execution_class",
+    "ack_id_set",
+    "output_schema",
+    "submit_channels",
+    "default_tier",
+    "independent_of",
+    "may",
+    "may_not"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "lensSetName": {
+      "description": "Lens-set names; the sets themselves are defined once, in org/seats/reviewer.yaml.",
+      "enum": ["frame", "frame_system", "plan", "test_task", "patch", "quick", "policy", "thorough"]
+    },
+    "lensSets": {
+      "description": "The lens-set table (reviewer seat only), keyed by $defs/lensSetName. All lenses of a set launch before any result is read.",
+      "type": "object",
+      "properties": {
+        "frame": {
+          "description": "Frame stage on the feature track.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "frame_system": {
+          "description": "Frame stage on the system track.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "plan": {
+          "description": "Plan gate on the feature and system tracks (plan.verification-gap).",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "test_task": {
+          "description": "Verify stage of a test task (a work order of kind test): the verification-gap lens over the frozen test output, next to verify.test-red.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "patch": {
+          "description": "Patch track outside a policy land (a per-change contract route).",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "quick": {
+          "description": "Build stage on the feature track.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "policy": {
+          "description": "Every policy land.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "thorough": {
+          "description": "Build stage on the system track, with a frontier-tier intent auditor.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/lens" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["frame", "patch", "quick", "policy", "thorough"],
+      "additionalProperties": false
+    }
+  }
+}

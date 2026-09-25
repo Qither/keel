@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://keel.invalid/schemas/triage.schema.json",
+  "title": "keel triage record",
+  "description": "A planner-owned triage record, TR-<sha12>.json (L10). It confirms or upgrades a finding, or proposes a dismissal that only the Board can grant (keel approve --rule dismiss); a planner cannot dismiss an independent critical or important finding. Every triage record cites evidence. Content-addressed records never contain their own id.",
+  "x-keel-status": "stable",
+  "x-keel-milestone": "M3",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "anyOf": [
+        { "$ref": "common.schema.json#/$defs/proposalId" },
+        { "$ref": "common.schema.json#/$defs/taskId" }
+      ]
+    },
+    "verdict": { "$ref": "common.schema.json#/$defs/verdictId" },
+    "finding": { "description": "Finding id within the verdict.", "type": "string", "minLength": 1 },
+    "action": {
+      "enum": ["confirm", "upgrade", "propose-dismissal"]
+    },
+    "severity": {
+      "description": "Severity after triage; upgrade only raises it.",
+      "$ref": "common.schema.json#/$defs/findingSeverity"
+    },
+    "rationale": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "description": "An evidence or verdict id, a commit, or path:line.",
+            "type": "string",
+            "minLength": 1
+          },
+          "note": { "type": "string", "minLength": 1 }
+        },
+        "required": ["ref"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "brief_hash": { "$ref": "common.schema.json#/$defs/briefId" },
+    "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+    "charter_version": { "$ref": "common.schema.json#/$defs/semver" }
+  },
+  "required": [
+    "subject",
+    "verdict",
+    "finding",
+    "action",
+    "severity",
+    "rationale",
+    "evidence",
+    "brief_hash",
+    "recorded_at",
+    "charter_version"
+  ],
+  "additionalProperties": false
+}

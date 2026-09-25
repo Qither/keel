@@ -1,0 +1,101 @@
+# config/keel.defaults.yaml: the package-defaults layer of keel configuration (schemas/config.schema.json).
+#
+# Layering: this file -> .keel/config.yaml (team, Board-owned) -> .keel/local.yaml (personal, gitignored).
+# Tables deep-merge, arrays of objects keyed by id (or runtime) replace whole entries, and unknown keys are
+# errors at every level. Every default below states its reason in the "reason:" comment above it; the
+# schema admits no extra keys, so reasons live in comments.
+#
+# Repository-specific values are not defaulted here: vcs.trunk, vcs.remotes, workspace_root (computed as
+# ../<repo>.ws/ when unset) and trace.since are written into the team layer by `keel init`.
+#
+# Provider endpoints, API keys and model names never appear in any configuration layer. The Board-signed
+# .keel/routing.yaml names environment variables only (docs/10-providers.md).
+
+vcs:
+  # reason: auto picks jj only when every jj precondition holds (jj >= 0.45.1 feature-probed, colocated
+  # repository, no LFS, submodule or filter) and the Board opted in; git alone is fully sufficient (D4).
+  backend: auto
+  # reason: jj is an optional enhancement; it stays off until the Board opts in explicitly.
+  jj_opt_in: false
+
+tracks:
+  patch:
+    # reason: one session keeps a patch small enough that skipping the plan phase is safe; anything that
+    # needs a second session has a plan worth checking.
+    max_sessions: 1
+    # reason: five files is the largest change one lens reliably reviews without a work-order breakdown.
+    max_files: 5
+    # reason: about 100 changed lines keeps a patch reviewable in one sitting by one lens; larger changes
+    # get the feature track's plan and quick lens set.
+    max_loc: 100
+  # reason: protected paths are project knowledge; the package protects .keel/** through
+  # submit.frozen-paths regardless of this list.
+  protected_globs: []
+  # reason: without an index, a change that spans more than one top-level directory mapping most likely
+  # crosses an element boundary, so the ratchet raises the track.
+  max_top_level_dirs: 1
+
+# reason: declared commands are project-specific; the gates' built-in checks run without them.
+commands: []
+
+caps:
+  # reason: three parallel builders keep the integration queue and the Board's review load bounded; a
+  # width above 1 on the feature track needs plan approval anyway.
+  max_parallel: 3
+  # reason: one success-shaped retry fixes honest slips; a second mismatch means the seat misread the
+  # brief, so blocked(ack_mismatch) routes an ask to the clause owner.
+  ack_attempts: 2
+  # reason: five fix rounds (three resumed, two fresh one tier up) is where extra rounds stop paying off;
+  # past it the task is blocked(non_convergence) and goes to the Board. The review check uses the same cap.
+  fix_rounds: 5
+  # reason: resuming the same engineer is cheapest while its context still helps; after three failed
+  # rounds a fresh engineer one tier up avoids retrying the same model unchanged.
+  resume_rounds: 3
+  # reason: at most five review focus items keeps each lens on what matters; longer lists dilute attention.
+  review_focus_max: 5
+  # reason: the managed AGENTS.md block is a pointer to keel brief and keel api, not policy text; 8 KiB
+  # keeps it well inside every runtime's instruction budget.
+  handbook_block_bytes: 8192
+  # reason: Codex truncates the AGENTS.md chain silently past 32 KiB, so the whole chain stays below it.
+  handbook_chain_bytes: 32768
+  # reason: heartbeats come only from parsed stream events, and one declared build or test command can
+  # run for many minutes without an event; 30 minutes avoids re-queueing a live run while still freeing a
+  # dead one within a working session.
+  lease_seconds: 1800
+  # reason: ten seconds lets a runtime flush its session and stream after stdin closes (SIGTERM on
+  # POSIX) before `taskkill /PID <pid> /T /F` or SIGKILL ends the process tree.
+  cancel_grace_seconds: 10
+  # reason: 64 KiB holds the largest legitimate drop (a result or verdict with findings and rulings) with a
+  # wide margin, while stopping a runaway seat from filling the outbox; api-side checks are a convenience
+  # and the Steward re-validates every drop at ingest.
+  submit_payload_bytes: 65536
+
+brief:
+  # reason: 24 KiB carries the frozen block, the ACC and the must and must_not obligations (never truncated)
+  # and a 2-4 KiB element brief with room for context sections; a brief over budget means the task must be
+  # split.
+  max_bytes: 24576
+  # reason: no per-runtime budget is set until conformance measures one; every runtime uses max_bytes.
+  runtimes: []
+  # reason: the upper end of the 2-4 KiB element brief target, so architecture context never crowds out
+  # the contract sections.
+  element_brief_bytes: 4096
+
+budget:
+  # reason: a warning at 80% leaves the Board time to raise a budget before blocked(budget) stops the
+  # run at 100%.
+  warn_at_percent: 80
+
+index:
+  # reason: none is the honest default until the project configures an index; doctor then reports the
+  # architecture checks as inert instead of guessing.
+  backend: none
+
+arch:
+  # reason: default blocks an unknown arch result on the system track or when rules reach the affected
+  # elements, and is advisory otherwise; settings can tighten this, never loosen it.
+  unknown: default
+
+land:
+  # reason: without a Board-signed standing land policy, every land needs a land approval.
+  policy: null

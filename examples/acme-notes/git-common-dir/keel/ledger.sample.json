@@ -1,0 +1,2647 @@
+[
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8A0003B03J2AYJBYQ2XTN",
+    "prev": null,
+    "ts": "2026-09-01T09:00:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "6411b381f395f4745aa8a1f345959a5a42178749",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-0b3d5f7a9c1e",
+      "kind": "tofu",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/08b7d4e6afb76be6621502248c1992d3e8bcb79c074fd92642a0b33237cadc61.tofu.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "7df335635c76681c93d294a354043d4fceeec9160f6f9fd12444fcfe2d3943e0"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8A865NV0T525Z1KRJYQ61",
+    "prev": "7df335635c76681c93d294a354043d4fceeec9160f6f9fd12444fcfe2d3943e0",
+    "ts": "2026-09-01T09:05:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "0196a4e3e906745497c978960a04a78c18879a65",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-1c4e6a8b0d2f",
+      "kind": "doc",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/193784c2da46e725d3e7b5a5471621aa3933b93d6329e8d96802756ffa77ab07.doc.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "b29085e7c74fb7096ce98cabe0fcf2071073567ae973ee81e3c1d285c4c18ec4"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8AGCBA0N9E3BHCNAX1S1Z",
+    "prev": "b29085e7c74fb7096ce98cabe0fcf2071073567ae973ee81e3c1d285c4c18ec4",
+    "ts": "2026-09-01T09:06:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "0196a4e3e906745497c978960a04a78c18879a65",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-3e5a7c9b1d4f",
+      "kind": "doc",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/f0672a61e14f288da9d2c6e19cbf6fb4b02c1a5b743a4543886046c6d7cb8c6c.doc.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "25f24a4d7b70015fa0f217be2ba32dbb013ba3843159e122df2e1a3a395f2fb5"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8ARJHM7PNK4F82JM5NEJS",
+    "prev": "25f24a4d7b70015fa0f217be2ba32dbb013ba3843159e122df2e1a3a395f2fb5",
+    "ts": "2026-09-01T09:07:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "0196a4e3e906745497c978960a04a78c18879a65",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-4f6b8d0c2e5a",
+      "kind": "doc",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/1f8ad2fedb9fd40d2f48a772580e75193e6add33a36e9f24f987e939e0599ac5.doc.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "d1a5b528d027ac8a0ea971843a511195ca7cfd1de66b1811a57ac50367274fdd"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8B0RQ20RJ5N0BMEM7JQMY",
+    "prev": "d1a5b528d027ac8a0ea971843a511195ca7cfd1de66b1811a57ac50367274fdd",
+    "ts": "2026-09-01T09:08:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "0196a4e3e906745497c978960a04a78c18879a65",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-5a7c9e1d3f6b",
+      "kind": "policy",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/2449c6e3d2acc79ff82d7c78c10bd490a637d28cf15cc37f2b8441b9362a93ed.policy.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "17937d518455d8b9b13b4471b73ef1f9d3f3117b9d1c70d79d69859962509ff8"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8B8YX6FMMX4F9PYP5ER1T",
+    "prev": "17937d518455d8b9b13b4471b73ef1f9d3f3117b9d1c70d79d69859962509ff8",
+    "ts": "2026-09-10T15:20:00Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": null,
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "66246d52f6ba235bba3931f4896cec3f1695f761",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-6b8d0f2e4a7c",
+      "kind": "doc",
+      "stage": null,
+      "rule": null,
+      "envelope": ".keel/signatures/73876ea007e67dce0739e53ec8b39f98820b2be9048c9d67b184451f9bf37d50.doc.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "4cb690bb541a93e86240cebbc1ad0301efbce54d9d9e5a6f881958879361fcd0"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8BH53DM5FEFS780JB2HDE",
+    "prev": "4cb690bb541a93e86240cebbc1ad0301efbce54d9d9e5a6f881958879361fcd0",
+    "ts": "2026-09-21T09:00:00Z",
+    "type": "proposal.created",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "3c92a83801e21ff2840baa3b2eb7f43ea69c6a17",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "slug": "note-tags",
+      "title": "Note tags",
+      "origin": "contract-approved",
+      "goals": [
+        "G-03"
+      ],
+      "policy": null,
+      "request_approval": null,
+      "base": "3c92a83801e21ff2840baa3b2eb7f43ea69c6a17",
+      "branch": "keel/P-7F3K9Q/main"
+    },
+    "hash": "5c9de14aa0332cd38fcdc6e06aa4a6ac55cf5d2f009955d67d93c9c69e1e142d"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8BSB9XGKM6MQJA344YCMS",
+    "prev": "5c9de14aa0332cd38fcdc6e06aa4a6ac55cf5d2f009955d67d93c9c69e1e142d",
+    "ts": "2026-09-21T09:00:01Z",
+    "type": "track.decided",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "track": "feature",
+      "previous": null,
+      "cause": "intake",
+      "ruling": null
+    },
+    "hash": "d70d5e6318f4b7366195e2f54b24d8b48c3e5ecd0a75ab44cdf8decba4a3b5d3"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8C1HF5AXNB2FG4NX55659",
+    "prev": "d70d5e6318f4b7366195e2f54b24d8b48c3e5ecd0a75ab44cdf8decba4a3b5d3",
+    "ts": "2026-09-21T09:00:02Z",
+    "type": "impact.recorded",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "3c92a83801e21ff2840baa3b2eb7f43ea69c6a17",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "impact": "IM-5e0b7c9d1f23",
+      "kind": "predicted"
+    },
+    "hash": "304d6ddf1a17a7db03acc3afa728068638b03cb8950e6e359e8f540e3e8705fc"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8C9QN85ER6P6YYB3SPGAX",
+    "prev": "304d6ddf1a17a7db03acc3afa728068638b03cb8950e6e359e8f540e3e8705fc",
+    "ts": "2026-09-21T09:01:00Z",
+    "type": "dispatch.queued",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "seat": "product",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      }
+    },
+    "hash": "281ed7944e3803855d40c35114b4d7b6dede007a78c8e00da00577d181bef720"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8CHXTGQB6F3GGRD0KECAT",
+    "prev": "281ed7944e3803855d40c35114b4d7b6dede007a78c8e00da00577d181bef720",
+    "ts": "2026-09-21T09:01:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-2a4c6e8f0b13",
+      "pg": "PG-0e2c4a6b8d1f",
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A",
+      "seat": "product",
+      "mode": "plan",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "blocked",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "final-message",
+      "rung": "A"
+    },
+    "hash": "f70ea1f647951d46a8a6fc5b903c28560a9f5f0891e5215f18e6aca9660b1296"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8CT402DCV1G21HSGY4V1N",
+    "prev": "f70ea1f647951d46a8a6fc5b903c28560a9f5f0891e5215f18e6aca9660b1296",
+    "ts": "2026-09-21T09:03:12Z",
+    "type": "ack.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "product",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-2a4c6e8f0b13",
+      "pg": "PG-0e2c4a6b8d1f",
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "channel": "final-message",
+      "attempt": 1,
+      "matched": true,
+      "missing": [],
+      "extra": [],
+      "write_set_ok": true,
+      "hash_ok": true
+    },
+    "hash": "46aad802f1de79df0333b8613f063039fe777921a807f7204e632881d1b7026a"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8D2A6Y7SVNTKM5X8AA5S2",
+    "prev": "46aad802f1de79df0333b8613f063039fe777921a807f7204e632881d1b7026a",
+    "ts": "2026-09-21T09:40:27Z",
+    "type": "result.submitted",
+    "actor": {
+      "kind": "seat",
+      "seat": "product",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-2a4c6e8f0b13",
+      "pg": "PG-0e2c4a6b8d1f",
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "status": "DONE",
+      "channel": "final-message"
+    },
+    "hash": "fe9b78cbc8f74cf3c67a600c8987a61cbf55c08c9374d4752f0f58a32f7f91f0"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8DAGCWVJR9ERNXKYZGASW",
+    "prev": "fe9b78cbc8f74cf3c67a600c8987a61cbf55c08c9374d4752f0f58a32f7f91f0",
+    "ts": "2026-09-21T09:40:29Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-2a4c6e8f0b13",
+      "pg": "PG-0e2c4a6b8d1f",
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "9a4c7fb116a13df2d1835275c853e429f73fcd93ba2e86fc8162b56ae6110b8d"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8DJPJ1MYMHT2K0JEYFWC2",
+    "prev": "9a4c7fb116a13df2d1835275c853e429f73fcd93ba2e86fc8162b56ae6110b8d",
+    "ts": "2026-09-21T09:41:00Z",
+    "type": "vcs.op",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8B2C0WQJK77H0E8NSRN1A"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "backend": "git",
+      "op": "commit",
+      "ref": "refs/heads/keel/P-7F3K9Q/main",
+      "jj_op": null
+    },
+    "hash": "2628b77bb58ac014be7ebb99058bd1be1878365c446a3f945a815cf38b3302f1"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8DTWRMVZAQQ0CW072DNMM",
+    "prev": "2628b77bb58ac014be7ebb99058bd1be1878365c446a3f945a815cf38b3302f1",
+    "ts": "2026-09-21T09:42:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8C4D05KEDW3B283EMTM66"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-3b5d7f9a1c24",
+      "pg": "PG-1f3d5b7c9e20",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8C4D05KEDW3B283EMTM66",
+      "seat": "reviewer",
+      "mode": "read-only-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "mcp",
+      "rung": "C"
+    },
+    "hash": "2acbdca5ebd8b3377b5ee2819137f6ae14c695d2353c60394e715ba85606c386"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8E32Y31X5PFH8BT8MRCDE",
+    "prev": "2acbdca5ebd8b3377b5ee2819137f6ae14c695d2353c60394e715ba85606c386",
+    "ts": "2026-09-21T09:55:40Z",
+    "type": "verdict.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "reviewer",
+      "runtime": "opencode",
+      "declared_family": "google",
+      "alias": "gemini-compat",
+      "run": "RUN-01J9Z8C4D05KEDW3B283EMTM66"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-3b5d7f9a1c24",
+      "pg": "PG-1f3d5b7c9e20",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "verdict": "VD-1f3a5c7e9b20",
+      "lens": "spec",
+      "recommendation": "approve"
+    },
+    "hash": "520686d8758862c969cb96816a9c35ca5ccb948abe8416f7c70bbbc1a293452a"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8EB94V32JPN8J71YEX6NF",
+    "prev": "520686d8758862c969cb96816a9c35ca5ccb948abe8416f7c70bbbc1a293452a",
+    "ts": "2026-09-21T09:55:42Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8C4D05KEDW3B283EMTM66"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-3b5d7f9a1c24",
+      "pg": "PG-1f3d5b7c9e20",
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8C4D05KEDW3B283EMTM66",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "9559bb06ea00c709e900ab8ee0edadfc4c105dfe980c3e1fbc46dc326222ae40"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8EKFAN0K34635A68D3DW0",
+    "prev": "9559bb06ea00c709e900ab8ee0edadfc4c105dfe980c3e1fbc46dc326222ae40",
+    "ts": "2026-09-21T09:56:00Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "frame.review",
+      "status": "pass",
+      "passed": 1,
+      "total": 1,
+      "unit": "lens verdicts in the frame set",
+      "reason": null
+    },
+    "hash": "2786b79551090dd7e42ecee2b29fa2efc6c2ed07907ac6d3f7f9218781341645"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8EVNF2ZWW9XC5GXBCZPYE",
+    "prev": "2786b79551090dd7e42ecee2b29fa2efc6c2ed07907ac6d3f7f9218781341645",
+    "ts": "2026-09-21T14:30:12Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "9039efbbec515d639b0c38dd6fa1051cfc3b3d76",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-2d9e4f6a8b0c",
+      "kind": "stage",
+      "stage": "contract",
+      "rule": null,
+      "envelope": ".keel/signatures/8f7e3bd76036e139a6de4c465e88bad8ff88520fbc48485d5c036ab68f19af3d.contract.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "bfe1d9e450feec088707a502b3fdb8e6021236954456bfd6b03e302950af7574"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8F3VNG7Z8S5H02GP88MXM",
+    "prev": "bfe1d9e450feec088707a502b3fdb8e6021236954456bfd6b03e302950af7574",
+    "ts": "2026-09-21T14:30:20Z",
+    "type": "vcs.op",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b98a821e1a38c53acdc7ef00ba804bc3b5c8c548",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "backend": "git",
+      "op": "commit",
+      "ref": "refs/heads/keel/P-7F3K9Q/main",
+      "jj_op": null
+    },
+    "hash": "f286965554a927b20604ff3cad14148557a6cfbe9cbdae389f6af1698178453c"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8FC1V6R60WXF9W69KE3RM",
+    "prev": "f286965554a927b20604ff3cad14148557a6cfbe9cbdae389f6af1698178453c",
+    "ts": "2026-09-21T14:35:00Z",
+    "type": "dispatch.queued",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "seat": "planner",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      }
+    },
+    "hash": "dea024c6aaf963aaed783cd6bb33c6e3871a069885296c26e354830dedc26df6"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8FM81Z97XW3PMHXSVATQR",
+    "prev": "dea024c6aaf963aaed783cd6bb33c6e3871a069885296c26e354830dedc26df6",
+    "ts": "2026-09-21T14:35:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-4c6e8a0b2d35",
+      "pg": "PG-2a4e6c8d0f31",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN",
+      "seat": "planner",
+      "mode": "plan",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "frontier",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "blocked",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "final-message",
+      "rung": "A"
+    },
+    "hash": "99938fc17818786b6d0c6959d307a50d6d4d9a7574103ff7fb0b4871bbedd2ed"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8FWE7MMZDS8TMFPN8KGTJ",
+    "prev": "99938fc17818786b6d0c6959d307a50d6d4d9a7574103ff7fb0b4871bbedd2ed",
+    "ts": "2026-09-21T14:37:44Z",
+    "type": "ack.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "planner",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-4c6e8a0b2d35",
+      "pg": "PG-2a4e6c8d0f31",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "channel": "final-message",
+      "attempt": 1,
+      "matched": true,
+      "missing": [],
+      "extra": [],
+      "write_set_ok": true,
+      "hash_ok": true
+    },
+    "hash": "45736824e07d134e328fa90b67849bcc9cc7acc52d3007f43faaba2c23a13db7"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8G4MDKNBAYMPR6VRHQX9Y",
+    "prev": "45736824e07d134e328fa90b67849bcc9cc7acc52d3007f43faaba2c23a13db7",
+    "ts": "2026-09-21T15:09:58Z",
+    "type": "result.submitted",
+    "actor": {
+      "kind": "seat",
+      "seat": "planner",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-4c6e8a0b2d35",
+      "pg": "PG-2a4e6c8d0f31",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "status": "DONE",
+      "channel": "final-message"
+    },
+    "hash": "1c7530696f0df7476259ad30c0eb601b86acbc1f9c388c7ad01744c3d4758cdb"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8GCTKQ38P3KY4QE1WN3NF",
+    "prev": "1c7530696f0df7476259ad30c0eb601b86acbc1f9c388c7ad01744c3d4758cdb",
+    "ts": "2026-09-21T15:10:00Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-4c6e8a0b2d35",
+      "pg": "PG-2a4e6c8d0f31",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "1f5a9016420bd17738469f526f88eafad0b80583e80638235468c388676ffbc2"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8GN0SHRR81G33TTKWCVKF",
+    "prev": "1f5a9016420bd17738469f526f88eafad0b80583e80638235468c388676ffbc2",
+    "ts": "2026-09-21T15:11:00Z",
+    "type": "vcs.op",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8E6F06YVM4G097HGGY1SN"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "016d1412552b50c7612e3109872e0128f64c177a",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "backend": "git",
+      "op": "commit",
+      "ref": "refs/heads/keel/P-7F3K9Q/main",
+      "jj_op": null
+    },
+    "hash": "641f87b4d744d3ee113f199132515324b21c9061a409943d5dc26b5230ba1494"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8GX6ZKK7478RAEDHGXH89",
+    "prev": "641f87b4d744d3ee113f199132515324b21c9061a409943d5dc26b5230ba1494",
+    "ts": "2026-09-21T15:12:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8G8H06AZ1DB5BE2YB9R92"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-5d7f9b1c3e46",
+      "pg": "PG-3b5f7d9e1a42",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8G8H06AZ1DB5BE2YB9R92",
+      "seat": "reviewer",
+      "mode": "read-only-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "mcp",
+      "rung": "C"
+    },
+    "hash": "6ff3fd8d58d1c829b46d12c4b03139a675812e125b9360852d3036305bdbbca8"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8H5D4PBTGV3TEQRNQ0JKK",
+    "prev": "6ff3fd8d58d1c829b46d12c4b03139a675812e125b9360852d3036305bdbbca8",
+    "ts": "2026-09-21T15:25:10Z",
+    "type": "verdict.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "reviewer",
+      "runtime": "opencode",
+      "declared_family": "google",
+      "alias": "gemini-compat",
+      "run": "RUN-01J9Z8G8H06AZ1DB5BE2YB9R92"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-5d7f9b1c3e46",
+      "pg": "PG-3b5f7d9e1a42",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "016d1412552b50c7612e3109872e0128f64c177a",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "verdict": "VD-8d0f2b4c6e71",
+      "lens": "verification-gap",
+      "recommendation": "approve"
+    },
+    "hash": "cde7b9351d956af54f144701c3f8ee95e83791e534a05d8d84278aa881c62506"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8HDKATM52K6Q8QEY46DC1",
+    "prev": "cde7b9351d956af54f144701c3f8ee95e83791e534a05d8d84278aa881c62506",
+    "ts": "2026-09-21T15:25:12Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8G8H06AZ1DB5BE2YB9R92"
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": "BR-5d7f9b1c3e46",
+      "pg": "PG-3b5f7d9e1a42",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8G8H06AZ1DB5BE2YB9R92",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "a778251f21fe3655f199bfd18c8a4c4eaa3ba738ad3250468f9cf2099de461e7"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8HNSGCV0M1ZT05BDYRTDZ",
+    "prev": "a778251f21fe3655f199bfd18c8a4c4eaa3ba738ad3250468f9cf2099de461e7",
+    "ts": "2026-09-21T15:26:00Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "016d1412552b50c7612e3109872e0128f64c177a",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "plan.ready",
+      "status": "pass",
+      "passed": 8,
+      "total": 8,
+      "unit": "plan checks",
+      "reason": null
+    },
+    "hash": "e257ead2dd698e38261934564010a994d3a9d9312b0fd9ac05cb70e2c456c822"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8HXZPCEB08MDV0CEBBZGN",
+    "prev": "e257ead2dd698e38261934564010a994d3a9d9312b0fd9ac05cb70e2c456c822",
+    "ts": "2026-09-22T08:00:00Z",
+    "type": "dispatch.queued",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "seat": "engineer",
+      "route": {
+        "runtime": "opencode",
+        "alias": "glm-main",
+        "tier": "standard",
+        "declared_family": "zhipu",
+        "protocol": "openai-chat",
+        "revision": 1
+      }
+    },
+    "hash": "bad67404795a90338c4cbecac93cbb4f40edc51f4e79bda85a9f7cf6de17e740"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8J65W09FDSW2N447FSEV5",
+    "prev": "bad67404795a90338c4cbecac93cbb4f40edc51f4e79bda85a9f7cf6de17e740",
+    "ts": "2026-09-22T08:00:03Z",
+    "type": "claim.acquired",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "016d1412552b50c7612e3109872e0128f64c177a",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "task": "P-7F3K9Q.T1",
+      "ref": "refs/keel/claims/P-7F3K9Q.T1",
+      "token": "4be5430c7eacad7a77b563f492f37ac8a43c8aa9c66ee998f5807082d7fb47d0",
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X",
+      "acquired_at": "2026-09-22T08:00:03Z",
+      "lease_seconds": 1800,
+      "workspace": {
+        "path": "C:/src/acme-notes.ws/P-7F3K9Q.T1",
+        "branch": "keel/P-7F3K9Q/t/1",
+        "base": "016d1412552b50c7612e3109872e0128f64c177a",
+        "sparse": [
+          "/*",
+          "!/.keel/proposals/"
+        ],
+        "lock_reason": "keel:P-7F3K9Q.T1:RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+      }
+    },
+    "hash": "edc0afc24f01c603ba79bda46687b54e5fea488d08c047bce1229664cc5fdf1b"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8JEC26QX7HMZSW6R9FWVP",
+    "prev": "edc0afc24f01c603ba79bda46687b54e5fea488d08c047bce1229664cc5fdf1b",
+    "ts": "2026-09-22T08:00:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-6e8a0c2d4f57",
+      "pg": "PG-5c7a9e1f3b64",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X",
+      "seat": "engineer",
+      "mode": "build-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "glm-main",
+        "tier": "standard",
+        "declared_family": "zhipu",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "unverified",
+      "submit_channel": "outbox",
+      "rung": "C"
+    },
+    "hash": "d17ef3bba5ae3683949fd0f2509fd70e1b090bce034c8c7d43ac403ea6b03abd"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8JPJ8D4YCGP357SKN8M0P",
+    "prev": "d17ef3bba5ae3683949fd0f2509fd70e1b090bce034c8c7d43ac403ea6b03abd",
+    "ts": "2026-09-22T08:01:20Z",
+    "type": "ack.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "engineer",
+      "runtime": "opencode",
+      "declared_family": "zhipu",
+      "alias": "glm-main",
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-6e8a0c2d4f57",
+      "pg": "PG-5c7a9e1f3b64",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "channel": "outbox",
+      "attempt": 1,
+      "matched": true,
+      "missing": [],
+      "extra": [],
+      "write_set_ok": true,
+      "hash_ok": true
+    },
+    "hash": "5bdd85f77e0f1548183a0e2bf3316241eba527d243d4b4d50710ad554fdbe494"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8JYREA36E3AM4KVJ39CKJ",
+    "prev": "5bdd85f77e0f1548183a0e2bf3316241eba527d243d4b4d50710ad554fdbe494",
+    "ts": "2026-09-22T08:29:50Z",
+    "type": "result.submitted",
+    "actor": {
+      "kind": "seat",
+      "seat": "engineer",
+      "runtime": "opencode",
+      "declared_family": "zhipu",
+      "alias": "glm-main",
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-6e8a0c2d4f57",
+      "pg": "PG-5c7a9e1f3b64",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "status": "DONE",
+      "channel": "outbox"
+    },
+    "hash": "588324aca6586bb9c66170022a94dc27747afcd20da7751a096447d7d32126e4"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8K6YM6KXV4HYHP5BZB3TY",
+    "prev": "588324aca6586bb9c66170022a94dc27747afcd20da7751a096447d7d32126e4",
+    "ts": "2026-09-22T08:29:52Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-6e8a0c2d4f57",
+      "pg": "PG-5c7a9e1f3b64",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "67306fb38e2141c562cf772894e3cceeb832eb75e70a02de621ef0ff020c3786"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8KF4SQR2RNZHEPVSFR1ND",
+    "prev": "67306fb38e2141c562cf772894e3cceeb832eb75e70a02de621ef0ff020c3786",
+    "ts": "2026-09-22T08:30:40Z",
+    "type": "round.committed",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-6e8a0c2d4f57",
+      "pg": "PG-5c7a9e1f3b64",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": "64a63c3b92f2585b9239995980c12749632f8fce",
+      "op": null
+    },
+    "data": {
+      "round": "P-7F3K9Q.T1.r1",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": "64a63c3b92f2585b9239995980c12749632f8fce",
+      "branch": "keel/P-7F3K9Q/t/1",
+      "snapshots": []
+    },
+    "hash": "19da05f3596d9a0d05ef0b4c65014c705fdc24e907cbbc37fa0e473bb89b6524"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8KQAZ8TWSNFFF780B1ETP",
+    "prev": "19da05f3596d9a0d05ef0b4c65014c705fdc24e907cbbc37fa0e473bb89b6524",
+    "ts": "2026-09-22T08:31:00Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "submit.scope",
+      "status": "pass",
+      "passed": 1,
+      "total": 1,
+      "unit": "changed paths inside write_set",
+      "reason": null
+    },
+    "hash": "de1c9e09b782368d9aa206f593decd6ea0c1720141fa2c346200cd95497699e9"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8KZH555GW0TZJJA8S9HAS",
+    "prev": "de1c9e09b782368d9aa206f593decd6ea0c1720141fa2c346200cd95497699e9",
+    "ts": "2026-09-22T08:31:30Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "submit.commands",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "declared submit commands passing",
+      "reason": null
+    },
+    "hash": "c2b934ba3b50511baef2a9818c60d61a0df957ca7cd792f41c2df74cc9583105"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8M7QBSJDEWZ5K3AGZQED1",
+    "prev": "c2b934ba3b50511baef2a9818c60d61a0df957ca7cd792f41c2df74cc9583105",
+    "ts": "2026-09-22T08:31:31Z",
+    "type": "claim.released",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "reason": "submitted"
+    },
+    "hash": "96b01d652aa823d320ff3699808fb82ac3d18ee593edba876280401559444dee"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8MFXHY5JYNWW45E4M60VS",
+    "prev": "96b01d652aa823d320ff3699808fb82ac3d18ee593edba876280401559444dee",
+    "ts": "2026-09-22T08:32:00Z",
+    "type": "evidence.recorded",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": "64a63c3b92f2585b9239995980c12749632f8fce",
+      "op": null
+    },
+    "data": {
+      "evidence": "EV-7d9f1b3c5e20",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "status": "fail"
+    },
+    "hash": "c1cfe9194d679d0a19640949fba5983b04ab40658eea4cbb11a171d237c0197f"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8MR3QNWKWGJXK7BQ5GFAS",
+    "prev": "c1cfe9194d679d0a19640949fba5983b04ab40658eea4cbb11a171d237c0197f",
+    "ts": "2026-09-22T08:32:05Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.test-red",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "cited rows red at the task commit",
+      "reason": null
+    },
+    "hash": "67998c63c2fa7bc4da727d4b15877cfd546abc034b9a11b29e42284e10c6b18b"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8N09XN73J28ZM2G1V0MQ4",
+    "prev": "67998c63c2fa7bc4da727d4b15877cfd546abc034b9a11b29e42284e10c6b18b",
+    "ts": "2026-09-22T08:32:06Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.commands",
+      "status": "not_run",
+      "passed": 0,
+      "total": 0,
+      "unit": "declared verify commands passing",
+      "reason": "not applicable: the only declared verify command has purpose test, which verify.test-red judges for a test task"
+    },
+    "hash": "fb70a1f3a395a845e9fc0d324f56d71bddaeda4edde96f8d7fb2b3516b0d86f0"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8N8G32Q3HAKF1ZMF9KP1Y",
+    "prev": "fb70a1f3a395a845e9fc0d324f56d71bddaeda4edde96f8d7fb2b3516b0d86f0",
+    "ts": "2026-09-22T08:33:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8P0Q0RQFPWFKQT3SMYSMP"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-1b3d5f7a9c2e",
+      "pg": "PG-8f0d2b4c6e97",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8P0Q0RQFPWFKQT3SMYSMP",
+      "seat": "reviewer",
+      "mode": "read-only-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "mcp",
+      "rung": "C"
+    },
+    "hash": "b9f6bd5b5bcbd400d079cf605ea3fde7186f63de04b511e685d5a7d21c2d4ce7"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8NGP9F3NRQ1FX3SX5AT2X",
+    "prev": "b9f6bd5b5bcbd400d079cf605ea3fde7186f63de04b511e685d5a7d21c2d4ce7",
+    "ts": "2026-09-22T08:38:10Z",
+    "type": "verdict.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "reviewer",
+      "runtime": "opencode",
+      "declared_family": "google",
+      "alias": "gemini-compat",
+      "run": "RUN-01J9Z8P0Q0RQFPWFKQT3SMYSMP"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-1b3d5f7a9c2e",
+      "pg": "PG-8f0d2b4c6e97",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "verdict": "VD-4e6a8c0b2d19",
+      "lens": "verification-gap",
+      "recommendation": "approve"
+    },
+    "hash": "146a496f8cd2bc8ac63d0bb91837f4146225e76ed2d091e38e78fcdcd459b4dc"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8NRWEBR6VFEPMDNKWB80X",
+    "prev": "146a496f8cd2bc8ac63d0bb91837f4146225e76ed2d091e38e78fcdcd459b4dc",
+    "ts": "2026-09-22T08:38:12Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8P0Q0RQFPWFKQT3SMYSMP"
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": "BR-1b3d5f7a9c2e",
+      "pg": "PG-8f0d2b4c6e97",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8P0Q0RQFPWFKQT3SMYSMP",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "99a0671130a75812b1694c4242e36da1c7d8b00b7dc778b2d28e62984b059439"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8P12M6VBAEATEPVKK01Y2",
+    "prev": "99a0671130a75812b1694c4242e36da1c7d8b00b7dc778b2d28e62984b059439",
+    "ts": "2026-09-22T08:38:30Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T1",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.review",
+      "status": "pass",
+      "passed": 1,
+      "total": 1,
+      "unit": "lenses of the test_task set approving",
+      "reason": null
+    },
+    "hash": "c18cca83aaa404d0a448f04d5cc5dae24de210f4431a1ad72d2d828f7491bba4"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8P98TWKVAXC63C29CRQ36",
+    "prev": "c18cca83aaa404d0a448f04d5cc5dae24de210f4431a1ad72d2d828f7491bba4",
+    "ts": "2026-09-22T08:40:00Z",
+    "type": "vcs.op",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "2bdb45a16a391385f43f15d156b93184934a4a58",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "backend": "git",
+      "op": "restack",
+      "ref": "refs/heads/keel/P-7F3K9Q/main",
+      "jj_op": null
+    },
+    "hash": "30a072c3f2e511ddda1a23d01e0daa31d1feff926dac4c94012b2204d874e5d4"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8PHF0GF3FS8028SVGTXAR",
+    "prev": "30a072c3f2e511ddda1a23d01e0daa31d1feff926dac4c94012b2204d874e5d4",
+    "ts": "2026-09-22T09:00:00Z",
+    "type": "dispatch.queued",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "seat": "engineer",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "standard",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      }
+    },
+    "hash": "51ecf9180575e50a265e8c3bf33d87297937682c16891338ccfb900e79dffe0f"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8PSN6RXET4XFZYQ0R0SQZ",
+    "prev": "51ecf9180575e50a265e8c3bf33d87297937682c16891338ccfb900e79dffe0f",
+    "ts": "2026-09-22T09:00:03Z",
+    "type": "claim.acquired",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "2bdb45a16a391385f43f15d156b93184934a4a58",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "task": "P-7F3K9Q.T2",
+      "ref": "refs/keel/claims/P-7F3K9Q.T2",
+      "token": "7254f1768707ed093159e32a1f677300e79923fc683a5e28f941110f448124fc",
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A",
+      "acquired_at": "2026-09-22T09:00:03Z",
+      "lease_seconds": 1800,
+      "workspace": {
+        "path": "C:/src/acme-notes.ws/P-7F3K9Q.T2",
+        "branch": "keel/P-7F3K9Q/t/2",
+        "base": "2bdb45a16a391385f43f15d156b93184934a4a58",
+        "sparse": [
+          "/*",
+          "!/.keel/proposals/"
+        ],
+        "lock_reason": "keel:P-7F3K9Q.T2:RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+      }
+    },
+    "hash": "3586b607c385d74cb409664d44cc5a72db25a3408f4b935201e76fa7adf7b386"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8Q1VCT8Q37HS3K635HFTE",
+    "prev": "3586b607c385d74cb409664d44cc5a72db25a3408f4b935201e76fa7adf7b386",
+    "ts": "2026-09-22T09:00:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A",
+      "seat": "engineer",
+      "mode": "accept-edits",
+      "route": {
+        "runtime": "claude-code",
+        "alias": "anthropic-main",
+        "tier": "standard",
+        "declared_family": "anthropic",
+        "protocol": "anthropic-messages",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "blocked",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "outbox",
+      "rung": "A"
+    },
+    "hash": "5567df342e1afdd95511ddf93895033f9d6179a8d067f64444e12a3cb69b5d20"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8QA1J9PNE4SGYMBZ1G895",
+    "prev": "5567df342e1afdd95511ddf93895033f9d6179a8d067f64444e12a3cb69b5d20",
+    "ts": "2026-09-22T09:01:10Z",
+    "type": "ack.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "engineer",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "channel": "outbox",
+      "attempt": 1,
+      "matched": true,
+      "missing": [],
+      "extra": [],
+      "write_set_ok": true,
+      "hash_ok": true
+    },
+    "hash": "c07d56458525a28179d8165f632e9cfe124ae0cdd2dc6df96deba4706fec0050"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8QJ7RKA5MMEDER982HZ8P",
+    "prev": "c07d56458525a28179d8165f632e9cfe124ae0cdd2dc6df96deba4706fec0050",
+    "ts": "2026-09-22T09:20:00Z",
+    "type": "claim.heartbeat",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": null,
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "lease_until": "2026-09-22T09:50:00Z"
+    },
+    "hash": "7fcefcb4b4fa5c100a8a03e91950f2e52c57174cbbf960348ac226a3ba26bcdd"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8QTDY12ZG8K8AYMBC0CAP",
+    "prev": "7fcefcb4b4fa5c100a8a03e91950f2e52c57174cbbf960348ac226a3ba26bcdd",
+    "ts": "2026-09-22T09:38:15Z",
+    "type": "ruling.made",
+    "actor": {
+      "kind": "seat",
+      "seat": "engineer",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "ruling": "RL-2c7e9a4b6d18",
+      "clause": "ADR-7KQ2B.O1",
+      "flagged": false
+    },
+    "hash": "9290d203ebf9ce4af5f213c64c47d039c6ff56f3ae00851254d5df2d9bf9d13b"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8R2M4N6P8Q0S2T4V6W8X0",
+    "prev": "9290d203ebf9ce4af5f213c64c47d039c6ff56f3ae00851254d5df2d9bf9d13b",
+    "ts": "2026-09-22T09:42:00Z",
+    "type": "result.submitted",
+    "actor": {
+      "kind": "seat",
+      "seat": "engineer",
+      "runtime": "claude-code",
+      "declared_family": "anthropic",
+      "alias": "anthropic-main",
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "status": "DONE",
+      "channel": "outbox"
+    },
+    "hash": "148f615c605aed263381fe5b895986197346f9838010def4917605e66defea8d"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8RBMPP8JJQG2999JXA99Z",
+    "prev": "148f615c605aed263381fe5b895986197346f9838010def4917605e66defea8d",
+    "ts": "2026-09-22T09:42:02Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "709095d90f0df91401a14ef8adc502ea1a3936e28cfee1a198c363f2d4cfe487"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8RMN8Z5M7668ZBV4DZDKH",
+    "prev": "709095d90f0df91401a14ef8adc502ea1a3936e28cfee1a198c363f2d4cfe487",
+    "ts": "2026-09-22T09:43:00Z",
+    "type": "round.committed",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-9e4c1a7b2d05",
+      "pg": "PG-4d8f0b2c6a13",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": "3a667d1ef542cd295daa1525a52a2c9767ed0577",
+      "op": null
+    },
+    "data": {
+      "round": "P-7F3K9Q.T2.r1",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": "3a667d1ef542cd295daa1525a52a2c9767ed0577",
+      "branch": "keel/P-7F3K9Q/t/2",
+      "snapshots": []
+    },
+    "hash": "b5a968385332709bef0b2dcf4ea3c8cf5e2a5fe83299672f93c8c7ed818e1d12"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8RXNT00KT0TEE65MB2S7G",
+    "prev": "b5a968385332709bef0b2dcf4ea3c8cf5e2a5fe83299672f93c8c7ed818e1d12",
+    "ts": "2026-09-22T09:43:30Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "submit.scope",
+      "status": "pass",
+      "passed": 3,
+      "total": 3,
+      "unit": "changed paths inside write_set",
+      "reason": null
+    },
+    "hash": "69e74085d949ba08dc8b73964659b14f2cc6f359eaa7355662208fe5d5fd9b45"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8S6PC3MFGNZW9CX0KC6VA",
+    "prev": "69e74085d949ba08dc8b73964659b14f2cc6f359eaa7355662208fe5d5fd9b45",
+    "ts": "2026-09-22T09:44:30Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "submit.commands",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "declared submit commands passing",
+      "reason": null
+    },
+    "hash": "ba1bdcdbd3cc75bdef073742372952b42cd7d406b9af6393dd5437ad089e4cf8"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8SFPYFV6TWE5DXA2NYBZK",
+    "prev": "ba1bdcdbd3cc75bdef073742372952b42cd7d406b9af6393dd5437ad089e4cf8",
+    "ts": "2026-09-22T09:44:31Z",
+    "type": "claim.released",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "reason": "submitted"
+    },
+    "hash": "00c9b984d76f3820b77ac08b5a4d57697790a5bd2a3a745f27292177d3e7271d"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8SRQGDBVWVWQA8R6TA9WD",
+    "prev": "00c9b984d76f3820b77ac08b5a4d57697790a5bd2a3a745f27292177d3e7271d",
+    "ts": "2026-09-22T09:50:00Z",
+    "type": "evidence.recorded",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": "3a667d1ef542cd295daa1525a52a2c9767ed0577",
+      "op": null
+    },
+    "data": {
+      "evidence": "EV-3a9c0e1b2d4f",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "status": "pass"
+    },
+    "hash": "eb3309e8a244bf4093d37a1bbb54a438b355959214907f2cdc4ea1a31f21078f"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8T1R25KETTNTDGPYBFDR7",
+    "prev": "eb3309e8a244bf4093d37a1bbb54a438b355959214907f2cdc4ea1a31f21078f",
+    "ts": "2026-09-22T09:50:05Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.evidence",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "acceptance matrix rows",
+      "reason": null
+    },
+    "hash": "e5deb55140efaaecad7bbff7a9a4caec9154b59820bd631a3f6e4dd35bbb99ea"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8TARMZ2C7AGFG3M49V38B",
+    "prev": "e5deb55140efaaecad7bbff7a9a4caec9154b59820bd631a3f6e4dd35bbb99ea",
+    "ts": "2026-09-22T09:50:10Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.commands",
+      "status": "pass",
+      "passed": 1,
+      "total": 1,
+      "unit": "declared verify commands passing",
+      "reason": null
+    },
+    "hash": "df6b5e8d5a2b26fca46a23229b2ad0ff39602beb66a15a19cce39d943264b18b"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8TKS6QEWCFZRGPCJM26Z6",
+    "prev": "df6b5e8d5a2b26fca46a23229b2ad0ff39602beb66a15a19cce39d943264b18b",
+    "ts": "2026-09-22T09:51:05Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8S1T0N107G90EAX04A27H"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-7f9b1d3e5a68",
+      "pg": "PG-6d8b0f2a4c75",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8S1T0N107G90EAX04A27H",
+      "seat": "reviewer",
+      "mode": "read-only-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "mcp",
+      "rung": "C"
+    },
+    "hash": "7b14fae1ddafe21b79a3ec737e0937775cbd3884665da3ff29d21da3d3d7541f"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8TWSRN6JBK3Y745PZ32FP",
+    "prev": "7b14fae1ddafe21b79a3ec737e0937775cbd3884665da3ff29d21da3d3d7541f",
+    "ts": "2026-09-22T09:51:06Z",
+    "type": "run.started",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8S1T1WV3BJM1HC6HDKTFY"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-8a0c2e4f6b79",
+      "pg": "PG-7e9c1a3b5d86",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8S1T1WV3BJM1HC6HDKTFY",
+      "seat": "reviewer",
+      "mode": "read-only-agent",
+      "route": {
+        "runtime": "opencode",
+        "alias": "gemini-compat",
+        "tier": "standard",
+        "declared_family": "google",
+        "protocol": "openai-chat",
+        "revision": 1
+      },
+      "exposure": {
+        "tool_env_exposure": "scrubbed",
+        "tool_file_exposure": "none",
+        "control_plane_exposure": "exposed",
+        "shim_coverage": "partial"
+      },
+      "conformance_status": "verified",
+      "submit_channel": "mcp",
+      "rung": "C"
+    },
+    "hash": "405a60b3563b50f16a922ed7abd409926ed8d2afc1f97d9eca266a48ab8ed253"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8V5TBSJQXHC07Z7C3TAKT",
+    "prev": "405a60b3563b50f16a922ed7abd409926ed8d2afc1f97d9eca266a48ab8ed253",
+    "ts": "2026-09-22T10:04:30Z",
+    "type": "verdict.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "reviewer",
+      "runtime": "opencode",
+      "declared_family": "google",
+      "alias": "gemini-compat",
+      "run": "RUN-01J9Z8S1T0N107G90EAX04A27H"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-7f9b1d3e5a68",
+      "pg": "PG-6d8b0f2a4c75",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "verdict": "VD-5b1d2e3f4a6c",
+      "lens": "blind-diff",
+      "recommendation": "approve"
+    },
+    "hash": "084e2f038aca34404a30263d5f350bc176475a63a519c99864a7545fb6dcfc05"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8VETXY5KYH30EN2J6H1NW",
+    "prev": "084e2f038aca34404a30263d5f350bc176475a63a519c99864a7545fb6dcfc05",
+    "ts": "2026-09-22T10:04:32Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8S1T0N107G90EAX04A27H"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-7f9b1d3e5a68",
+      "pg": "PG-6d8b0f2a4c75",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8S1T0N107G90EAX04A27H",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "bfcc18a03d7032b7940af3be417995a95ffdddb2b165e3fe02b7107bd8f0c64c"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8VQVFPPK4GPVPC9M9B1Y2",
+    "prev": "bfcc18a03d7032b7940af3be417995a95ffdddb2b165e3fe02b7107bd8f0c64c",
+    "ts": "2026-09-22T10:06:10Z",
+    "type": "verdict.recorded",
+    "actor": {
+      "kind": "seat",
+      "seat": "reviewer",
+      "runtime": "opencode",
+      "declared_family": "google",
+      "alias": "gemini-compat",
+      "run": "RUN-01J9Z8S1T1WV3BJM1HC6HDKTFY"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-8a0c2e4f6b79",
+      "pg": "PG-7e9c1a3b5d86",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "verdict": "VD-6c2e3f4a5b7d",
+      "lens": "verification-gap",
+      "recommendation": "approve"
+    },
+    "hash": "a17e513dbad6717f19c2e5ff4c9f095afd370897dd2b15f9c14de01409b8139c"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8W0W16GY0FM37Z77EBVG1",
+    "prev": "a17e513dbad6717f19c2e5ff4c9f095afd370897dd2b15f9c14de01409b8139c",
+    "ts": "2026-09-22T10:06:12Z",
+    "type": "run.finished",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": "RUN-01J9Z8S1T1WV3BJM1HC6HDKTFY"
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": "BR-8a0c2e4f6b79",
+      "pg": "PG-7e9c1a3b5d86",
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "run": "RUN-01J9Z8S1T1WV3BJM1HC6HDKTFY",
+      "outcome": "completed",
+      "exit_code": 0
+    },
+    "hash": "54fc60a97b3e6d10d2216aa516a8b58299144294e6bf917bd0ca3ec80ef54542"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8W9WK1X9SQ5J8AK4APGZJ",
+    "prev": "54fc60a97b3e6d10d2216aa516a8b58299144294e6bf917bd0ca3ec80ef54542",
+    "ts": "2026-09-22T10:07:00Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q.T2",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "verify.review",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "lenses of the quick set approving",
+      "reason": null
+    },
+    "hash": "0687c7263a8036e59ee2c28e19aabf330bc9eeda2e95607e3dc6d27174d2966c"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8WJX5K6BB4SD0G24Q6C20",
+    "prev": "0687c7263a8036e59ee2c28e19aabf330bc9eeda2e95607e3dc6d27174d2966c",
+    "ts": "2026-09-23T10:00:00Z",
+    "type": "vcs.op",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3e22fba13b188278ab2eaf241f8a171de14f42a8",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "backend": "git",
+      "op": "restack",
+      "ref": "refs/heads/keel/P-7F3K9Q/main",
+      "jj_op": null
+    },
+    "hash": "c2f2881f896791fc8f92138041e5d08bfe0c21bf947bc4e8baa4774886e46abe"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8WVXQQQX9FDHK9X8K8CKA",
+    "prev": "c2f2881f896791fc8f92138041e5d08bfe0c21bf947bc4e8baa4774886e46abe",
+    "ts": "2026-09-23T10:05:00Z",
+    "type": "gate.checked",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3e22fba13b188278ab2eaf241f8a171de14f42a8",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "check": "land.re-execution",
+      "status": "pass",
+      "passed": 2,
+      "total": 2,
+      "unit": "acceptance matrix rows on the integrated commit",
+      "reason": null
+    },
+    "hash": "0b358628ff0bea1f0aa412f140d3fc687396bb0802306bfd9fb4adb98e9c7565"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8X4Y943S99R239AGQB7J7",
+    "prev": "0b358628ff0bea1f0aa412f140d3fc687396bb0802306bfd9fb4adb98e9c7565",
+    "ts": "2026-09-23T10:30:08Z",
+    "type": "approval.recorded",
+    "actor": {
+      "kind": "board",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "3e22fba13b188278ab2eaf241f8a171de14f42a8",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "approval": "AP-7a1c3e5f9b2d",
+      "kind": "stage",
+      "stage": "land",
+      "rule": null,
+      "envelope": ".keel/signatures/a64e8eb312c365dd6293e71709b4eb0567bd9a7a6c796ebe67635225b3046715.land.json",
+      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+    },
+    "hash": "0db3ac06ebd5415c68bf736233ca01ff5e1dd8ea38ff042716b49577eea42ef6"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8XDYV4YNRJ3PM202HKR8H",
+    "prev": "0db3ac06ebd5415c68bf736233ca01ff5e1dd8ea38ff042716b49577eea42ef6",
+    "ts": "2026-09-23T10:31:00Z",
+    "type": "land.completed",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": "cd24b712d0dcd55228fcfd30be9707c5decf94fb",
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "landed": "cd24b712d0dcd55228fcfd30be9707c5decf94fb",
+      "trunk": "main",
+      "method": "ff-only",
+      "approval": "AP-7a1c3e5f9b2d",
+      "policy": null
+    },
+    "hash": "699a9351810b24c17793045c8ffc1e03edd85c81d5d5adc25a822b295ab72c94"
+  },
+  {
+    "v": 1,
+    "id": "EVT-01J9Z8XPZDF8EBDC6QGMX0EGRJ",
+    "prev": "699a9351810b24c17793045c8ffc1e03edd85c81d5d5adc25a822b295ab72c94",
+    "ts": "2026-09-23T10:32:00Z",
+    "type": "cleanup.completed",
+    "actor": {
+      "kind": "steward",
+      "seat": null,
+      "runtime": null,
+      "declared_family": null,
+      "alias": null,
+      "run": null
+    },
+    "subject": "P-7F3K9Q",
+    "refs": {
+      "brief": null,
+      "pg": null,
+      "contract_hash": "e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea",
+      "charter_version": "1.0.0",
+      "commit": null,
+      "tree": null,
+      "op": null
+    },
+    "data": {
+      "worktrees": 3,
+      "refs": 4
+    },
+    "hash": "9a89ad0977e8d5714e52377b35a53f217c4f67b26fc39df86cd18f0ef1784c55"
+  }
+]
