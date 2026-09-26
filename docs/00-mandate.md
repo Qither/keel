@@ -240,15 +240,17 @@ four things, all current state and never narrative:
   more than the mandate needs). Statuses: `open`, `analysed`, `proposed`, `decided`, `closed`; `deferred`
   only by the owner and to a named milestone; `dismissed` with a reason. Closed entries are never deleted.
 - `order`: the standing order map of the design, not a per-issue note. `steps[]` are verbs, gates and phase
-  steps with their `after` edges and the machine they run in (`runs_in`: local, supervisor, seat or clone);
+  steps with their `after` edges and the machine they run in (`runs_in`: local, supervisor, seat,
+  agent-api for keel's own api, hook and MCP processes in the seat's process tree, or clone);
   `artifacts[]` name the step that produces each one, the steps that require it and where it lives
-  (`where`: the working tree, the git common dir, `refs/keel`, the proposal branch, a trunk commit or the
-  archive commit); `locks[]` name who holds each one, who waits for it and which step releases it. Every
-  entry is anchored to the heading that states it. The `issues` check walks the map: a cycle, or an
-  artifact required by a step whose machine cannot reach where it lives (a clone reaches trunk and archive
-  commits only; a seat reaches its worktree and the proposal branch only), is an error unless the entry is
-  tagged with an open issue; a tag on a closed or dismissed issue is an error, so a closed issue cannot
-  keep tolerating its edge.
+  (`where`: the working tree, the workspace root, the task branch, the proposal branch, the git common
+  dir, `refs/keel`, a trunk commit or the archive commit); `locks[]` name who holds each one, who waits for
+  it and which step releases it. Every entry is anchored to the heading that states it. The `issues` check
+  walks the map: a cycle, or an artifact required by a step whose machine cannot reach where it lives (a
+  clone reaches trunk and archive commits only; a seat reaches its worktree, the workspace root, its task
+  branch and the proposal branch; an agent-api process reaches those and the git common dir and
+  `refs/keel`), is an error unless the entry is tagged with an open issue; a tag on a closed or dismissed
+  issue is an error, so a closed issue cannot keep tolerating its edge.
 - `matrix`: the walkthrough matrix, track × actor × sequence. The actors are standing: the Board at a
   terminal, the Board while a wave is in flight, the supervising Steward, a second Steward process while
   the supervisor lock is held, a seat, a runtime hook, a fresh CI clone, a crashed supervisor, a second

@@ -3,7 +3,7 @@
   "$id": "https://keel.invalid/schemas/design-issues.schema.json",
   "title": "keel design-issue register",
   "description": "The canonical register of the design iteration discipline (P5, docs/00-mandate.md section 5), docs/design-issues.yaml. It holds every design issue found in keel's own documents, schemas, templates and tables (class, status, anchors, walk, terms, decision, closure), the standing order map of the design (steps, artifacts, locks) over which the issues check of scripts/validate.mjs runs cycle detection and reachability, the walkthrough matrix (tracks, actors, sequences) and the append-only walkthrough history. Current state only: no narrative, no history of the issue text; git is the history.",
-  "$comment": "Not in the strict subset: the fields an issue must carry depend on its status (if/then). An anchor is a file plus a heading (Markdown) or a file plus a JSON pointer (JSON or YAML), never a line number; the issues check resolves each one. Milestone order for the blocks gate: M0 < M1a < M1b < M2 < M3 < M4 < M5 < M6 < M7 < M8. Reachability for the order map: local and supervisor reach every place; clone reaches trunk-commit and archive-commit only; seat reaches working-tree and proposal-branch only.",
+  "$comment": "Not in the strict subset: the fields an issue must carry depend on its status (if/then). An anchor is a file plus a heading (Markdown) or a file plus a JSON pointer (JSON or YAML), never a line number; the issues check resolves each one. Milestone order for the blocks gate: M0 < M1a < M1b < M2 < M3 < M4 < M5 < M6 < M7 < M8. Reachability for the order map: local and supervisor reach every place; clone reaches trunk-commit and archive-commit only; seat reaches working-tree, workspace-root, task-branch and proposal-branch; agent-api (keel's own api, hook and MCP processes in the seat's process tree) reaches those and git-common-dir and refs-keel.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M0",
   "type": "object",
@@ -80,12 +80,12 @@
       "enum": ["rule-tightened", "term-overloaded", "no-order-check", "silent-reconciliation", "unread-field", "cardinality", "other"]
     },
     "runsIn": {
-      "description": "The machine and process a step runs in.",
-      "enum": ["local", "supervisor", "seat", "clone"]
+      "description": "The machine and process a step runs in. local: a Board or Steward process on the owner's clone with no seat running. supervisor: the keel run process while a seat runs. seat: the seat's own process tree. agent-api: keel's own api, hook and MCP processes started in the seat's process tree. clone: a fresh CI clone with no git common dir state and no refs/keel.",
+      "enum": ["local", "supervisor", "seat", "agent-api", "clone"]
     },
     "place": {
-      "description": "Where an artifact lives.",
-      "enum": ["working-tree", "git-common-dir", "refs-keel", "proposal-branch", "trunk-commit", "archive-commit"]
+      "description": "Where an artifact lives at the moment its consumer reads it. workspace-root: the run directories, outboxes and worktrees under the workspace root outside the repository. task-branch: refs/heads/keel/<P>/t/<n>.",
+      "enum": ["working-tree", "workspace-root", "task-branch", "proposal-branch", "git-common-dir", "refs-keel", "trunk-commit", "archive-commit"]
     },
     "cell": {
       "description": "One cell of the walkthrough matrix.",

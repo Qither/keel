@@ -15,10 +15,9 @@ version: 1
 exit_review: null
 
 matrix:
-  tracks: [spike, patch, feature, system]
+  tracks: [ spike, patch, feature, system ]
   actors:
-    - id: board-at-terminal
-      description: A Board member at a terminal, no seat running
+    - { id: board-at-terminal, description: "A Board member at a terminal, no seat running" }
     - id: board-during-wave
       description: A Board member running a mutating verb while a wave is in flight
     - id: supervisor
@@ -27,68 +26,1592 @@ matrix:
       description: A second Steward process (approve, check, land, run --hold) while the supervisor lock is held
     - id: seat
       description: A seat in its sparse worktree, reaching keel through keel api or a submit channel
-    - id: hook
-      description: A runtime hook calling keel hook
+    - { id: hook, description: A runtime hook calling keel hook }
     - id: ci-fresh-clone
       description: A CI job on a fresh clone of the shared remote, with no git common dir state and no refs/keel
     - id: crashed-supervisor
       description: A supervisor that died or hung while holding a lock or a claim
     - id: second-machine
       description: Another machine that sees committed records and archive projections only
-    - id: dashboard
-      description: The read-only dashboard reading the ledger and the committed files
+    - { id: dashboard, description: The read-only dashboard reading the ledger and the committed files }
   sequences:
     - id: spike-happy
       track: spike
-      verbs: [new, run, status]
+      verbs: [ new, "run (product, scratch worktree)", status ]
     - id: patch-per-change
       track: patch
-      verbs: [new, approve --stage contract, run, check --gate submit, check --gate verify, land, approve --stage land, land]
+      verbs:
+        - new
+        - run (frame)
+        - check --gate frame
+        - approve --stage contract
+        - run (build)
+        - check --gate submit
+        - check --gate verify
+        - land
+        - approve --stage land
+        - land
     - id: patch-policy
       track: patch
-      verbs: [new --policy, approve --request, run, check --gate submit, check --gate verify, land, approve --stage receipt]
+      verbs:
+        - new --policy
+        - run (build)
+        - check --gate submit
+        - check --gate verify
+        - land
+        - approve --stage land
+        - land
+        - approve --stage receipt
     - id: feature-happy
       track: feature
-      verbs: [new, run, approve --stage contract, run, check --gate plan, run, check --gate submit, check --gate verify, land --preview, land, approve --stage land, land]
+      verbs:
+        - new
+        - run (frame)
+        - check --gate frame
+        - approve --stage contract
+        - run (plan)
+        - check --gate plan
+        - run (build)
+        - check --gate submit
+        - run (review)
+        - check --gate verify
+        - land --preview
+        - land
+        - approve --stage land
+        - land
     - id: system-happy
       track: system
-      verbs: [new, run, approve --stage contract, run, approve --stage plan, run, check --gate submit, check --gate verify, land --preview, land, approve --stage land, land]
+      verbs:
+        - new
+        - run (frame)
+        - check --gate frame
+        - approve --stage contract
+        - run (plan)
+        - check --gate plan
+        - approve --stage plan
+        - run (build)
+        - check --gate submit
+        - run (review)
+        - check --gate verify
+        - land --preview
+        - land
+        - approve --stage land
+        - land
     - id: hold
       track: any
-      verbs: [run --hold on, run --hold off]
+      verbs: [ run (build), run --hold on, run --hold off ]
     - id: abandon
       track: any
-      verbs: [approve --rule abandon]
+      verbs: [ run (build), approve --rule abandon ]
     - id: override
       track: any
-      verbs: [approve --rule override]
+      verbs: [ run (build), approve --rule override ]
     - id: amendment
       track: any
-      verbs: [approve --amend]
+      verbs: [ run (frame), approve --stage contract, run (frame), approve --stage contract ]
     - id: crash-resume
       track: any
-      verbs: [run, audit, run]
+      verbs: [ run (build), audit, run (build) ]
     - id: second-land
       track: any
-      verbs: [land, approve --stage land, land, land]
+      verbs: [ land, approve --stage land, land, land ]
     - id: ci-check-at-tip
       track: any
-      verbs: [check --gate land --check approval --at <sha>]
+      verbs: [ push, check --gate land --check approval --at <sha> ]
 
 order:
-  steps: []
-  artifacts: []
-  locks: []
+  steps:
+    - id: board.approve.policy
+      doc: { file: docs/03-lifecycle.md, heading: Standing policy limits }
+      after: []
+      runs_in: local
+    - id: board.new
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      after: []
+      runs_in: local
+    - id: gate.frame.intake
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      after: [ board.new, board.new-policy ]
+      runs_in: local
+    - id: steward.derive-work-order
+      doc: { file: docs/03-lifecycle.md, heading: Patch track and policy path }
+      after: [ gate.frame.intake ]
+      runs_in: local
+    - id: steward.run.resolve-route
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.compute-waves, board.new ]
+      runs_in: supervisor
+    - id: steward.run.claim
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.resolve-route, board.new ]
+      runs_in: supervisor
+    - id: steward.run.worktree
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.claim, board.init, board.new ]
+      runs_in: supervisor
+    - id: steward.run.compile-brief
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.claim, steward.run.worktree, steward.run.snapshot-refs ]
+      runs_in: supervisor
+    - id: steward.run.snapshot-refs
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.worktree ]
+      runs_in: supervisor
+    - id: steward.run.spawn
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after:
+        - steward.run.compile-brief
+        - steward.run.snapshot-refs
+        - steward.run.worktree
+        - board.run.hold-off
+        - ledger.verify-chain
+        - steward.run.pre-spawn-base
+        - steward.run.claim
+        - board.approve.plan
+        - board.approve.contract
+        - gate.plan
+        - gate.frame.approvals
+        - doctor.exposure
+      runs_in: supervisor
+    - id: seat.ack
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.spawn ]
+      runs_in: agent-api
+    - id: seat.work
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ seat.ack, steward.run.spawn, steward.run.compile-brief ]
+      runs_in: seat
+    - id: seat.submit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ seat.work, steward.run.spawn ]
+      runs_in: agent-api
+    - id: steward.run.ingest
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after:
+        - seat.submit
+        - seat.ack
+        - steward.run.snapshot-refs
+        - steward.run.spawn
+        - seat.ask
+        - seat.rule
+        - hook.event
+        - seat.work
+      runs_in: supervisor
+    - id: steward.run.commit-round
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after: [ steward.run.ingest, steward.run.provider-path-check, gate.submit.provider-path-events ]
+      runs_in: supervisor
+    - id: gate.submit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      after:
+        - steward.run.commit-round
+        - seat.submit
+        - steward.run.ingest
+        - gate.submit.brief
+        - gate.submit.ack
+        - gate.submit.result
+        - gate.submit.freshness
+        - gate.submit.scope
+        - gate.submit.frozen-paths
+        - gate.submit.fake-completion
+        - gate.submit.ratchet
+        - gate.submit.reserved-op
+        - gate.submit.provider-path-events
+        - gate.submit.subagent-events
+        - gate.submit.obligations-cheap
+        - gate.submit.commands
+      runs_in: supervisor
+    - id: gate.frame
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      after:
+        - gate.frame.intake
+        - run.frame
+        - board.new
+        - gate.frame.schema
+        - gate.frame.id-unique
+        - gate.frame.goal-active
+        - gate.frame.ears
+        - gate.frame.acc-coverage
+        - gate.frame.open-questions
+        - gate.frame.charter-current
+        - gate.frame.approvals
+        - gate.frame.skills-trigger-only
+        - gate.frame.budgets
+        - gate.frame.arch-to-be
+        - gate.frame.review
+      runs_in: local
+    - id: board.approve.contract
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      after: [ gate.frame, arch.plan, board.new ]
+      runs_in: local
+    - id: steward.plan.route
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      after: [ board.approve.contract ]
+      runs_in: local
+    - id: gate.plan
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      after:
+        - board.approve.contract
+        - steward.plan.route
+        - run.plan
+        - board.new
+        - gate.plan.ready
+        - gate.plan.coverage
+        - gate.plan.interfaces
+        - gate.plan.waves
+        - gate.plan.test-independence
+        - gate.plan.verification-gap
+        - gate.plan.review-focus
+        - gate.plan.briefs-compile
+        - gate.plan.budgets
+      runs_in: local
+    - id: board.approve.plan
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      after: [ gate.plan, board.approve.contract, board.new ]
+      runs_in: local
+    - id: steward.plan.remove-worktree
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      after: [ gate.plan, board.approve.plan ]
+      runs_in: local
+    - id: steward.verify.runner
+      doc: { file: docs/03-lifecycle.md, heading: Phase 4 Verify }
+      after: [ gate.submit ]
+      runs_in: local
+    - id: gate.verify
+      doc: { file: docs/03-lifecycle.md, heading: Phase 4 Verify }
+      after:
+        - gate.submit
+        - steward.verify.runner
+        - arch.drift
+        - steward.run.commit-round
+        - gate.verify.evidence
+        - gate.verify.test-red
+        - gate.verify.red-green
+        - gate.verify.commands
+        - gate.verify.obligations
+        - gate.verify.arch
+        - gate.verify.review
+      runs_in: local
+    - id: steward.land.restack
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after:
+        - gate.verify
+        - steward.plan-worktree.remove
+        - gate.submit
+        - board.land
+        - seat.rule
+        - steward.run.commit-round
+      runs_in: local
+    - id: steward.land.preview
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after: [ steward.land.restack, gate.submit, arch.drift ]
+      runs_in: local
+    - id: steward.land.reexecute
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after: [ steward.land.restack, steward.land.preview, steward.verify.checkout, gate.verify ]
+      runs_in: local
+    - id: gate.land
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after:
+        - steward.land.reexecute
+        - gate.verify
+        - steward.land.preview
+        - steward.land.restack
+        - gate.land.trace
+        - gate.land.ancestry
+        - gate.land.re-execution
+        - gate.land.preview
+        - gate.land.ref-snapshot
+        - gate.land.projection
+      runs_in: local
+    - id: steward.land.draft-receipt
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after:
+        - steward.land.preview
+        - gate.land
+        - steward.land.reexecute
+        - steward.run.collision
+        - gate.verify
+        - steward.land.restack
+      runs_in: local
+    - id: board.approve.land
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after: [ steward.land.draft-receipt ]
+      runs_in: local
+    - id: steward.land.check-approval
+      doc: { file: docs/03-lifecycle.md, heading: Proposal states }
+      after:
+        - board.approve.land
+        - ledger.verify-chain
+        - gate.land
+        - steward.land.draft-receipt
+        - gate.land.approval
+      runs_in: local
+    - id: steward.land.apply-arch-delta
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after: [ steward.land.check-approval, gate.land, board.approve.contract ]
+      runs_in: local
+    - id: steward.land.archive-commit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after:
+        - steward.land.check-approval
+        - steward.land.apply-arch-delta
+        - gate.land
+        - board.approve.land
+        - steward.land.reexecute
+        - steward.land.preview
+      runs_in: local
+    - id: steward.land.advance-trunk
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after:
+        - steward.land.archive-commit
+        - steward.land.apply-arch-delta
+        - gate.land
+        - steward.land.check-approval
+        - steward.land.ref-diff
+      runs_in: local
+    - id: board.push
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      after: [ steward.land.advance-trunk, board.land ]
+      runs_in: local
+    - id: steward.close
+      doc: { file: docs/03-lifecycle.md, heading: Phase 6 Close }
+      after: [ steward.land.advance-trunk ]
+      runs_in: local
+    - id: board.approve.receipt
+      doc: { file: docs/03-lifecycle.md, heading: Standing policy limits }
+      after: [ steward.land.advance-trunk, steward.land.archive-commit ]
+      runs_in: local
+    - id: board.run.hold-on
+      doc: { file: docs/03-lifecycle.md, heading: Proposal states }
+      after: [ board.new ]
+      runs_in: local
+    - id: steward.run.cancel
+      doc: { file: docs/03-lifecycle.md, heading: Proposal states }
+      after: [ board.run.hold-on, board.approve.rule.abandon, ledger.append ]
+      runs_in: supervisor
+    - id: board.run.hold-off
+      doc: { file: docs/03-lifecycle.md, heading: Proposal states }
+      after: [ board.run.hold-on ]
+      runs_in: local
+    - id: board.approve.rule.abandon
+      doc: { file: docs/03-lifecycle.md, heading: Proposal states }
+      after: [ board.new ]
+      runs_in: local
+    - id: board.approve.rule.track
+      doc:
+        file: docs/03-lifecycle.md
+        heading: Track signals and the upward-only ratchet (including the no-index fallback)
+      after: []
+      runs_in: local
+    - id: board.approve.rule.budget
+      doc: { file: docs/03-lifecycle.md, heading: Budgets }
+      after: [ board.new ]
+      runs_in: local
+    - id: board.approve.rule.override
+      doc: { file: docs/03-lifecycle.md, heading: Blocked reasons }
+      after: [ board.new ]
+      runs_in: local
+    - id: ledger.append
+      doc: { file: docs/03-lifecycle.md, heading: State machine }
+      after: []
+      runs_in: local
+    - id: board.status
+      doc: { file: docs/03-lifecycle.md, heading: State machine }
+      after: []
+      runs_in: local
+    - id: audit.sweep
+      doc: { file: docs/03-lifecycle.md, heading: Liveness invariant }
+      after: [ ledger.verify-chain, steward.land.archive-commit ]
+      runs_in: local
+    - id: dashboard.build
+      doc: { file: docs/03-lifecycle.md, heading: Liveness invariant }
+      after: [ ledger.append ]
+      runs_in: local
+    - id: board.new-policy
+      doc: { file: docs/02-alignment.md, heading: Requests and seat-proof verbs }
+      after: []
+      runs_in: local
+    - id: board.approve.doc
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after: [ board.init ]
+      runs_in: local
+    - id: board.approve.rule.unverified
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after: [ board.new ]
+      runs_in: local
+    - id: board.land
+      doc: { file: docs/02-alignment.md, heading: Requests and seat-proof verbs }
+      after: [ gate.verify, board.new ]
+      runs_in: local
+    - id: hook.event
+      doc: { file: docs/02-alignment.md, heading: What each rung can prevent and what it can only detect }
+      after: [ steward.run.spawn ]
+      runs_in: agent-api
+    - id: steward.run.end
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after:
+        - steward.run.commit-round
+        - steward.run.ingest
+        - gate.submit
+        - steward.run.ref-diff
+        - steward.run.remote-diff
+        - steward.run.cancel
+      runs_in: supervisor
+    - id: ledger.verify-chain
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after: []
+      runs_in: local
+    - id: ci.check-approval
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after: [ ledger.verify-chain, steward.land.archive-commit, board.push ]
+      runs_in: clone
+    - id: ledger.anchor-update
+      doc: { file: docs/04-trace-and-state.md, heading: Single writer }
+      after: [ ledger.append ]
+      runs_in: local
+    - id: board.init
+      doc: { file: docs/05-vcs.md, heading: Backend selection }
+      after: []
+      runs_in: local
+    - id: steward.plan-worktree.remove
+      doc: { file: docs/05-vcs.md, heading: Creating worktrees }
+      after: [ board.approve.plan ]
+      runs_in: local
+    - id: steward.run.provider-path-check
+      doc: { file: docs/05-vcs.md, heading: The Steward commit at submit }
+      after: [ steward.run.worktree ]
+      runs_in: supervisor
+    - id: steward.run.pre-spawn-base
+      doc: { file: docs/05-vcs.md, heading: Snapshots between turns }
+      after: [ steward.run.worktree, steward.run.provider-path-check ]
+      runs_in: supervisor
+    - id: steward.run.shadow-snapshot
+      doc: { file: docs/05-vcs.md, heading: Snapshots between turns }
+      after: [ steward.run.spawn, steward.run.provider-path-check ]
+      runs_in: supervisor
+    - id: steward.run.ack-check
+      doc: { file: docs/05-vcs.md, heading: Snapshots between turns }
+      after: [ seat.ack, steward.run.shadow-snapshot, steward.run.pre-spawn-base ]
+      runs_in: supervisor
+    - id: steward.run.ref-diff
+      doc: { file: docs/05-vcs.md, heading: Detection (the guarantee) }
+      after: [ steward.run.ingest, steward.run.snapshot-refs ]
+      runs_in: supervisor
+    - id: steward.run.remote-diff
+      doc: { file: docs/05-vcs.md, heading: Detection (the guarantee) }
+      after: [ steward.run.ingest ]
+      runs_in: supervisor
+    - id: steward.verify.checkout
+      doc: { file: docs/05-vcs.md, heading: Creating worktrees }
+      after: []
+      runs_in: local
+    - id: steward.land.ref-diff
+      doc: { file: docs/05-vcs.md, heading: Detection (the guarantee) }
+      after: [ steward.run.snapshot-refs, steward.run.end ]
+      runs_in: local
+      issue: DI-14
+    - id: steward.run.compute-waves
+      doc: { file: docs/06-parallelism.md, heading: Waves }
+      after: [ gate.plan ]
+      runs_in: supervisor
+    - id: steward.run.collision
+      doc: { file: docs/06-parallelism.md, heading: Collision prediction }
+      after: [ steward.run.ingest ]
+      runs_in: supervisor
+    - id: seat.rule
+      doc: { file: docs/06-parallelism.md, heading: Collision prediction }
+      after: [ steward.run.spawn ]
+      runs_in: agent-api
+    - id: steward.land.bisect
+      doc: { file: docs/06-parallelism.md, heading: Integration queue and land re-run }
+      after: [ steward.land.preview ]
+      runs_in: local
+    - id: arch.index
+      doc: { file: docs/07-architecture-intelligence.md, heading: Per-commit index and diff overlay }
+      after: []
+      runs_in: local
+    - id: arch.find
+      doc: { file: docs/07-architecture-intelligence.md, heading: Search }
+      after: []
+      runs_in: local
+    - id: arch.drift
+      doc: { file: docs/07-architecture-intelligence.md, heading: Drift and the unknown policy }
+      after: [ arch.index ]
+      runs_in: local
+    - id: arch.plan
+      doc: { file: docs/07-architecture-intelligence.md, heading: Impact and the ratchet }
+      after: []
+      runs_in: agent-api
+    - id: gate.frame.schema
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.id-unique
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.goal-active
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.ears
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.acc-coverage
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.open-questions
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.charter-current
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.approvals
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.skills-trigger-only
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.budgets
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.arch-to-be
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: []
+      runs_in: local
+    - id: gate.frame.review
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      after: [ run.frame ]
+      runs_in: local
+    - id: gate.plan.ready
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after:
+        - gate.plan.coverage
+        - gate.plan.interfaces
+        - gate.plan.waves
+        - gate.plan.test-independence
+        - gate.plan.verification-gap
+        - gate.plan.review-focus
+        - gate.plan.briefs-compile
+        - gate.plan.budgets
+      runs_in: local
+    - id: gate.plan.coverage
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.interfaces
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.waves
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.test-independence
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.verification-gap
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: [ run.plan ]
+      runs_in: local
+    - id: gate.plan.review-focus
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.briefs-compile
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: gate.plan.budgets
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      after: []
+      runs_in: local
+    - id: seat.review
+      doc: { file: docs/11-verification.md, heading: 4. Review lenses and lens sets }
+      after: [ run.review ]
+      runs_in: seat
+    - id: gate.submit.brief
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.ack
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.result
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.freshness
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.scope
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.frozen-paths
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.fake-completion
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.ratchet
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.reserved-op
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: [ steward.run.snapshot-refs ]
+      runs_in: supervisor
+    - id: gate.submit.provider-path-events
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: [ seat.submit ]
+      runs_in: supervisor
+    - id: gate.submit.subagent-events
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.obligations-cheap
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.submit.commands
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      after: []
+      runs_in: supervisor
+    - id: gate.verify.evidence
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ gate.submit, steward.run.ingest ]
+      runs_in: local
+    - id: gate.verify.test-red
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ gate.submit ]
+      runs_in: local
+    - id: gate.verify.red-green
+      doc: { file: docs/11-verification.md, heading: 3. Test independence and red/green proof }
+      after: [ gate.submit, test-task.land ]
+      runs_in: local
+    - id: gate.verify.commands
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ gate.submit ]
+      runs_in: local
+    - id: gate.verify.obligations
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ gate.submit ]
+      runs_in: local
+    - id: gate.verify.arch
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ gate.submit ]
+      runs_in: local
+    - id: gate.verify.review
+      doc: { file: docs/11-verification.md, heading: gate:verify }
+      after: [ run.review, fixloop.rereview ]
+      runs_in: local
+    - id: fixloop.rereview
+      doc: { file: docs/11-verification.md, heading: 7. Fix loop }
+      after: [ seat.review, gate.submit ]
+      runs_in: seat
+    - id: test-task.land
+      doc: { file: docs/11-verification.md, heading: 3. Test independence and red/green proof }
+      after: [ gate.verify.test-red ]
+      runs_in: local
+    - id: evidence.reuse
+      doc: { file: docs/11-verification.md, heading: 2. Source-state binding and land re-execution }
+      after: [ steward.land.restack, gate.verify.evidence ]
+      runs_in: local
+    - id: gate.land.trace
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ steward.land.restack ]
+      runs_in: local
+    - id: gate.land.approval
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ ledger.verify-chain, steward.land.draft-receipt, board.approve.land, gate.verify.red-green ]
+      runs_in: local
+    - id: gate.land.ancestry
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ steward.land.restack ]
+      runs_in: local
+    - id: gate.land.re-execution
+      doc: { file: docs/11-verification.md, heading: 2. Source-state binding and land re-execution }
+      after: [ steward.land.restack ]
+      runs_in: local
+    - id: gate.land.preview
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ steward.land.preview ]
+      runs_in: local
+    - id: gate.land.ref-snapshot
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ steward.run.snapshot-refs ]
+      runs_in: local
+    - id: gate.land.projection
+      doc: { file: docs/11-verification.md, heading: gate:land }
+      after: [ gate.verify ]
+      runs_in: local
+    - id: ci.negative-controls
+      doc: { file: docs/11-verification.md, heading: 8. Negative controls }
+      after: []
+      runs_in: clone
+    - id: board.approve.rule.degraded
+      doc:
+        file: docs/11-verification.md
+        heading: 5. Independence (declared) and three-state conformance status
+      after: []
+      runs_in: local
+    - id: board.approve.rule.dismiss
+      doc: { file: docs/11-verification.md, heading: 6. Findings authority and triage records }
+      after: []
+      runs_in: local
+    - id: board.sync
+      doc: { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      after: [ board.init ]
+      runs_in: local
+    - id: board.doctor
+      doc: { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      after: []
+      runs_in: local
+    - id: steward.run.dry-run
+      doc: { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      after: [ steward.run.resolve-route ]
+      runs_in: local
+    - id: seat.context
+      doc: { file: docs/12-cli-api-mcp.md, heading: 4. keel api }
+      after: [ steward.run.compile-brief ]
+      runs_in: agent-api
+    - id: seat.ask
+      doc: { file: docs/12-cli-api-mcp.md, heading: 4. keel api }
+      after: [ steward.run.spawn ]
+      runs_in: agent-api
+    - id: board.trace
+      doc: { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      after: []
+      runs_in: local
+    - id: steward.arch.index
+      doc: { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      after: []
+      runs_in: local
+    - id: doctor.exposure
+      doc: { file: docs/14-trust-security.md, heading: Exposure profile and known limits }
+      after: []
+      runs_in: local
+    - id: doctor.approvals
+      doc: { file: docs/14-trust-security.md, heading: Approvals and the single writer }
+      after: []
+      runs_in: local
+    - id: run.frame
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      after: [ gate.frame.intake ]
+      runs_in: supervisor
+    - id: run.plan
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      after: [ board.approve.contract ]
+      runs_in: supervisor
+    - id: run.review
+      doc: { file: docs/11-verification.md, heading: 4. Review lenses and lens sets }
+      after: [ steward.run.commit-round ]
+      runs_in: supervisor
+    - id: steward.derive-amendment
+      doc: { file: docs/02-alignment.md, heading: Amendment ledger }
+      after: []
+      runs_in: local
+    - id: board.approve.rule
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      after: [ board.new ]
+      runs_in: local
+    - id: seat.arch-query
+      doc: { file: docs/12-cli-api-mcp.md, heading: "5. MCP (two read tools, one write tool)" }
+      after: [ steward.run.spawn ]
+      runs_in: agent-api
+  artifacts:
+    - id: proposal-dir
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      produced_by: board.new
+      required_by:
+        - board.new-policy
+        - gate.frame.intake
+        - gate.submit
+        - steward.land.archive-commit
+        - gate.frame
+        - board.approve.contract
+        - board.approve.plan
+        - gate.land
+        - steward.land.restack
+        - steward.land.preview
+        - gate.frame.schema
+        - gate.frame.id-unique
+        - gate.frame.goal-active
+        - gate.frame.charter-current
+        - gate.frame.budgets
+        - gate.plan.budgets
+        - gate.submit.ratchet
+        - steward.run.resolve-route
+        - board.land
+      where: proposal-branch
+    - id: planning-worktree
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      produced_by: board.new
+      required_by: [ seat.work, steward.plan.remove-worktree ]
+      where: workspace-root
+    - id: frozen-intent
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      produced_by: run.frame
+      required_by:
+        - gate.frame
+        - board.approve.contract
+        - steward.derive-work-order
+        - steward.land.archive-commit
+        - steward.run.compile-brief
+        - steward.run.ingest
+        - gate.submit
+        - gate.verify
+        - steward.land.reexecute
+        - steward.derive-amendment
+        - gate.land
+        - gate.frame.acc-coverage
+        - gate.frame.open-questions
+        - gate.plan.coverage
+        - gate.submit.freshness
+        - seat.review
+        - gate.land.trace
+      where: proposal-branch
+    - id: spec-delta
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      produced_by: run.frame
+      required_by:
+        - gate.frame
+        - board.approve.contract
+        - steward.land.archive-commit
+        - gate.frame.ears
+        - gate.frame.acc-coverage
+        - seat.review
+        - gate.land.trace
+      where: proposal-branch
+    - id: arch-delta
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      produced_by: run.frame
+      required_by:
+        - gate.frame
+        - board.approve.contract
+        - steward.land.apply-arch-delta
+        - steward.land.archive-commit
+        - gate.frame.arch-to-be
+      where: proposal-branch
+    - id: proposal-adr
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      produced_by: run.frame
+      required_by: [ steward.land.archive-commit ]
+      where: proposal-branch
+    - id: contract-approval-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: board.approve.contract
+      required_by:
+        - gate.plan
+        - steward.derive-work-order
+        - steward.run.spawn
+        - steward.land.check-approval
+        - steward.derive-amendment
+        - steward.land.archive-commit
+        - audit.sweep
+        - steward.land.apply-arch-delta
+        - gate.verify.evidence
+        - gate.land.approval
+        - gate.land.trace
+        - board.doctor
+        - doctor.approvals
+      where: proposal-branch
+    - id: plan-yaml
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: run.plan
+      required_by:
+        - gate.plan
+        - board.approve.plan
+        - steward.land.restack
+        - gate.submit
+        - gate.land
+        - steward.land.archive-commit
+        - steward.run.compute-waves
+        - gate.plan.coverage
+        - gate.plan.interfaces
+        - gate.plan.waves
+        - gate.plan.budgets
+        - seat.review
+      where: proposal-branch
+    - id: work-orders
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: run.plan
+      required_by:
+        - gate.plan
+        - board.approve.plan
+        - steward.run.claim
+        - gate.verify
+        - steward.run.compile-brief
+        - steward.run.ingest
+        - gate.submit
+        - gate.land
+        - steward.land.archive-commit
+        - steward.run.compute-waves
+        - steward.run.collision
+        - steward.land.restack
+        - steward.land.bisect
+        - dashboard.build
+        - gate.plan.test-independence
+        - gate.plan.verification-gap
+        - gate.plan.review-focus
+        - gate.plan.briefs-compile
+        - gate.submit.freshness
+        - gate.submit.scope
+        - gate.submit.frozen-paths
+        - gate.verify.evidence
+        - gate.verify.test-red
+        - gate.verify.red-green
+        - seat.work
+        - seat.review
+        - steward.land.draft-receipt
+      where: proposal-branch
+    - id: routing-snapshot
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: steward.plan.route
+      required_by:
+        - gate.plan
+        - board.approve.plan
+        - steward.run.resolve-route
+        - gate.verify.review
+        - board.approve.land
+        - steward.land.draft-receipt
+      where: proposal-branch
+    - id: impact-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: steward.plan.route
+      required_by: [ steward.land.archive-commit, gate.plan, gate.submit, gate.verify ]
+      where: git-common-dir
+    - id: plan-approval-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 2 Plan }
+      produced_by: board.approve.plan
+      required_by:
+        - steward.run.claim
+        - steward.plan.remove-worktree
+        - steward.run.spawn
+        - steward.land.check-approval
+        - steward.land.archive-commit
+        - audit.sweep
+        - steward.run.resolve-route
+        - board.doctor
+        - doctor.approvals
+      where: proposal-branch
+    - id: request-approval-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      produced_by: board.new-policy
+      required_by:
+        - gate.frame.intake
+        - steward.derive-work-order
+        - steward.run.spawn
+        - steward.land.check-approval
+        - steward.land.archive-commit
+        - steward.land.draft-receipt
+        - audit.sweep
+        - gate.frame.approvals
+        - gate.land.approval
+        - board.doctor
+      where: proposal-branch
+    - id: policy-approval-record
+      doc: { file: docs/03-lifecycle.md, heading: Standing policy limits }
+      produced_by: board.approve.policy
+      required_by:
+        - board.new
+        - steward.derive-work-order
+        - steward.land.check-approval
+        - steward.land.draft-receipt
+        - board.new-policy
+        - steward.run.spawn
+        - audit.sweep
+        - gate.frame.approvals
+        - gate.land.approval
+        - board.doctor
+      where: trunk-commit
+    - id: ruling-record
+      doc: { file: docs/03-lifecycle.md, heading: Blocked reasons }
+      produced_by: board.approve.rule
+      required_by:
+        - gate.frame.intake
+        - steward.land.archive-commit
+        - audit.sweep
+        - gate.land
+        - steward.run.cancel
+        - gate.verify.review
+        - seat.review
+        - board.doctor
+      where: proposal-branch
+    - id: override-record
+      doc: { file: docs/03-lifecycle.md, heading: Blocked reasons }
+      produced_by: board.approve.rule.override
+      required_by:
+        - steward.close
+        - steward.land.check-approval
+        - steward.land.draft-receipt
+        - audit.sweep
+        - gate.land
+        - gate.verify
+        - gate.frame
+        - gate.plan
+        - gate.submit
+        - gate.verify.evidence
+        - gate.verify.arch
+        - gate.verify.review
+      where: proposal-branch
+    - id: amendment-record
+      doc: { file: docs/03-lifecycle.md, heading: Blocked reasons }
+      produced_by: steward.derive-amendment
+      required_by:
+        - steward.run.claim
+        - steward.run.spawn
+        - steward.land.check-approval
+        - steward.land.archive-commit
+        - audit.sweep
+      where: proposal-branch
+    - id: run-dir
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: steward.run.spawn
+      required_by:
+        - steward.run.ingest
+        - steward.run.commit-round
+        - steward.run.ack-check
+        - seat.work
+        - seat.ack
+        - seat.ask
+        - seat.rule
+        - seat.submit
+        - hook.event
+        - steward.land.draft-receipt
+        - dashboard.build
+      where: workspace-root
+    - id: brief
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: steward.run.compile-brief
+      required_by:
+        - steward.run.spawn
+        - seat.ack
+        - steward.run.ingest
+        - gate.submit
+        - gate.land
+        - steward.run.commit-round
+        - gate.submit.brief
+        - gate.submit.ack
+        - gate.submit.result
+        - gate.submit.freshness
+        - seat.context
+        - hook.event
+      where: git-common-dir
+    - id: ack
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: seat.ack
+      required_by:
+        - steward.run.ingest
+        - gate.submit
+        - steward.run.commit-round
+        - steward.run.ack-check
+        - gate.submit.ack
+        - gate.submit.freshness
+        - hook.event
+        - gate.land
+      where: workspace-root
+    - id: result
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: seat.submit
+      required_by: [ steward.run.ingest, gate.submit, gate.submit.brief, gate.submit.result, gate.land ]
+      where: workspace-root
+    - id: ref-snapshot
+      doc: { file: docs/03-lifecycle.md, heading: Blocked reasons }
+      produced_by: steward.run.snapshot-refs
+      required_by:
+        - steward.run.ingest
+        - steward.run.end
+        - steward.run.ref-diff
+        - steward.land.ref-diff
+        - steward.run.remote-diff
+        - audit.sweep
+        - gate.submit.reserved-op
+        - gate.land.ref-snapshot
+        - gate.land
+      where: git-common-dir
+    - id: shadow-snapshot
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: steward.run.shadow-snapshot
+      required_by: [ steward.run.ack-check ]
+      where: refs-keel
+    - id: round-commit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: steward.run.commit-round
+      required_by:
+        - gate.submit
+        - gate.verify
+        - steward.land.restack
+        - gate.land
+        - audit.sweep
+        - steward.land.preview
+        - gate.submit.scope
+        - gate.submit.frozen-paths
+        - gate.submit.fake-completion
+        - gate.submit.ratchet
+        - gate.submit.obligations-cheap
+        - gate.submit.commands
+        - gate.verify.evidence
+        - gate.verify.test-red
+        - gate.verify.red-green
+        - gate.verify.commands
+        - gate.verify.obligations
+        - gate.verify.arch
+        - seat.review
+        - fixloop.rereview
+      where: task-branch
+    - id: task-worktree
+      doc: { file: docs/03-lifecycle.md, heading: Phase 3 Build }
+      produced_by: steward.run.worktree
+      required_by:
+        - seat.work
+        - steward.run.commit-round
+        - steward.run.spawn
+        - steward.run.provider-path-check
+        - steward.run.shadow-snapshot
+      where: workspace-root
+    - id: claim-ref
+      doc: { file: docs/03-lifecycle.md, heading: Liveness invariant }
+      produced_by: steward.run.claim
+      required_by: [ audit.sweep, steward.run.snapshot-refs, steward.run.end, steward.run.ingest, dashboard.build ]
+      where: refs-keel
+    - id: ledger-event
+      doc: { file: docs/03-lifecycle.md, heading: State machine }
+      produced_by: ledger.append
+      required_by:
+        - gate.submit
+        - board.status
+        - audit.sweep
+        - dashboard.build
+        - steward.close
+        - steward.land.archive-commit
+        - ledger.verify-chain
+        - steward.run.ingest
+        - steward.land.check-approval
+        - gate.land
+        - steward.run.ref-diff
+        - steward.land.ref-diff
+        - steward.land.draft-receipt
+        - gate.submit.reserved-op
+        - board.doctor
+        - steward.run.claim
+      where: git-common-dir
+    - id: ledger-anchor
+      doc: { file: docs/03-lifecycle.md, heading: Phase 1 Frame (and design on system) }
+      produced_by: ledger.append
+      required_by:
+        - board.approve.contract
+        - ledger.verify-chain
+        - steward.run.snapshot-refs
+        - steward.run.ingest
+        - board.land
+        - steward.run.ref-diff
+        - steward.land.ref-diff
+        - gate.submit.reserved-op
+        - audit.sweep
+      where: refs-keel
+    - id: evidence-file
+      doc: { file: docs/03-lifecycle.md, heading: Phase 4 Verify }
+      produced_by: steward.verify.runner
+      required_by:
+        - gate.verify
+        - steward.land.restack
+        - steward.land.archive-commit
+        - gate.land
+        - steward.land.draft-receipt
+        - steward.land.reexecute
+        - evidence.reuse
+        - gate.land.projection
+      where: git-common-dir
+    - id: verdict
+      doc: { file: docs/03-lifecycle.md, heading: Phase 4 Verify }
+      produced_by: steward.run.ingest
+      required_by:
+        - gate.verify
+        - steward.land.archive-commit
+        - gate.land
+        - steward.land.draft-receipt
+        - gate.verify.evidence
+        - gate.verify.review
+        - test-task.land
+        - gate.land.projection
+      where: git-common-dir
+    - id: triage-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 4 Verify }
+      produced_by: steward.run.ingest
+      required_by:
+        - gate.verify
+        - steward.land.archive-commit
+        - gate.verify.review
+        - seat.review
+        - gate.land.projection
+      where: git-common-dir
+      issue: DI-18
+    - id: integrated-commit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.restack
+      required_by:
+        - steward.land.preview
+        - steward.land.reexecute
+        - steward.land.draft-receipt
+        - steward.land.advance-trunk
+        - board.approve.land
+        - steward.land.archive-commit
+        - gate.land
+        - gate.land.trace
+        - gate.land.re-execution
+        - gate.land.approval
+      where: proposal-branch
+    - id: receipt-draft
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.draft-receipt
+      required_by:
+        - board.approve.land
+        - steward.land.check-approval
+        - steward.land.archive-commit
+        - gate.land.approval
+      where: git-common-dir
+    - id: land-approval-record
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.archive-commit
+      required_by:
+        - steward.land.check-approval
+        - ci.check-approval
+        - audit.sweep
+        - steward.land.archive-commit
+        - gate.land.approval
+        - board.doctor
+        - gate.land
+        - doctor.approvals
+      where: archive-commit
+      issue: DI-02
+    - id: archive-commit
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.archive-commit
+      required_by: [ steward.land.advance-trunk, ci.check-approval, audit.sweep, gate.land.ancestry ]
+      where: trunk-commit
+      issue: DI-19
+    - id: receipt
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.archive-commit
+      required_by: [ board.approve.receipt, steward.close, audit.sweep ]
+      where: archive-commit
+    - id: series-point
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.archive-commit
+      required_by: [ dashboard.build ]
+      where: trunk-commit
+    - id: arch-model
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.apply-arch-delta
+      required_by:
+        - gate.submit
+        - steward.plan.route
+        - steward.run.compile-brief
+        - gate.verify
+        - steward.land.archive-commit
+        - gate.frame
+        - gate.plan
+        - gate.land
+        - steward.land.preview
+        - board.new
+        - arch.find
+        - arch.drift
+        - dashboard.build
+        - steward.land.draft-receipt
+        - gate.frame.ears
+        - gate.frame.arch-to-be
+        - gate.verify.arch
+        - seat.arch-query
+      where: trunk-commit
+      issue: DI-07
+    - id: trunk-tip
+      doc: { file: docs/03-lifecycle.md, heading: Phase 5 Land }
+      produced_by: steward.land.advance-trunk
+      required_by: [ board.push, ci.check-approval, audit.sweep ]
+      where: trunk-commit
+    - id: receipt-ack-record
+      doc: { file: docs/03-lifecycle.md, heading: Standing policy limits }
+      produced_by: board.approve.receipt
+      required_by: [ steward.close, audit.sweep, board.doctor ]
+      where: trunk-commit
+    - id: answer-md
+      doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
+      produced_by: seat.work
+      required_by: [ steward.close ]
+      where: workspace-root
+    - id: charter
+      doc: { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      produced_by: board.approve.doc
+      required_by: [ gate.frame, steward.run.compile-brief, gate.submit, gate.verify ]
+      where: trunk-commit
+    - id: goals
+      doc: { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      produced_by: board.approve.doc
+      required_by: [ gate.frame, steward.run.compile-brief ]
+      where: trunk-commit
+    - id: living-spec
+      doc: { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      produced_by: steward.land.archive-commit
+      required_by: []
+      where: trunk-commit
+    - id: adr
+      doc: { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      produced_by: run.frame
+      required_by:
+        - board.approve.contract
+        - steward.run.compile-brief
+        - gate.submit
+        - gate.verify
+        - steward.land.archive-commit
+      where: proposal-branch
+    - id: arch-baseline
+      doc: { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      produced_by: steward.land.apply-arch-delta
+      required_by: [ gate.verify, board.approve.contract, arch.drift, steward.land.preview, gate.frame.arch-to-be ]
+      where: trunk-commit
+      issue: DI-07
+    - id: prompt-provenance
+      doc: { file: docs/02-alignment.md, heading: Brief compiler and normalized hashing }
+      produced_by: steward.run.spawn
+      required_by: [ steward.run.commit-round ]
+      where: git-common-dir
+    - id: seat-ruling
+      doc: { file: docs/02-alignment.md, heading: "Precedence order, decision boundaries and rulings" }
+      produced_by: seat.rule
+      required_by: [ steward.run.ingest, steward.land.draft-receipt ]
+      where: workspace-root
+    - id: seat-question
+      doc: { file: docs/02-alignment.md, heading: "Precedence order, decision boundaries and rulings" }
+      produced_by: seat.ask
+      required_by: [ steward.run.ingest ]
+      where: workspace-root
+    - id: document-approval-record
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      produced_by: board.approve.doc
+      required_by:
+        - gate.frame
+        - audit.sweep
+        - steward.run.spawn
+        - steward.land.check-approval
+        - gate.frame.approvals
+        - board.doctor
+      where: trunk-commit
+    - id: approval-recorded-event
+      doc:
+        file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+      produced_by: ledger.append
+      required_by:
+        - steward.run.spawn
+        - steward.land.check-approval
+        - ci.check-approval
+        - audit.sweep
+        - gate.land
+        - gate.frame.approvals
+        - gate.land.approval
+        - board.doctor
+        - gate.frame
+        - gate.plan
+        - steward.run.ingest
+        - doctor.approvals
+      where: git-common-dir
+      issue: DI-03
+    - id: proposal-created-event
+      doc: { file: docs/02-alignment.md, heading: Requests and seat-proof verbs }
+      produced_by: ledger.append
+      required_by: [ steward.run.spawn, steward.land.check-approval ]
+      where: git-common-dir
+    - id: argv-redacted
+      doc: { file: docs/04-trace-and-state.md, heading: Redaction and field whitelist }
+      produced_by: steward.run.spawn
+      required_by: [ steward.land.archive-commit ]
+      where: git-common-dir
+    - id: trace-db
+      doc: { file: docs/04-trace-and-state.md, heading: Trace check range and epoch }
+      produced_by: steward.run.ingest
+      required_by: [ gate.submit.provider-path-events, gate.submit.subagent-events, board.trace ]
+      where: git-common-dir
+    - id: project-config
+      doc: { file: docs/05-vcs.md, heading: Backend selection }
+      produced_by: board.init
+      required_by: [ steward.run.worktree, steward.land.advance-trunk ]
+      where: working-tree
+    - id: task-branch
+      doc: { file: docs/05-vcs.md, heading: Branch naming (no nesting) }
+      produced_by: steward.run.worktree
+      required_by: [ steward.run.ingest, steward.run.commit-round, steward.land.restack ]
+      where: task-branch
+    - id: pre-spawn-base
+      doc: { file: docs/05-vcs.md, heading: Snapshots between turns }
+      produced_by: steward.run.pre-spawn-base
+      required_by: [ steward.run.ack-check, steward.run.shadow-snapshot, steward.run.commit-round ]
+      where: refs-keel
+    - id: seat-commit-snapshot
+      doc: { file: docs/05-vcs.md, heading: The Steward commit at submit }
+      produced_by: steward.run.ingest
+      required_by: [ steward.run.ref-diff, steward.land.ref-diff ]
+      where: refs-keel
+    - id: preview-commit
+      doc: { file: docs/05-vcs.md, heading: Integration preview and restack }
+      produced_by: steward.land.preview
+      required_by: [ steward.land.reexecute, steward.land.archive-commit ]
+      where: git-common-dir
+    - id: verify-checkout
+      doc: { file: docs/05-vcs.md, heading: Creating worktrees }
+      produced_by: steward.verify.checkout
+      required_by: [ gate.verify, steward.land.reexecute ]
+      where: workspace-root
+    - id: cancellation-event
+      doc: { file: docs/06-parallelism.md, heading: Cancellation }
+      produced_by: ledger.append
+      required_by: [ steward.run.cancel, steward.run.end ]
+      where: git-common-dir
+    - id: collision-ruling-record
+      doc: { file: docs/06-parallelism.md, heading: Collision prediction }
+      produced_by: seat.rule
+      required_by: [ steward.land.restack ]
+      where: workspace-root
+    - id: index
+      doc: { file: docs/07-architecture-intelligence.md, heading: IndexProvider port and backends }
+      produced_by: arch.index
+      required_by:
+        - arch.find
+        - arch.drift
+        - board.new
+        - gate.submit
+        - gate.verify
+        - gate.land
+        - steward.land.preview
+        - steward.land.reexecute
+        - steward.land.draft-receipt
+        - steward.run.compile-brief
+        - seat.arch-query
+        - dashboard.build
+        - gate.submit.ratchet
+        - gate.plan.waves
+        - gate.verify.arch
+        - evidence.reuse
+      where: git-common-dir
+    - id: worktree-diff
+      doc: { file: docs/11-verification.md, heading: gate:submit }
+      produced_by: seat.work
+      required_by: [ gate.submit.provider-path-events ]
+      where: working-tree
+    - id: gate-checked-event
+      doc: { file: docs/11-verification.md, heading: 2. Source-state binding and land re-execution }
+      produced_by: ledger.append
+      required_by: [ dashboard.build ]
+      where: git-common-dir
+    - id: frozen-tests
+      doc: { file: docs/11-verification.md, heading: 3. Test independence and red/green proof }
+      produced_by: test-task.land
+      required_by: [ gate.verify.red-green ]
+      where: proposal-branch
+    - id: question
+      doc: { file: docs/12-cli-api-mcp.md, heading: 4. keel api }
+      produced_by: seat.ask
+      required_by: [ steward.run.ingest ]
+      where: workspace-root
+    - id: hook-outcome
+      doc: { file: docs/12-cli-api-mcp.md, heading: 6. keel hook }
+      produced_by: hook.event
+      required_by: [ steward.run.ingest, board.doctor ]
+      where: workspace-root
+    - id: frame-verdict
+      doc: { file: docs/11-verification.md, heading: gate:frame }
+      produced_by: run.frame
+      required_by: [ gate.frame.review, gate.frame ]
+      where: git-common-dir
+    - id: plan-verdict
+      doc: { file: docs/11-verification.md, heading: gate:plan }
+      produced_by: run.plan
+      required_by: [ gate.plan.verification-gap, gate.plan ]
+      where: git-common-dir
+    - id: land-evidence
+      doc: { file: docs/11-verification.md, heading: 2. Source-state binding and land re-execution }
+      produced_by: steward.land.reexecute
+      required_by: [ gate.land.re-execution, steward.land.draft-receipt, steward.land.archive-commit ]
+      where: git-common-dir
+  locks:
+    - id: lock.claim
+      doc: { file: docs/06-parallelism.md, heading: The lock }
+      held_by: steward.run.claim
+      waited_by: []
+      released_by: steward.run.ingest
+    - id: lock.supervisor
+      doc: { file: docs/04-trace-and-state.md, heading: Single writer }
+      held_by: steward.run.spawn
+      waited_by:
+        - board.new
+        - board.new-policy
+        - board.approve.contract
+        - board.approve.plan
+        - board.approve.land
+        - board.approve.receipt
+        - board.approve.doc
+        - board.approve.policy
+        - board.approve.rule.abandon
+        - board.approve.rule.override
+        - board.approve.rule.budget
+        - board.approve.rule.unverified
+        - steward.derive-amendment
+        - board.run.hold-on
+        - board.run.hold-off
+        - board.land
+        - audit.sweep
+        - board.approve.rule
+      released_by: steward.run.end
+      issue: DI-04
+    - id: lock.ledger-writer
+      doc: { file: docs/04-trace-and-state.md, heading: Single writer }
+      held_by: ledger.append
+      waited_by: []
+      released_by: ledger.anchor-update
+    - id: lock.integration-queue
+      doc: { file: docs/06-parallelism.md, heading: Integration queue and land re-run }
+      held_by: steward.land.restack
+      waited_by: []
+      released_by: steward.land.advance-trunk
+      issue: DI-16
 
 issues:
   - id: DI-01
     title: Clause 11 and P1 say keel never reads a provider value; invariant I2 reads env values in memory
     statement: >-
       Clause 11 of the owner's statement and the P1 row say that keel never reads a provider value or a
-      credential file. The exact invariant of the providers document, its I2 clause, ADR-0006 and KP-13
-      say that keel reads env values in memory in exactly two modules, at spawn and at direct-lane call
-      time, and the P1 mapping row restates that reading. The lower documents add qualifiers the clause
-      does not have (in memory, in exactly two modules, never persists); the two texts cannot both hold.
+      credential file. The exact invariant of the providers document, its I2 clause, ADR-0006 and KP-13 say
+      that keel reads env values in memory in exactly two modules, at spawn and at direct-lane call time, and
+      the P1 mapping row restates that reading. The lower documents add qualifiers the clause does not have
+      (in memory, in exactly two modules, never persists); the two texts cannot both hold.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -99,46 +1622,57 @@ issues:
       - { file: docs/10-providers.md, heading: "1. The exact invariant" }
       - { file: docs/adr/ADR-0006-provider-values-by-reference.md, heading: "Decision" }
       - { file: docs/00-vision.md, heading: "KP-13 Provider values belong to the user" }
+    class: mandate-conflict
+    blocks: M0
+    higher: { file: docs/00-mandate.md, heading: 1. The owner's statement }
+    lower: { file: docs/10-providers.md, heading: 1. The exact invariant }
 
   - id: DI-02
     title: The land approval record is committed only in the archive commit that the land gate must pass first
     statement: >-
-      The recording rule places the land approval record in the archive commit itself, and the gate accepts
-      an approval only when the record already exists in git at its expected place. The land verb checks
-      the land approval on its second run and only then writes the archive commit. The record cannot exist
-      in a commit that is written after the check that requires it.
+      The recording rule places the land approval record in the archive commit itself, and the gate accepts an
+      approval only when the record already exists in git at its expected place. The land verb checks the land
+      approval on its second run and only then writes the archive commit. The record cannot exist in a commit
+      that is written after the check that requires it.
     status: open
     found_by: external-review
     found_on: 2026-09-26
     root_cause: rule-tightened
     anchors:
-      - { file: docs/02-alignment.md, heading: "Board approvals (explicit confirmation, hash binding, invalidation)" }
+      - file: docs/02-alignment.md
+        heading: "Board approvals (explicit confirmation, hash binding, invalidation)"
       - { file: docs/12-cli-api-mcp.md, heading: "1. 16 verbs and at most 40 modes" }
       - { file: docs/04-trace-and-state.md, heading: "Land projection and the projection gate" }
+    class: cycle
+    blocks: M1b
 
   - id: DI-03
     title: The recommended CI approval check needs a ledger event that a fresh clone never has
     statement: >-
       The branch-protection recommendation has CI run the land gate's approval check at the trunk tip. That
-      gate accepts an approval only together with an approval.recorded event on the verified ledger chain.
-      The ledger lives in the git common dir and refs/keel is never pushed, so a fresh CI clone cannot
-      satisfy the condition; the CI check and the local gate need to be two different checks.
+      gate accepts an approval only together with an approval.recorded event on the verified ledger chain. The
+      ledger lives in the git common dir and refs/keel is never pushed, so a fresh CI clone cannot satisfy the
+      condition; the CI check and the local gate need to be two different checks.
     status: open
     found_by: external-review
     found_on: 2026-09-26
     root_cause: rule-tightened
     anchors:
       - { file: docs/14-trust-security.md, heading: "Server-side branch protection recommendations" }
-      - { file: docs/02-alignment.md, heading: "Board approvals (explicit confirmation, hash binding, invalidation)" }
+      - file: docs/02-alignment.md
+        heading: "Board approvals (explicit confirmation, hash binding, invalidation)"
       - { file: docs/04-trace-and-state.md, heading: "Single writer" }
+    class: cycle
+    blocks: M1b
 
   - id: DI-04
-    title: Every mutating verb waits for the supervisor lock without exception, so a hold or an abandon cannot reach the holder
+    title: Every mutating verb waits for the supervisor lock without exception, so a hold or an abandon cannot
+      reach the holder
     statement: >-
-      The single-writer rule makes every other mutating verb, keel approve included, wait for the
-      supervisor lock while a seat runs, with no exception. Cancellation says that a Board hold and an
-      abandon ruling cancel the running task. The hold mode and the abandon ruling are mutating verbs, so
-      they wait for the lock that only the run they are meant to stop releases.
+      The single-writer rule makes every other mutating verb, keel approve included, wait for the supervisor
+      lock while a seat runs, with no exception. Cancellation says that a Board hold and an abandon ruling
+      cancel the running task. The hold mode and the abandon ruling are mutating verbs, so they wait for the
+      lock that only the run they are meant to stop releases.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -148,14 +1682,16 @@ issues:
       - { file: docs/06-parallelism.md, heading: "Cancellation" }
       - { file: docs/12-cli-api-mcp.md, heading: "1. 16 verbs and at most 40 modes" }
       - { file: docs/03-lifecycle.md, heading: "Proposal states" }
+    class: cycle
+    blocks: M1a
 
   - id: DI-05
     title: Recovery of the supervisor lock and the run after a supervisor crash is undefined
     statement: >-
       The single-writer rule defers the recovery of a lock left behind by a crashed process to an
-      implementation detail, and the lease rules cover claims, not the supervisor lock. No document says
-      how a crashed or hung supervisor is detected, who takes over its lock, and how its run and its
-      window of ledger events are closed.
+      implementation detail, and the lease rules cover claims, not the supervisor lock. No document says how a
+      crashed or hung supervisor is detected, who takes over its lock, and how its run and its window of
+      ledger events are closed.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -163,14 +1699,16 @@ issues:
     anchors:
       - { file: docs/04-trace-and-state.md, heading: "Single writer" }
       - { file: docs/06-parallelism.md, heading: "The lease" }
+    class: cycle
+    blocks: M1a
 
   - id: DI-06
     title: Dependents at depth 2 are called the impact closure and used to prove that no dependency changed
     statement: >-
       Impact follows dependents at depth 2. The same section calls that computation the impact closure and
-      lets evidence be reused for a scope once the closure proves that no dependency of the scope changed;
-      the verification and integration documents rely on that proof. A depth-bounded set cannot prove an
-      unbounded claim; dependents at depth 3 and beyond are outside it.
+      lets evidence be reused for a scope once the closure proves that no dependency of the scope changed; the
+      verification and integration documents rely on that proof. A depth-bounded set cannot prove an unbounded
+      claim; dependents at depth 3 and beyond are outside it.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -179,15 +1717,17 @@ issues:
       - { file: docs/07-architecture-intelligence.md, heading: "Impact and the ratchet" }
       - { file: docs/11-verification.md, heading: "2. Source-state binding and land re-execution" }
       - { file: docs/06-parallelism.md, heading: "Integration queue and land re-run" }
+    class: term-collision
+    blocks: M4
 
   - id: DI-07
     title: The architecture model changes only at land, so an approved new dependency fails verify.arch before land
     statement: >-
       The declared model changes only through an arch delta applied by the land archive commit, and the
-      verify.arch check judges new violations against the declared model. A contract approval on the
-      system track binds an arch delta that adds a dependency; a correct implementation of that dependency
-      is judged against the trunk model, which does not yet contain it. No target model (trunk model plus
-      the approved delta) is defined for verification and preview.
+      verify.arch check judges new violations against the declared model. A contract approval on the system
+      track binds an arch delta that adds a dependency; a correct implementation of that dependency is judged
+      against the trunk model, which does not yet contain it. No target model (trunk model plus the approved
+      delta) is defined for verification and preview.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -196,13 +1736,15 @@ issues:
       - { file: docs/07-architecture-intelligence.md, heading: "Declared model" }
       - { file: docs/07-architecture-intelligence.md, heading: "Drift and the unknown policy" }
       - { file: docs/11-verification.md, heading: "gate:verify" }
+    class: cycle
+    blocks: M4
 
   - id: DI-08
     title: Goal progress is requirement coverage, and nothing reads success_signal when a goal closes
     statement: >-
       The alignment chain, the RTM, the dashboard overview and the measures table define goal progress as
-      requirements verified at head over the total. A goal's success_signal is a required string that no
-      verb, gate, record or view reads, and nothing is needed to set a goal's status to done. A goal whose
+      requirements verified at head over the total. A goal's success_signal is a required string that no verb,
+      gate, record or view reads, and nothing is needed to set a goal's status to done. A goal whose
       requirements are all verified reports full progress whether or not its success signal was observed.
     status: open
     found_by: external-review
@@ -214,15 +1756,17 @@ issues:
       - { file: docs/08-dashboard.md, heading: "Overview" }
       - { file: docs/15-roadmap.md, heading: "Measures" }
       - { file: schemas/goals.schema.json, pointer: "#/$defs/goal/properties/success_signal" }
+    class: term-collision
+    blocks: M1a
 
   - id: DI-09
     title: The patch track derives exactly one work order and also allows a test fixed first by a test task
     statement: >-
       The patch track says the Steward derives exactly one work order, and in the same sentence lets its
-      acceptance come from a test fixed first by a test task on a different declared family. A test task is
-      a work order of kind test, so the patch has two work orders, or it has one and the test task cannot
-      exist. The rule does not say whether a patch that needs a test is raised to feature or is allowed two
-      work orders.
+      acceptance come from a test fixed first by a test task on a different declared family. A test task is a
+      work order of kind test, so the patch has two work orders, or it has one and the test task cannot exist.
+      The rule does not say whether a patch that needs a test is raised to feature or is allowed two work
+      orders.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -230,6 +1774,8 @@ issues:
     anchors:
       - { file: docs/03-lifecycle.md, heading: "Patch track and policy path" }
       - { file: docs/11-verification.md, heading: "3. Test independence and red/green proof" }
+    class: gap
+    blocks: M2
 
   - id: DI-10
     title: A quick-patch on a shared trunk needs a request approval, a land approval and a receipt acknowledgement
@@ -237,8 +1783,8 @@ issues:
       The standing policy limits require a land approval for patches on shared trunks and a receipt
       acknowledgement after every policy land. On a shared trunk a quick-patch therefore costs three Board
       touches (request, land, receipt), more than the per-change contract route it is meant to lighten and
-      more than the staffing table's typical count. Policy land (a land on the policy path) and land policy
-      (a standing policy that replaces the per-land approval) are two meanings under one wording.
+      more than the staffing table's typical count. Policy land (a land on the policy path) and land policy (a
+      standing policy that replaces the per-land approval) are two meanings under one wording.
     status: open
     found_by: external-review
     found_on: 2026-09-26
@@ -248,5 +1794,476 @@ issues:
       - { file: docs/03-lifecycle.md, heading: "Patch track and policy path" }
       - { file: docs/01-org-model.md, heading: "Staffing per track" }
       - { file: docs/17-open-decisions.md, heading: "Adopted by recommendation (reversible, with ADR)" }
+    class: term-collision
+    blocks: M0
+  - id: DI-11
+    title: The register's place and machine vocabulary lacks the workspace root and keel's own agent-side processes
+    statement: The order map's vocabulary placed every run input, outbox drop and worktree in the git common dir
+      and let a seat reach only its worktree and the proposal branch, so every brief a seat ACKs, every outbox
+      drop and every read by keel api, keel hook or the MCP server was flagged as a place the seat cannot
+      reach. The design puts run inputs, outboxes and worktrees under the workspace root outside the
+      repository, round commits on the task branch, and keel's own api, hook and MCP processes in the seat's
+      process tree with the control plane readable; the vocabulary of section 5.2, not the design, was what
+      could not hold.
+    status: closed
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: other
+    anchors:
+      - { file: docs/00-mandate.md, heading: 5.2 The design-issue register }
+      - { file: docs/04-trace-and-state.md, heading: Local control plane }
+      - { file: docs/05-vcs.md, heading: Creating worktrees }
+      - { file: docs/12-cli-api-mcp.md, heading: "5. MCP (two read tools, one write tool)" }
+      - { file: schemas/design-issues.schema.json, pointer: "#/$defs/place" }
+    class: gap
+    blocks: M0
+    walk:
+      producers:
+        - precondition: a seat reads its brief and writes its outbox drops
+          producer: { file: docs/04-trace-and-state.md, heading: Local control plane }
+          position: before
+          sufficient: true
+          reason: run inputs and outboxes live under the workspace root, which the runtime is started in; the compiled
+            brief itself stays in the git common dir and reaches the seat through the run inputs
+      consumers:
+        - anchor: { file: docs/00-mandate.md, heading: 5.2 The design-issue register }
+          actor: seat
+          outcome: changed
+          reason: the reachability sentence gains the workspace root, the task branch and the agent-api machine
+        - anchor: { file: docs/13-artifacts-schemas.md, heading: 6. validate coverage and the D1 tooling exception }
+          actor: board-at-terminal
+          outcome: unchanged
+          reason: the issues row names the reachability check, not the place list
+        - anchor: { file: docs/04-trace-and-state.md, heading: Local control plane }
+          actor: seat
+          outcome: unchanged
+          reason: the design already states that the control plane is readable by keel's own processes and, on exposed
+            runtimes, by seats
+      places:
+        - artifact: run-dir
+          where: workspace-root
+          reachable_from: [ local, supervisor, seat, agent-api ]
+        - artifact: brief
+          where: git-common-dir
+          reachable_from: [ local, supervisor, agent-api ]
+        - artifact: round-commit
+          where: task-branch
+          reachable_from: [ local, supervisor, seat, agent-api ]
+      readers:
+        - field: "place: workspace-root, task-branch"
+          readers: [ "order.artifacts[].where", the reachability table of the issues check ]
+        - field: "runs_in: agent-api"
+          readers: [ "order.steps[].runs_in", the reachability table of the issues check ]
+      tally: []
+    options:
+      - "Extend the vocabulary: places workspace-root and task-branch, machine agent-api (keel's own api, hook
+        and MCP processes in the seat's process tree), with the reachability table stated in section 5.2 and
+        enforced by the issues check."
+      - Keep the vocabulary and exempt supervisor-handed inputs from the reachability check by tagging every
+        affected edge with an open issue.
+    recommendation: "Option 1: the places exist in the design (workspace root, task branch) and the exemption
+      would hide real unreachable places behind tags."
+    decision:
+      by: recommendation
+      date: 2026-09-27
+      option: Option 1
+      recorded_in: [ docs/00-mandate.md, schemas/design-issues.schema.json, scripts/validate.mjs ]
+    closure:
+      date: 2026-09-27
+      checks: [ schemas, examples, issues, i18n ]
+      tests: []
+      anchors:
+        - { file: docs/00-mandate.md, heading: 5.2 The design-issue register }
+        - { file: schemas/design-issues.schema.json, pointer: "#/$defs/place" }
+        - { file: schemas/design-issues.schema.json, pointer: "#/$defs/runsIn" }
+    regression:
+      - { track: feature, actor: seat, sequence: feature-happy }
+      - { track: feature, actor: hook, sequence: feature-happy }
+  - id: DI-12
+    title: The close check blocks on the receipt acknowledgement that the same phase calls non-blocking
+    statement: Phase 6 produces a receipt acknowledgement item when the change landed under a policy, and its
+      gate, the close check, requires no unacknowledged receipt on the touched elements or paths. The same
+      phase and the standing policy limits say the acknowledgement does not block and only blocks the next
+      change that touches the same elements. At close, a proposal that landed under a policy has exactly one
+      unacknowledged receipt on exactly the elements it touched, its own; as written the close check blocks on
+      it unless the check excludes the proposal's own receipt, which no sentence says.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: other
+    anchors:
+      - { file: docs/03-lifecycle.md, heading: Phase 6 Close }
+      - { file: docs/03-lifecycle.md, heading: Standing policy limits }
+  - id: DI-13
+    title: A proposal ADR is accepted by the contract approval but not bound by its hashes
+    statement: The L3 row says an ADR is accepted by the contract approval on the system track and that anchor or
+      body drift voids the acceptance. The bound-artifacts table binds the contract kind to exactly the frozen
+      block, the spec delta and the arch delta, summarized as contract_hash, and the hash rules say the hashes
+      cover exactly the listed artifacts. contract_hash never covers the ADR, so the gate check that compares
+      every bound artifact's hash cannot see ADR drift, and the acceptance the row promises has no producer.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: other
+    anchors:
+      - { file: docs/02-alignment.md, heading: Alignment chain L0–L11 }
+      - file: docs/02-alignment.md
+        heading: Board approvals (explicit confirmation, hash binding, invalidation)
+  - id: DI-14
+    title: The land-time ref diff cannot explain the ledger anchor moves made after the run window
+    statement: "The ref, HEAD and reflog parts of the snapshot taken before each spawn are diffed at ingest and at
+      land, and a move of the ledger anchor is explained only when it matches the appends the supervising
+      Steward process made itself. At land no supervising process exists, and between the last pre-spawn
+      snapshot and the land the anchor has moved by appends the supervisor did not make: the land approval's
+      approval.recorded event, the restack's old and new commit ids, land.started. Read as written, every land
+      sees an unexplained anchor move, sets blocked(reserved_op) and needs an override; no sentence names a
+      land-time baseline snapshot."
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: no-order-check
+    anchors:
+      - { file: docs/05-vcs.md, heading: Detection (the guarantee) }
+      - { file: docs/04-trace-and-state.md, heading: Single writer }
+  - id: DI-15
+    title: Every submitted round has a commit, except the round that fails the provider path listing
+    statement: The Steward commit at submit says every submitted round therefore has a commit, whether its submit
+      gate passes or not, and in the next sentence that the name-only provider path listing runs before the
+      commit and that a hit fails the round with submit.provider-path-events and nothing is staged or
+      committed. A round that fails the listing is a submitted round with no commit; the fix round that builds
+      on the failed round's commit, and the trace that expects a Keel-Round trailer per round, have nothing to
+      build on, and the failing check carries a submit-gate id although the submit gate is said to run on the
+      round commit.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: cardinality
+    anchors:
+      - { file: docs/05-vcs.md, heading: The Steward commit at submit }
+      - { file: docs/11-verification.md, heading: gate:submit }
+  - id: DI-16
+    title: The per-trunk integration lock names no release and no behaviour across the land approval pause
+    statement: "One proposal integrates at a time per trunk, under a per-trunk lock in the locks directory, in the
+      order keel land requests arrive. The sentence introduces a wait without naming what ends it, and the
+      land is a two-step verb that stops for the land approval between the receipt draft and the archive
+      commit: if the lock is held across the pause, every other proposal on the trunk waits on a Board action;
+      if it is released, the second land re-enters the queue behind lands that arrived meanwhile and its
+      restacked base may be stale. Neither reading is stated."
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: other
+    anchors:
+      - { file: docs/06-parallelism.md, heading: Integration queue and land re-run }
+      - { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+  - id: DI-17
+    title: Ruling names two records with two authors
+    statement: A ruling is the Board's approval of kind rule (abandon, override, budget, track, unverified,
+      dismiss), written by keel approve --rule as an approval record, and it is also the planner's or a seat's
+      record written through keel api rule into the run outbox, which produces a ruling.made event and gates
+      integration after a collision. The glossary, the id table and the register's vocabulary carry one term
+      for both, and the seat contracts, the collision rule and the approval rules read the word with different
+      authors and different authority.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: term-overloaded
+    anchors:
+      - { file: docs/02-alignment.md, heading: "Precedence order, decision boundaries and rulings" }
+      - { file: docs/06-parallelism.md, heading: Collision prediction }
+      - { file: docs/12-cli-api-mcp.md, heading: 1. 16 verbs and at most 40 modes }
+      - { file: docs/12-cli-api-mcp.md, heading: 4. keel api }
+  - id: DI-18
+    title: No sentence says how a triage record reaches the audit lens that checks its citation
+    statement: Triage records are planner-owned records in the git common dir, projected only at land, and every
+      triage record cites evidence that the auditor checks. The audit lens runs in a reviewer seat, and the
+      lens rules say verdicts and the diff are passed inline or by path; nothing says how a triage record
+      reaches the auditing seat, whether the auditor is the audit lens at all, or which process reads the
+      record on the seat's behalf.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: other
+    anchors:
+      - { file: docs/11-verification.md, heading: 6. Findings authority and triage records }
+      - { file: docs/11-verification.md, heading: 4. Review lenses and lens sets }
+      - { file: docs/04-trace-and-state.md, heading: Local control plane }
+  - id: DI-19
+    title: The land gate's ancestry check needs the archive commit that is written after the gate
+    statement: The land gate runs in the land process after integration and before the archive commit is written,
+      and its ancestry check verifies that trunk is an ancestor of the archive commit. The archive commit is
+      produced by the second land after the land approval, so the check reads a commit that does not yet
+      exist; the check may intend the integrated commit about to be archived, which no sentence says. The
+      shape is DI-02's on a different artifact, so DI-02's correction does not close it.
+    status: open
+    found_by: walkthrough
+    found_on: 2026-09-27
+    root_cause: no-order-check
+    anchors:
+      - { file: docs/11-verification.md, heading: gate:land }
+      - { file: docs/03-lifecycle.md, heading: Phase 5 Land }
 
-walkthroughs: []
+walkthroughs:
+  - date: 2026-09-27
+    trigger: baseline
+    scope: "Baseline walk of P5: the order map extracted from the nine home documents (02, 03, 04, 05, 06, 07, 11,
+      12, 14) and every applicable cell of the matrix walked mechanically over it; cross-instance reads (the
+      previous land's trunk tip, model and living spec, the previous round's commit, a re-run's own approval)
+      are not order edges and were left out"
+    cells:
+      - { track: spike, actor: board-at-terminal, sequence: spike-happy }
+      - { track: spike, actor: board-during-wave, sequence: spike-happy }
+      - { track: spike, actor: supervisor, sequence: spike-happy }
+      - { track: spike, actor: second-steward-process, sequence: spike-happy }
+      - { track: spike, actor: crashed-supervisor, sequence: spike-happy }
+      - { track: spike, actor: dashboard, sequence: spike-happy }
+      - { track: patch, actor: board-at-terminal, sequence: patch-per-change }
+      - { track: patch, actor: board-during-wave, sequence: patch-per-change }
+      - { track: patch, actor: supervisor, sequence: patch-per-change }
+      - { track: patch, actor: second-steward-process, sequence: patch-per-change }
+      - { track: patch, actor: seat, sequence: patch-per-change }
+      - { track: patch, actor: hook, sequence: patch-per-change }
+      - { track: patch, actor: crashed-supervisor, sequence: patch-per-change }
+      - { track: patch, actor: dashboard, sequence: patch-per-change }
+      - { track: patch, actor: board-at-terminal, sequence: patch-policy }
+      - { track: patch, actor: board-during-wave, sequence: patch-policy }
+      - { track: patch, actor: supervisor, sequence: patch-policy }
+      - { track: patch, actor: second-steward-process, sequence: patch-policy }
+      - { track: patch, actor: seat, sequence: patch-policy }
+      - { track: patch, actor: hook, sequence: patch-policy }
+      - { track: patch, actor: crashed-supervisor, sequence: patch-policy }
+      - { track: patch, actor: dashboard, sequence: patch-policy }
+      - { track: feature, actor: board-at-terminal, sequence: feature-happy }
+      - { track: feature, actor: board-during-wave, sequence: feature-happy }
+      - { track: feature, actor: supervisor, sequence: feature-happy }
+      - { track: feature, actor: second-steward-process, sequence: feature-happy }
+      - { track: feature, actor: seat, sequence: feature-happy }
+      - { track: feature, actor: hook, sequence: feature-happy }
+      - { track: feature, actor: crashed-supervisor, sequence: feature-happy }
+      - { track: feature, actor: dashboard, sequence: feature-happy }
+      - { track: system, actor: board-at-terminal, sequence: system-happy }
+      - { track: system, actor: board-during-wave, sequence: system-happy }
+      - { track: system, actor: supervisor, sequence: system-happy }
+      - { track: system, actor: second-steward-process, sequence: system-happy }
+      - { track: system, actor: seat, sequence: system-happy }
+      - { track: system, actor: hook, sequence: system-happy }
+      - { track: system, actor: crashed-supervisor, sequence: system-happy }
+      - { track: system, actor: dashboard, sequence: system-happy }
+      - { track: spike, actor: board-at-terminal, sequence: hold }
+      - { track: spike, actor: board-during-wave, sequence: hold }
+      - { track: spike, actor: supervisor, sequence: hold }
+      - { track: spike, actor: second-steward-process, sequence: hold }
+      - { track: spike, actor: seat, sequence: hold }
+      - { track: spike, actor: hook, sequence: hold }
+      - { track: spike, actor: crashed-supervisor, sequence: hold }
+      - { track: spike, actor: dashboard, sequence: hold }
+      - { track: patch, actor: board-at-terminal, sequence: hold }
+      - { track: patch, actor: board-during-wave, sequence: hold }
+      - { track: patch, actor: supervisor, sequence: hold }
+      - { track: patch, actor: second-steward-process, sequence: hold }
+      - { track: patch, actor: seat, sequence: hold }
+      - { track: patch, actor: hook, sequence: hold }
+      - { track: patch, actor: crashed-supervisor, sequence: hold }
+      - { track: patch, actor: dashboard, sequence: hold }
+      - { track: feature, actor: board-at-terminal, sequence: hold }
+      - { track: feature, actor: board-during-wave, sequence: hold }
+      - { track: feature, actor: supervisor, sequence: hold }
+      - { track: feature, actor: second-steward-process, sequence: hold }
+      - { track: feature, actor: seat, sequence: hold }
+      - { track: feature, actor: hook, sequence: hold }
+      - { track: feature, actor: crashed-supervisor, sequence: hold }
+      - { track: feature, actor: dashboard, sequence: hold }
+      - { track: system, actor: board-at-terminal, sequence: hold }
+      - { track: system, actor: board-during-wave, sequence: hold }
+      - { track: system, actor: supervisor, sequence: hold }
+      - { track: system, actor: second-steward-process, sequence: hold }
+      - { track: system, actor: seat, sequence: hold }
+      - { track: system, actor: hook, sequence: hold }
+      - { track: system, actor: crashed-supervisor, sequence: hold }
+      - { track: system, actor: dashboard, sequence: hold }
+      - { track: spike, actor: board-at-terminal, sequence: abandon }
+      - { track: spike, actor: board-during-wave, sequence: abandon }
+      - { track: spike, actor: supervisor, sequence: abandon }
+      - { track: spike, actor: second-steward-process, sequence: abandon }
+      - { track: spike, actor: seat, sequence: abandon }
+      - { track: spike, actor: hook, sequence: abandon }
+      - { track: spike, actor: crashed-supervisor, sequence: abandon }
+      - { track: spike, actor: dashboard, sequence: abandon }
+      - { track: patch, actor: board-at-terminal, sequence: abandon }
+      - { track: patch, actor: board-during-wave, sequence: abandon }
+      - { track: patch, actor: supervisor, sequence: abandon }
+      - { track: patch, actor: second-steward-process, sequence: abandon }
+      - { track: patch, actor: seat, sequence: abandon }
+      - { track: patch, actor: hook, sequence: abandon }
+      - { track: patch, actor: crashed-supervisor, sequence: abandon }
+      - { track: patch, actor: dashboard, sequence: abandon }
+      - { track: feature, actor: board-at-terminal, sequence: abandon }
+      - { track: feature, actor: board-during-wave, sequence: abandon }
+      - { track: feature, actor: supervisor, sequence: abandon }
+      - { track: feature, actor: second-steward-process, sequence: abandon }
+      - { track: feature, actor: seat, sequence: abandon }
+      - { track: feature, actor: hook, sequence: abandon }
+      - { track: feature, actor: crashed-supervisor, sequence: abandon }
+      - { track: feature, actor: dashboard, sequence: abandon }
+      - { track: system, actor: board-at-terminal, sequence: abandon }
+      - { track: system, actor: board-during-wave, sequence: abandon }
+      - { track: system, actor: supervisor, sequence: abandon }
+      - { track: system, actor: second-steward-process, sequence: abandon }
+      - { track: system, actor: seat, sequence: abandon }
+      - { track: system, actor: hook, sequence: abandon }
+      - { track: system, actor: crashed-supervisor, sequence: abandon }
+      - { track: system, actor: dashboard, sequence: abandon }
+      - { track: spike, actor: board-at-terminal, sequence: override }
+      - { track: spike, actor: board-during-wave, sequence: override }
+      - { track: spike, actor: supervisor, sequence: override }
+      - { track: spike, actor: second-steward-process, sequence: override }
+      - { track: spike, actor: seat, sequence: override }
+      - { track: spike, actor: hook, sequence: override }
+      - { track: spike, actor: crashed-supervisor, sequence: override }
+      - { track: spike, actor: dashboard, sequence: override }
+      - { track: patch, actor: board-at-terminal, sequence: override }
+      - { track: patch, actor: board-during-wave, sequence: override }
+      - { track: patch, actor: supervisor, sequence: override }
+      - { track: patch, actor: second-steward-process, sequence: override }
+      - { track: patch, actor: seat, sequence: override }
+      - { track: patch, actor: hook, sequence: override }
+      - { track: patch, actor: crashed-supervisor, sequence: override }
+      - { track: patch, actor: dashboard, sequence: override }
+      - { track: feature, actor: board-at-terminal, sequence: override }
+      - { track: feature, actor: board-during-wave, sequence: override }
+      - { track: feature, actor: supervisor, sequence: override }
+      - { track: feature, actor: second-steward-process, sequence: override }
+      - { track: feature, actor: seat, sequence: override }
+      - { track: feature, actor: hook, sequence: override }
+      - { track: feature, actor: crashed-supervisor, sequence: override }
+      - { track: feature, actor: dashboard, sequence: override }
+      - { track: system, actor: board-at-terminal, sequence: override }
+      - { track: system, actor: board-during-wave, sequence: override }
+      - { track: system, actor: supervisor, sequence: override }
+      - { track: system, actor: second-steward-process, sequence: override }
+      - { track: system, actor: seat, sequence: override }
+      - { track: system, actor: hook, sequence: override }
+      - { track: system, actor: crashed-supervisor, sequence: override }
+      - { track: system, actor: dashboard, sequence: override }
+      - { track: spike, actor: board-at-terminal, sequence: amendment }
+      - { track: spike, actor: board-during-wave, sequence: amendment }
+      - { track: spike, actor: supervisor, sequence: amendment }
+      - { track: spike, actor: second-steward-process, sequence: amendment }
+      - { track: spike, actor: crashed-supervisor, sequence: amendment }
+      - { track: spike, actor: dashboard, sequence: amendment }
+      - { track: patch, actor: board-at-terminal, sequence: amendment }
+      - { track: patch, actor: board-during-wave, sequence: amendment }
+      - { track: patch, actor: supervisor, sequence: amendment }
+      - { track: patch, actor: second-steward-process, sequence: amendment }
+      - { track: patch, actor: crashed-supervisor, sequence: amendment }
+      - { track: patch, actor: dashboard, sequence: amendment }
+      - { track: feature, actor: board-at-terminal, sequence: amendment }
+      - { track: feature, actor: board-during-wave, sequence: amendment }
+      - { track: feature, actor: supervisor, sequence: amendment }
+      - { track: feature, actor: second-steward-process, sequence: amendment }
+      - { track: feature, actor: crashed-supervisor, sequence: amendment }
+      - { track: feature, actor: dashboard, sequence: amendment }
+      - { track: system, actor: board-at-terminal, sequence: amendment }
+      - { track: system, actor: board-during-wave, sequence: amendment }
+      - { track: system, actor: supervisor, sequence: amendment }
+      - { track: system, actor: second-steward-process, sequence: amendment }
+      - { track: system, actor: crashed-supervisor, sequence: amendment }
+      - { track: system, actor: dashboard, sequence: amendment }
+      - { track: spike, actor: board-at-terminal, sequence: crash-resume }
+      - { track: spike, actor: board-during-wave, sequence: crash-resume }
+      - { track: spike, actor: supervisor, sequence: crash-resume }
+      - { track: spike, actor: second-steward-process, sequence: crash-resume }
+      - { track: spike, actor: seat, sequence: crash-resume }
+      - { track: spike, actor: hook, sequence: crash-resume }
+      - { track: spike, actor: crashed-supervisor, sequence: crash-resume }
+      - { track: spike, actor: dashboard, sequence: crash-resume }
+      - { track: patch, actor: board-at-terminal, sequence: crash-resume }
+      - { track: patch, actor: board-during-wave, sequence: crash-resume }
+      - { track: patch, actor: supervisor, sequence: crash-resume }
+      - { track: patch, actor: second-steward-process, sequence: crash-resume }
+      - { track: patch, actor: seat, sequence: crash-resume }
+      - { track: patch, actor: hook, sequence: crash-resume }
+      - { track: patch, actor: crashed-supervisor, sequence: crash-resume }
+      - { track: patch, actor: dashboard, sequence: crash-resume }
+      - { track: feature, actor: board-at-terminal, sequence: crash-resume }
+      - { track: feature, actor: board-during-wave, sequence: crash-resume }
+      - { track: feature, actor: supervisor, sequence: crash-resume }
+      - { track: feature, actor: second-steward-process, sequence: crash-resume }
+      - { track: feature, actor: seat, sequence: crash-resume }
+      - { track: feature, actor: hook, sequence: crash-resume }
+      - { track: feature, actor: crashed-supervisor, sequence: crash-resume }
+      - { track: feature, actor: dashboard, sequence: crash-resume }
+      - { track: system, actor: board-at-terminal, sequence: crash-resume }
+      - { track: system, actor: board-during-wave, sequence: crash-resume }
+      - { track: system, actor: supervisor, sequence: crash-resume }
+      - { track: system, actor: second-steward-process, sequence: crash-resume }
+      - { track: system, actor: seat, sequence: crash-resume }
+      - { track: system, actor: hook, sequence: crash-resume }
+      - { track: system, actor: crashed-supervisor, sequence: crash-resume }
+      - { track: system, actor: dashboard, sequence: crash-resume }
+      - { track: spike, actor: board-at-terminal, sequence: second-land }
+      - { track: spike, actor: board-during-wave, sequence: second-land }
+      - { track: spike, actor: second-steward-process, sequence: second-land }
+      - { track: spike, actor: crashed-supervisor, sequence: second-land }
+      - { track: spike, actor: dashboard, sequence: second-land }
+      - { track: patch, actor: board-at-terminal, sequence: second-land }
+      - { track: patch, actor: board-during-wave, sequence: second-land }
+      - { track: patch, actor: second-steward-process, sequence: second-land }
+      - { track: patch, actor: crashed-supervisor, sequence: second-land }
+      - { track: patch, actor: dashboard, sequence: second-land }
+      - { track: feature, actor: board-at-terminal, sequence: second-land }
+      - { track: feature, actor: board-during-wave, sequence: second-land }
+      - { track: feature, actor: second-steward-process, sequence: second-land }
+      - { track: feature, actor: crashed-supervisor, sequence: second-land }
+      - { track: feature, actor: dashboard, sequence: second-land }
+      - { track: system, actor: board-at-terminal, sequence: second-land }
+      - { track: system, actor: board-during-wave, sequence: second-land }
+      - { track: system, actor: second-steward-process, sequence: second-land }
+      - { track: system, actor: crashed-supervisor, sequence: second-land }
+      - { track: system, actor: dashboard, sequence: second-land }
+      - { track: spike, actor: board-at-terminal, sequence: ci-check-at-tip }
+      - { track: spike, actor: board-during-wave, sequence: ci-check-at-tip }
+      - { track: spike, actor: second-steward-process, sequence: ci-check-at-tip }
+      - { track: spike, actor: ci-fresh-clone, sequence: ci-check-at-tip }
+      - { track: spike, actor: crashed-supervisor, sequence: ci-check-at-tip }
+      - { track: spike, actor: second-machine, sequence: ci-check-at-tip }
+      - { track: spike, actor: dashboard, sequence: ci-check-at-tip }
+      - { track: patch, actor: board-at-terminal, sequence: ci-check-at-tip }
+      - { track: patch, actor: board-during-wave, sequence: ci-check-at-tip }
+      - { track: patch, actor: second-steward-process, sequence: ci-check-at-tip }
+      - { track: patch, actor: ci-fresh-clone, sequence: ci-check-at-tip }
+      - { track: patch, actor: crashed-supervisor, sequence: ci-check-at-tip }
+      - { track: patch, actor: second-machine, sequence: ci-check-at-tip }
+      - { track: patch, actor: dashboard, sequence: ci-check-at-tip }
+      - { track: feature, actor: board-at-terminal, sequence: ci-check-at-tip }
+      - { track: feature, actor: board-during-wave, sequence: ci-check-at-tip }
+      - { track: feature, actor: second-steward-process, sequence: ci-check-at-tip }
+      - { track: feature, actor: ci-fresh-clone, sequence: ci-check-at-tip }
+      - { track: feature, actor: crashed-supervisor, sequence: ci-check-at-tip }
+      - { track: feature, actor: second-machine, sequence: ci-check-at-tip }
+      - { track: feature, actor: dashboard, sequence: ci-check-at-tip }
+      - { track: system, actor: board-at-terminal, sequence: ci-check-at-tip }
+      - { track: system, actor: board-during-wave, sequence: ci-check-at-tip }
+      - { track: system, actor: second-steward-process, sequence: ci-check-at-tip }
+      - { track: system, actor: ci-fresh-clone, sequence: ci-check-at-tip }
+      - { track: system, actor: crashed-supervisor, sequence: ci-check-at-tip }
+      - { track: system, actor: second-machine, sequence: ci-check-at-tip }
+      - { track: system, actor: dashboard, sequence: ci-check-at-tip }
+    outcome: issues
+    issues:
+      - DI-02
+      - DI-03
+      - DI-04
+      - DI-05
+      - DI-07
+      - DI-11
+      - DI-12
+      - DI-13
+      - DI-14
+      - DI-15
+      - DI-16
+      - DI-17
+      - DI-18
+      - DI-19
+    notes: "604 findings in 136 cells, every one tagged with the issue it reproduces; DI-11 to DI-19 filed from
+      the document walk"

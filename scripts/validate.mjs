@@ -429,9 +429,11 @@ function checkReferences() {
 // never behaviour. It reads the register, Markdown headings, JSON/YAML pointers and the glossary only.
 const MILESTONES = ["M0", "M1a", "M1b", "M2", "M3", "M4", "M5", "M6", "M7", "M8"];
 const OPEN_STATUSES = new Set(["open", "analysed", "proposed", "decided"]);
-const PLACES = ["working-tree", "git-common-dir", "refs-keel", "proposal-branch", "trunk-commit", "archive-commit"];
-// Which places each machine can read: a fresh clone sees pushed commits only, a seat its worktree and branch.
-const REACH = { local: new Set(PLACES), supervisor: new Set(PLACES), seat: new Set(["working-tree", "proposal-branch"]), clone: new Set(["trunk-commit", "archive-commit"]) };
+const PLACES = ["working-tree", "workspace-root", "task-branch", "proposal-branch", "git-common-dir", "refs-keel", "trunk-commit", "archive-commit"];
+// Which places each machine can read: a fresh clone sees pushed commits only; a seat its worktree, the
+// workspace root, its task branch and the proposal branch; keel's own agent-side processes also the control plane.
+const SEAT_REACH = ["working-tree", "workspace-root", "task-branch", "proposal-branch"];
+const REACH = { local: new Set(PLACES), supervisor: new Set(PLACES), seat: new Set(SEAT_REACH), "agent-api": new Set([...SEAT_REACH, "git-common-dir", "refs-keel"]), clone: new Set(["trunk-commit", "archive-commit"]) };
 
 // Heading texts of a Markdown file (any level), fence-aware, without the # marks.
 function headingTexts(text) {
