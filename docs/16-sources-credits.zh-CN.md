@@ -11,7 +11,7 @@ keel 借鉴的是思路，而不是依赖或文本（P3，KP-15）。本文档�
 - 工具的公开文档，用于描述 keel 如何驱动该工具；
 - 已发布的标准或文件格式（AGENTS.md、Agent Skills、C4、EARS、SCIP）；
 - keel 自身的设计过程：相互竞争的蓝图提案、调研综述和评审轮次；
-- 所有者的决策 D1–D7 和常设偏好 P1–P4，以 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中的表述为准。
+- 所有者的决策 D1–D7 和常设偏好 P1–P5，以 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中的表述为准。
 
 ## 构造 → 允许来源映射
 
@@ -168,6 +168,7 @@ keel 借鉴的是思路，而不是依赖或文本（P3，KP-15）。本文档�
 | 模型提供方路径集、暴露规则、已批准的请求、红绿证明、纯 git 保留操作检测、非嵌套分支名、投影门禁 | [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md), [05-vcs.zh-CN.md](05-vcs.zh-CN.md) | 合规、事实和一致性评审轮次；对齐评判 | 原创 |
 | 显式确认批准：展示变更、确认、重新哈希、连同哈希、声明的批准人和本地时间一起记录；被绑定内容有任何变更即失效；只有 `keel approve` 能写记录 | [02-alignment.zh-CN.md](02-alignment.zh-CN.md), [ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.zh-CN.md) | 所有者决策 D6 | 决策 |
 | 仅名称的模型提供方配置；TanStack 看板；git 优先 | [ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md), [ADR-0008](adr/ADR-0008-read-only-dashboard.zh-CN.md), [ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md), [ADR-0001](adr/ADR-0001-git-primary-jj-optional.zh-CN.md) | 所有者决策 P1、P2、D4 | 决策 |
+| 设计迭代纪律：带类别与状态的设计问题登记表、规则走查（生产方、消费方、位置、读者与计数）、带环与可达性检查的常设顺序图、走查矩阵、里程碑退出时的阻塞门禁 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 5 节、`docs/design-issues.yaml`、`issues` 检查 | 所有者常设指令 P5；keel 自身的对抗式评审轮次 | 决策 |
 
 ## 外部项目
 

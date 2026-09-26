@@ -2,7 +2,7 @@
 
 > 英文原文（规范版本）：[15-roadmap.md](15-roadmap.md)。本文是其简体中文镜像，两者不一致时以英文版为准。
 
-keel 分九个里程碑构建，从 M0 到 M8，其中 M1 拆分为 M1a 和 M1b。每个里程碑都有固定的范围和退出条件，这些条件是测试，而不是看法。当每一项退出条件都在 windows-latest 和 ubuntu-latest（Node 22.13 和 24）的 CI 中通过时，或者对于需要真实路由的条件，当董事会（Board）已运行可选检查并记录结果时，该里程碑即告完成。从 M1a 起，一个里程碑还需要运行 P4 的刷新评审（[00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 4 节）并将其记录在 `docs/reference-projects.yaml` 中。
+keel 分九个里程碑构建，从 M0 到 M8，其中 M1 拆分为 M1a 和 M1b。每个里程碑都有固定的范围和退出条件，这些条件是测试，而不是看法。当每一项退出条件都在 windows-latest 和 ubuntu-latest（Node 22.13 和 24）的 CI 中通过时，或者对于需要真实路由的条件，当董事会（Board）已运行可选检查并记录结果时，该里程碑即告完成。从 M1a 起，一个里程碑还需要运行 P4 的刷新评审（[00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 4 节）并将其记录在 `docs/reference-projects.yaml` 中。从 M0 起，一个里程碑还需要通过 P5 的设计问题门禁（[00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 5 节）：在 `docs/design-issues.yaml` 中把 `exit_review` 设为该里程碑，`issues` 检查通过，从而没有任何阻塞本里程碑或更早里程碑的问题仍然开放、没有任何开放问题尚未归类，并且该次退出的走查已记录在那里。
 
 本文档负责里程碑计划、风险和度量。当某个条件提到某个机制时，该机制的归属文档列在 [README.zh-CN.md](README.zh-CN.md) 的单一归属表中。
 
@@ -30,10 +30,12 @@ flowchart LR
 范围：
 
 - `docs/` 中的设计文档（英文为规范版本，另有简体中文镜像）以及 `docs/adr/` 中的九份设计 ADR（ADR-0001 到 ADR-0009）；
-- 所有者纲领（`docs/00-mandate.md`），它逐字记录所有者声明，并负责刷新纪律（P4）；
+- 所有者纲领（`docs/00-mandate.md`），它逐字记录所有者声明，并负责刷新纪律（P4）和设计迭代纪律（P5）；
 - 参考项目登记表（`docs/reference-projects.yaml`，由 `examples` 检查经 `schemas/examples.map.json` 依据
   `schemas/reference-registry.schema.json` 校验，并由 `scripts/validate.mjs` 的 `references` 检查与
   00-mandate 和 16 交叉核对）；
+- 设计问题登记表（`docs/design-issues.yaml`，由 `examples` 检查依据 `schemas/design-issues.schema.json`
+  校验，并由 `scripts/validate.mjs` 的 `issues` 检查交叉核对），保存迄今登记的开放问题、顺序图和走查矩阵；
 - M1–M3 产物的完整 JSON Schema 和纯类型 TypeScript，M4 及之后的产物为单行的延后存根；
 - 席位（seat）契约和规范表（`org/`、`runtimes/hook-events.yaml`）；
 - 带有 `verification_status` 和待探测验证（verify by probe）清单的运行时（runtime）描述符；
@@ -46,8 +48,9 @@ flowchart LR
 
 退出条件：
 
-- 所有者已回答阻塞 M0 的决策（许可证、文档语言、批准机制、VCS 策略、来源、技术栈），并确认了按建议采纳的清单；确定这些决策的 2026-09-25 所有者声明记录在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中。[17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md) 中仍开放的决策不阻塞 M0。
+- 所有者已回答阻塞 M0 的决策（许可证、文档语言、批准机制、VCS 策略、来源、技术栈），并确认了按建议采纳的清单；确定这些决策的 2026-09-25 所有者声明记录在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中。[17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md) 中仍开放的决策不阻塞 M0，但类别为 `mandate-conflict` 的设计问题除外，它阻塞发现它的那个里程碑的退出。
 - 所有者声明已逐字记录在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中，[00-vision.zh-CN.md](00-vision.zh-CN.md) 中的每一行 R、D 和 P 都映射到它，并且参考项目登记表通过其 schema 的校验（`examples` 检查），其所有者点名的项目通过交叉核对（`references` 检查通过）。
+- 设计问题登记表通过其 schema 的校验（`examples` 检查），并且 `issues` 检查在 `exit_review: M0` 下通过：每个阻塞 M0 的问题都已关闭、被所有者推迟或被驳回，没有开放问题尚未归类，并且 P5 的基线走查（依据归属文档填满顺序图，并把走查矩阵的每个格走过一遍）已记录在 `walkthroughs[]` 中。
 - `npm run typecheck` 在 windows-latest 和 ubuntu-latest 上通过。
 - `node scripts/validate.mjs` 对每个 schema 进行元校验，校验 `schemas/examples.map.json` 中列出的每个 YAML 和 JSON 示例（JSONL 从 M1 开始），并通过严格子集检查。
 - `docs/13-artifacts-schemas.md`、`docs/12-cli-api-mcp.md` 与骨架路径一致（清单检查）。
@@ -198,6 +201,7 @@ flowchart LR
 | RK-14 | 读者把检测当成预防 | 虚假的安心 | 每份回执（receipt）中都有暴露面画像；[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md) 说明了这些局限 | M2 |
 | RK-15 | TanStack 或 React 的主版本发生变化（框架更迭） | 看板构建失效或需要迁移 | 锁定的 lockfile；无头（headless）库叠加在原生标记之上；模型与框架无关，因此迁移只限于 `src/dashboard/` | M5 及每次刷新评审 |
 | RK-16 | 刷新评审被跳过 | keel 偏离其参考项目和 P4 | 该评审从 M1a 起是退出条件；登记表记录日期和 HEAD；下文的“刷新评审时效”度量 | 每个里程碑 |
+| RK-17 | 设计迭代被跳过：规则收紧却没有走查，术语获得第二个含义，纲领冲突在下游被调和 | 环、死锁、无人读取的字段和悄悄的调和重新回到文档并进入实现 | `issues` 门禁从 M0 起是退出条件；轻量模式把每次规则变更都绑定到登记表中的一次走查；顺序图接受环与可达性检查；下文的“设计问题时效”度量 | 每个里程碑 |
 
 ## 度量
 
@@ -223,5 +227,6 @@ flowchart LR
 | 活性孤儿 | 0 | `keel audit` | M3 |
 | 索引新鲜度 | `index_commit` 与 head 的距离 | 索引状态 | M4 |
 | 刷新评审时效 | 每个有本地克隆的项目条目都有一条评审，其范围写明正在退出的里程碑（例如“M1a exit review”），且 `scouting.last_run` 的日期不早于上一次里程碑退出 | `docs/reference-projects.yaml` | M1a |
+| 设计问题时效 | 每次里程碑退出时，没有阻塞该里程碑或更早里程碑的问题仍然开放，每个开放问题都有类别，并且记录了一条范围写明该次退出的走查；两次退出之间，按类别和所阻塞里程碑统计的开放问题数 | `docs/design-issues.yaml`（设置了 `exit_review` 的 `issues` 检查） | M0 |
 | 看板大小 | 对 5k 文件的仓库小于 2 MB | 构建输出 | M5 |
 | 看板 JavaScript | 压缩后小于 600 KB，内联 | 构建输出 | M5 |

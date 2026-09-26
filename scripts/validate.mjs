@@ -2,11 +2,11 @@
 //
 // This is the only non-type code in keel M0. It checks the design skeleton (schemas,
 // examples, the strict subset, bilingual docs, the D2/P1/D1 audit, the docs/13
-// manifest and the P4 reference registry) and holds no product logic. P1: it never
-// opens a file that may hold provider values or credentials; such a file is reported
-// by name only.
+// manifest, the P4 reference registry and the P5 design-issue register) and holds no
+// product logic. P1: it never opens a file that may hold provider values or
+// credentials; such a file is reported by name only.
 //
-// Usage: node scripts/validate.mjs [--only schemas,examples,strict,i18n,audit,manifest,references]
+// Usage: node scripts/validate.mjs [--only schemas,examples,strict,i18n,audit,manifest,references,issues]
 // Each check prints "<check>: <passed>/<total> <unit>" followed by its errors.
 // Exit code: 0 ok, 1 when any selected check reports an error, 2 on usage errors.
 
@@ -19,7 +19,7 @@ import YAML from "yaml";
 import ts from "typescript";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CHECKS = ["schemas", "examples", "strict", "i18n", "audit", "manifest", "references"];
+const CHECKS = ["schemas", "examples", "strict", "i18n", "audit", "manifest", "references", "issues"];
 const SCHEMA_BASE = "https://keel.invalid/schemas/";
 const DRAFT = "https://json-schema.org/draft/2020-12/schema";
 const FORMATS = ["yaml", "json", "jsonl", "json-array", "md-frontmatter"];
@@ -27,6 +27,9 @@ const MAP_FILE = "schemas/examples.map.json";
 const MANIFEST_DOC = "docs/13-artifacts-schemas.md";
 const REGISTRY = "docs/reference-projects.yaml";
 const REGISTRY_DOCS = ["docs/00-mandate.md", "docs/16-sources-credits.md"];
+const ISSUES = "docs/design-issues.yaml";
+const DECISIONS_DOC = "docs/17-open-decisions.md";
+const GLOSSARY_DOC = "docs/00-vision.md";
 
 // ---------- repository files ----------
 const SKIP_DIRS = new Set([".git", "node_modules", "dist", "coverage", ".codegraph"]);
@@ -421,8 +424,201 @@ function checkReferences() {
   return { passed, total, unit: "owner-named projects cross-referenced", errors };
 }
 
+// ---------- issues (P5 design-issue register: ids, anchors, statuses, the blocks gate, the order map) ----------
+// docs/00-mandate.md section 5.2. The check proves presence, single-home, acyclicity and reachability,
+// never behaviour. It reads the register, Markdown headings, JSON/YAML pointers and the glossary only.
+const MILESTONES = ["M0", "M1a", "M1b", "M2", "M3", "M4", "M5", "M6", "M7", "M8"];
+const OPEN_STATUSES = new Set(["open", "analysed", "proposed", "decided"]);
+const PLACES = ["working-tree", "git-common-dir", "refs-keel", "proposal-branch", "trunk-commit", "archive-commit"];
+// Which places each machine can read: a fresh clone sees pushed commits only, a seat its worktree and branch.
+const REACH = { local: new Set(PLACES), supervisor: new Set(PLACES), seat: new Set(["working-tree", "proposal-branch"]), clone: new Set(["trunk-commit", "archive-commit"]) };
+
+// Heading texts of a Markdown file (any level), fence-aware, without the # marks.
+function headingTexts(text) {
+  const out = [];
+  let fence = null;
+  for (const line of text.split(/\r?\n/)) {
+    const f = /^ {0,3}(`{3,}|~{3,})/.exec(line);
+    if (f) fence = fence === null ? f[1][0] : f[1][0] === fence ? null : fence;
+    else if (fence === null && /^ {0,3}#{1,6}\s/.test(line)) out.push(line.replace(/^ {0,3}#{1,6}\s+/, "").replace(/[ #]+$/, ""));
+  }
+  return out;
+}
+
+// First cells of the glossary rows of docs/00-vision.md (the "## Glossary" section), with their counts.
+function glossaryRows() {
+  const counts = new Map();
+  if (!FILE_SET.has(GLOSSARY_DOC)) return counts;
+  let inside = false;
+  for (const line of read(GLOSSARY_DOC).split(/\r?\n/)) {
+    if (/^## /.test(line)) inside = /^## Glossary\b/.test(line);
+    if (!inside || !/^\s*\|/.test(line)) continue;
+    const cell = line.trim().slice(1).split("|")[0].trim();
+    if (!cell || /^-+$/.test(cell) || cell === "Term" || cell === "Prefix") continue;
+    counts.set(cell, (counts.get(cell) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function checkIssues() {
+  if (!FILE_SET.has(ISSUES)) return { skipped: `${ISSUES} missing` };
+  const errors = [];
+  const reg = attempt(errors, ISSUES, () => parseYaml(read(ISSUES)));
+  if (!reg) return { passed: 0, total: 0, unit: "issues consistent", errors };
+  const issues = Array.isArray(reg.issues) ? reg.issues : [];
+  const order = reg.order ?? {};
+  const [steps, artifacts, locks] = ["steps", "artifacts", "locks"].map((k) => (Array.isArray(order[k]) ? order[k] : []));
+  const matrix = reg.matrix ?? {};
+  const tracks = new Set(Array.isArray(matrix.tracks) ? matrix.tracks : []);
+  const actors = new Set((Array.isArray(matrix.actors) ? matrix.actors : []).map((a) => a?.id));
+  const sequences = new Set((Array.isArray(matrix.sequences) ? matrix.sequences : []).map((s) => s?.id));
+  const bad = new Set();
+  const flag = (id, msg) => { bad.add(id); errors.push(`${ISSUES}: ${id}: ${msg}`); };
+  const headingCache = new Map();
+  const headingsOf = (file) => headingCache.get(file) ?? headingCache.set(file, headingTexts(read(file))).get(file);
+  // An anchor resolves when its file exists and its heading (Markdown) or pointer (JSON, YAML) is found.
+  const anchorOk = (id, a, what) => {
+    if (!a || typeof a.file !== "string") return flag(id, `${what}: anchor needs a file`);
+    if (!FILE_SET.has(a.file)) return flag(id, `${what}: ${a.file} does not exist`);
+    if (neverOpen(a.file)) return flag(id, `${what}: ${a.file} is never opened (P1)`);
+    if (a.file.endsWith(".md")) {
+      if (typeof a.heading !== "string") return flag(id, `${what}: ${a.file} needs a heading`);
+      if (!headingsOf(a.file).includes(a.heading)) flag(id, `${what}: heading "${a.heading}" not found in ${a.file}`);
+      return;
+    }
+    if (typeof a.pointer !== "string") return flag(id, `${what}: ${a.file} needs a pointer`);
+    let node = attempt(errors, `${ISSUES}: ${id}: ${what}: ${a.file}`, () => (a.file.endsWith(".json") ? JSON.parse(read(a.file)) : parseYaml(read(a.file))));
+    for (const raw of a.pointer.split("/").slice(1)) {
+      const key = decodeURIComponent(raw).replace(/~1/g, "/").replace(/~0/g, "~");
+      node = node !== null && typeof node === "object" && key in node ? node[key] : undefined;
+    }
+    if (node === undefined) flag(id, `${what}: pointer ${a.pointer} does not resolve in ${a.file}`);
+  };
+  const cellOk = (id, c, what) => {
+    if (!tracks.has(c?.track)) flag(id, `${what}: unknown track ${c?.track}`);
+    if (!actors.has(c?.actor)) flag(id, `${what}: unknown actor ${c?.actor}`);
+    if (!sequences.has(c?.sequence)) flag(id, `${what}: unknown sequence ${c?.sequence}`);
+  };
+  const decisionsText = FILE_SET.has(DECISIONS_DOC) ? read(DECISIONS_DOC) : "";
+  const mandateAnchor = (a) => a?.file === "docs/00-mandate.md" && /^[12]\. /.test(a.heading ?? "");
+  const byId = new Map();
+  issues.forEach((it, i) => {
+    const id = typeof it?.id === "string" ? it.id : `issues[${i}]`;
+    const want = `DI-${String(i + 1).padStart(2, "0")}`;
+    if (it?.id !== want) flag(id, `id must be ${want} (sequential, oldest first)`);
+    if (byId.has(id)) flag(id, "duplicate id");
+    byId.set(id, it ?? {});
+    const anchors = Array.isArray(it?.anchors) ? it.anchors : [];
+    anchors.forEach((a, k) => anchorOk(id, a, `anchors[${k}]`));
+    for (const k of ["higher", "lower"]) if (it?.[k] !== undefined) anchorOk(id, it[k], k);
+    (it?.closure?.anchors ?? []).forEach((a, k) => anchorOk(id, a, `closure.anchors[${k}]`));
+    (it?.terms ?? []).forEach((t, k) => (t?.uses ?? []).forEach((u, m) => anchorOk(id, u?.anchor, `terms[${k}].uses[${m}]`)));
+    (it?.walk?.producers ?? []).forEach((p, k) => anchorOk(id, p?.producer, `walk.producers[${k}].producer`));
+    (it?.walk?.consumers ?? []).forEach((c, k) => { anchorOk(id, c?.anchor, `walk.consumers[${k}]`); if (!actors.has(c?.actor)) flag(id, `walk.consumers[${k}]: unknown actor ${c?.actor}`); });
+    (it?.walk?.tally ?? []).forEach((t, k) => anchorOk(id, t?.bound, `walk.tally[${k}].bound`));
+    (it?.regression ?? []).forEach((c, k) => cellOk(id, c, `regression[${k}]`));
+    (it?.decision?.recorded_in ?? []).forEach((p) => { if (!FILE_SET.has(p)) flag(id, `decision.recorded_in: ${p} does not exist`); });
+    // By construction: an anchor in section 1 or 2 of the mandate makes the class mandate-conflict.
+    if (it?.class !== undefined && anchors.some(mandateAnchor) && it.class !== "mandate-conflict") flag(id, "an anchor in section 1 or 2 of docs/00-mandate.md makes the class mandate-conflict");
+    if (it?.class === "mandate-conflict") {
+      if (!decisionsText.includes(id)) flag(id, `a mandate-conflict is put to the owner: ${id} is not named in ${DECISIONS_DOC}`);
+      if (it.decision?.by === "recommendation") flag(id, "a mandate-conflict is decided by the owner, never by recommendation");
+    }
+    if (it?.status === "deferred" && it.decision?.by !== "owner") flag(id, "only the owner defers an issue");
+    if (it?.status === "closed" && it.class === "cycle" && !(it.closure?.tests ?? []).length && it.blocks !== "M0") flag(id, "a closed cycle needs a negative control in closure.tests");
+  });
+  // The blocks gate, armed while a milestone-exit review is in progress.
+  const exit = reg.exit_review ?? null;
+  if (exit !== null) {
+    const cut = MILESTONES.indexOf(exit);
+    for (const [id, it] of byId) {
+      if (!OPEN_STATUSES.has(it.status)) continue;
+      if (it.class === undefined || it.blocks === undefined) flag(id, `${exit} exit review: the issue is still unclassified`);
+      else if (it.blocks !== "none" && MILESTONES.indexOf(it.blocks) <= cut) flag(id, `blocks ${it.blocks} and is ${it.status} at the ${exit} exit review`);
+    }
+  }
+  // The order map: every edge means "a before b". An entry tagged with an open issue keeps its edges out of
+  // the cycle search and the reachability check; a tag on a closed or dismissed issue is an error.
+  const stepById = new Map(steps.map((s) => [s?.id, s]));
+  const mapFlag = (msg) => errors.push(`${ISSUES}: order: ${msg}`);
+  const tolerated = (what, issue) => {
+    if (issue === undefined) return false;
+    const it = byId.get(issue);
+    if (!it) mapFlag(`${what}: tagged with unknown issue ${issue}`);
+    else if (OPEN_STATUSES.has(it.status)) return true;
+    else mapFlag(`${what}: tagged with ${issue}, which is ${it.status}; a closed issue cannot keep tolerating its edge`);
+    return false;
+  };
+  const known = (what, ref) => stepById.has(ref) || (mapFlag(`${what}: unknown step ${ref}`), false);
+  const edges = new Map();
+  const before = (a, b, skip) => { if (!skip) (edges.get(a) ?? edges.set(a, new Set()).get(a)).add(b); };
+  for (const s of steps) {
+    const what = `steps ${s?.id}`;
+    anchorOk(what, s?.doc, "doc");
+    const skip = tolerated(what, s?.issue);
+    for (const a of s?.after ?? []) if (known(what, a)) before(a, s.id, skip);
+  }
+  for (const a of artifacts) {
+    const what = `artifacts ${a?.id}`;
+    anchorOk(what, a?.doc, "doc");
+    const skip = tolerated(what, a?.issue);
+    if (!known(what, a?.produced_by)) continue;
+    for (const r of a?.required_by ?? []) {
+      if (!known(what, r)) continue;
+      before(a.produced_by, r, skip);
+      const machine = stepById.get(r)?.runs_in;
+      if (!skip && !REACH[machine]?.has(a.where)) mapFlag(`${what} lives in ${a.where}, which step ${r} (${machine}) cannot reach`);
+    }
+  }
+  for (const l of locks) {
+    const what = `locks ${l?.id}`;
+    anchorOk(what, l?.doc, "doc");
+    const skip = tolerated(what, l?.issue);
+    if (!known(what, l?.held_by) || !known(what, l?.released_by)) continue;
+    before(l.held_by, l.released_by, skip);
+    for (const w of l?.waited_by ?? []) if (known(what, w)) before(l.released_by, w, skip);
+  }
+  const colour = new Map();
+  const stack = [];
+  const cycles = [];
+  const dfs = (n) => {
+    colour.set(n, 1);
+    stack.push(n);
+    for (const m of edges.get(n) ?? []) {
+      const c = colour.get(m) ?? 0;
+      if (c === 0) dfs(m);
+      else if (c === 1) cycles.push([...stack.slice(stack.indexOf(m)), m].join(" -> "));
+    }
+    stack.pop();
+    colour.set(n, 2);
+  };
+  for (const n of [...stepById.keys(), ...edges.keys()]) if ((colour.get(n) ?? 0) === 0) dfs(n);
+  for (const c of cycles) mapFlag(`cycle without an open issue tag: ${c}`);
+  // Glossary: one row per term; a closed term issue has its kept and renamed terms in the glossary.
+  const rows = glossaryRows();
+  for (const [term, n] of rows) if (n > 1) errors.push(`${GLOSSARY_DOC}: glossary row "${term}" appears ${n} times`);
+  for (const [id, it] of byId) {
+    if (it.status !== "closed") continue;
+    for (const t of it.terms ?? []) {
+      if (t?.kept && rows.get(t.name) !== 1) flag(id, `kept term "${t.name}" needs exactly one glossary row in ${GLOSSARY_DOC}`);
+      for (const r of t?.renamed ?? []) if (rows.get(r?.new_name) !== 1) flag(id, `renamed term "${r?.new_name}" needs exactly one glossary row in ${GLOSSARY_DOC}`);
+    }
+  }
+  // Walkthroughs: append-only, oldest first; cells and issues resolve.
+  const walks = Array.isArray(reg.walkthroughs) ? reg.walkthroughs : [];
+  walks.forEach((w, i) => {
+    const what = `walkthroughs[${i}]`;
+    if (i > 0 && String(w?.date) < String(walks[i - 1]?.date)) errors.push(`${ISSUES}: ${what}: dates must not decrease (append-only, oldest first)`);
+    (w?.cells ?? []).forEach((c, k) => cellOk(what, c, `cells[${k}]`));
+    for (const id of w?.issues ?? []) if (!byId.has(id)) errors.push(`${ISSUES}: ${what}: unknown issue ${id}`);
+  });
+  const passed = issues.filter((it) => !bad.has(it?.id)).length;
+  const unit = `issues consistent (${steps.length} steps, ${artifacts.length} artifacts, ${locks.length} locks in the order map; blocks gate ${exit ?? "disarmed"})`;
+  return { passed, total: issues.length, unit, errors };
+}
+
 // ---------- main ----------
-const RUN = { schemas: checkSchemas, examples: checkExamples, strict: checkStrict, i18n: checkI18n, audit: checkAudit, manifest: checkManifest, references: checkReferences };
+const RUN = { schemas: checkSchemas, examples: checkExamples, strict: checkStrict, i18n: checkI18n, audit: checkAudit, manifest: checkManifest, references: checkReferences, issues: checkIssues };
 const argv = process.argv.slice(2);
 const onlyArg = argv.length === 0 ? CHECKS.join(",") : argv[0] === "--only" && argv.length === 2 ? argv[1] : argv.length === 1 && argv[0].startsWith("--only=") ? argv[0].slice(7) : "";
 const selected = onlyArg.split(",").map((s) => s.trim()).filter(Boolean);

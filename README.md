@@ -37,7 +37,7 @@ nothing that runs as a product:
 The single declared tooling exception is `scripts/validate.mjs`, which checks the skeleton itself. There
 is no `keel` executable yet; the commands shown in the docs are the designed interface. The roadmap from
 M1a to M8, with exit criteria, is in [docs/15-roadmap.md](docs/15-roadmap.md). The owner's statement that
-every document derives from, with the ids R1–R5, D1–D7 and P1–P4, is
+every document derives from, with the ids R1–R5, D1–D7 and P1–P5, is
 [docs/00-mandate.md](docs/00-mandate.md).
 
 ## What keel does, in one screen
@@ -72,7 +72,7 @@ What keel is not (an agent runtime, an LLM router, a sandbox, a hosted service, 
 
 | Path | Contents |
 | --- | --- |
-| `docs/` | Design documents: the root is [docs/00-mandate.md](docs/00-mandate.md); start at [docs/README.md](docs/README.md) for the reading order and the single-home table; `docs/reference-projects.yaml` is the reference registry (P4) |
+| `docs/` | Design documents: the root is [docs/00-mandate.md](docs/00-mandate.md); start at [docs/README.md](docs/README.md) for the reading order and the single-home table; `docs/reference-projects.yaml` is the reference registry (P4); `docs/design-issues.yaml` is the design-issue register (P5) |
 | `docs/adr/` | keel's own architecture decision records (ADR-0001 onwards) |
 | `schemas/` | JSON Schemas (draft 2020-12); `common.schema.json` is the only home of id patterns and shared enums |
 | `src/` | Type-only TypeScript mirroring the schemas and interfaces; no runtime code in M0 |
@@ -98,7 +98,7 @@ Requires Node >= 22.13.
 npm ci
 npm run check                                  # typecheck + validate, as CI runs it
 node scripts/validate.mjs --only audit         # one check
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references,issues
 ```
 
 CI runs the same commands on windows-latest and ubuntu-latest with Node 22.13 and 24.

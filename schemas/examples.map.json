@@ -1,5 +1,5 @@
 {
-  "$comment": "Maps each example and fixture data file to the schema that validates it. file: repo-relative path. schema: a schema $id (https://keel.invalid/schemas/<name>.schema.json), optionally with a #/$defs/<name> pointer. format: yaml | json | jsonl (each line) | json-array (each element) | md-frontmatter (YAML between leading --- lines). Every .yaml/.yml/.json/.jsonl file under examples/ and test/fixtures/ must be mapped here or listed in unmapped_ok as {file, reason}. The package data tables under org/, config/, conformance/ and runtimes/ are mapped too, so validate checks them against their schemas, and so is the P4 reference registry under docs/ (docs/reference-projects.yaml). Checked by node scripts/validate.mjs --only examples.",
+  "$comment": "Maps each example and fixture data file to the schema that validates it. file: repo-relative path. schema: a schema $id (https://keel.invalid/schemas/<name>.schema.json), optionally with a #/$defs/<name> pointer. format: yaml | json | jsonl (each line) | json-array (each element) | md-frontmatter (YAML between leading --- lines). Every .yaml/.yml/.json/.jsonl file under examples/ and test/fixtures/ must be mapped here or listed in unmapped_ok as {file, reason}. The package data tables under org/, config/, conformance/ and runtimes/ are mapped too, so validate checks them against their schemas, and so are the P4 reference registry and the P5 design-issue register under docs/ (docs/reference-projects.yaml, docs/design-issues.yaml). Checked by node scripts/validate.mjs --only examples.",
   "entries": [
     { "file": "examples/acme-notes/.keel/config.yaml", "schema": "https://keel.invalid/schemas/config.schema.json", "format": "yaml" },
     { "file": "examples/acme-notes/.keel/charter.md", "schema": "https://keel.invalid/schemas/charter.schema.json", "format": "md-frontmatter" },
@@ -45,7 +45,8 @@
     { "file": "runtimes/kimi-code.yaml", "schema": "https://keel.invalid/schemas/runtime-descriptor.schema.json", "format": "yaml" },
     { "file": "runtimes/opencode.yaml", "schema": "https://keel.invalid/schemas/runtime-descriptor.schema.json", "format": "yaml" },
     { "file": "runtimes/direct.yaml", "schema": "https://keel.invalid/schemas/runtime-descriptor.schema.json", "format": "yaml" },
-    { "file": "docs/reference-projects.yaml", "schema": "https://keel.invalid/schemas/reference-registry.schema.json", "format": "yaml" }
+    { "file": "docs/reference-projects.yaml", "schema": "https://keel.invalid/schemas/reference-registry.schema.json", "format": "yaml" },
+    { "file": "docs/design-issues.yaml", "schema": "https://keel.invalid/schemas/design-issues.schema.json", "format": "yaml" }
   ],
   "unmapped_ok": [
     { "file": "test/fixtures/fake-providers.yaml", "reason": "Test-harness fixture (loopback fake providers, fake keys, scripted replies) whose format the M2 harness owns; no product schema covers it, and no keel artifact is shaped like it." },

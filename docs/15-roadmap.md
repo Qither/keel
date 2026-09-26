@@ -5,6 +5,10 @@ scope and exit criteria that are tests, not opinions. A milestone is done when e
 in CI on windows-latest and ubuntu-latest (Node 22.13 and 24), or, for criteria that need real routes, when
 the Board has run the opt-in check and recorded the result. From M1a on, a milestone also needs the refresh
 review of P4 ([00-mandate.md](00-mandate.md) section 4) run and recorded in `docs/reference-projects.yaml`.
+From M0 on, a milestone also needs the design-issue gate of P5 ([00-mandate.md](00-mandate.md) section 5):
+`exit_review` set to the milestone in `docs/design-issues.yaml`, the `issues` check passing, so that no
+issue that blocks this or an earlier milestone is open and no open issue is unclassified, and the walk of
+the exit recorded there.
 
 This document owns the milestone plan, the risks and the measures. Where a criterion names a mechanism, the
 mechanism's home document is listed in the single-home table of [README.md](README.md).
@@ -37,10 +41,14 @@ Scope:
 - the design documents in `docs/` (English canonical, Simplified Chinese mirrors) and the nine design
   ADRs in `docs/adr/` (ADR-0001 to ADR-0009);
 - the owner's mandate (`docs/00-mandate.md`), which records the owner's statement verbatim and owns the
-  refresh discipline (P4);
+  refresh discipline (P4) and the design iteration discipline (P5);
 - the reference registry (`docs/reference-projects.yaml`, validated against
   `schemas/reference-registry.schema.json` by the `examples` check via `schemas/examples.map.json` and
   cross-referenced with 00-mandate and 16 by the `references` check of `scripts/validate.mjs`);
+- the design-issue register (`docs/design-issues.yaml`, validated against
+  `schemas/design-issues.schema.json` by the `examples` check and cross-checked by the `issues` check of
+  `scripts/validate.mjs`), holding the issues filed so far as open entries, the order map and the
+  walkthrough matrix;
 - full JSON Schemas and type-only TypeScript for the M1–M3 artifacts, with M4 and later artifacts as
   one-line deferred stubs;
 - seat contracts and the canonical tables (`org/`, `runtimes/hook-events.yaml`);
@@ -59,10 +67,15 @@ Exit criteria:
 - The owner has answered the decisions that block M0 (licence, documentation language, approval mechanism,
   VCS strategy, provenance, stack) and confirmed the adopted-by-recommendation list; the owner's statement
   that settles them is recorded in [00-mandate.md](00-mandate.md). The decisions still open in
-  [17-open-decisions.md](17-open-decisions.md) do not block M0.
+  [17-open-decisions.md](17-open-decisions.md) do not block M0, except a design issue of class
+  `mandate-conflict`, which blocks the exit of the milestone in which it was found.
 - The owner's statement is recorded verbatim in [00-mandate.md](00-mandate.md), every R, D and P row of
   [00-vision.md](00-vision.md) maps to it, and the reference registry validates against its schema (`examples`
   check) and its owner-named projects are cross-referenced (the `references` check passes).
+- The design-issue register validates against its schema (`examples` check) and the `issues` check passes
+  with `exit_review: M0`: every issue that blocks M0 is closed, deferred by the owner or dismissed, no open
+  issue is unclassified, and the baseline walk of P5 (the order map filled from the home documents and every
+  cell of the walkthrough matrix walked once) is recorded in `walkthroughs[]`.
 - `npm run typecheck` passes on windows-latest and ubuntu-latest.
 - `node scripts/validate.mjs` meta-validates every schema, validates every YAML and JSON example listed in
   `schemas/examples.map.json` (JSONL from M1), and passes the strict-subset lint.
@@ -256,6 +269,7 @@ settled.
 | RK-14 | Readers take detection for prevention | False assurance | The exposure profile in every receipt; [14-trust-security.md](14-trust-security.md) states the limits | M2 |
 | RK-15 | TanStack or React major versions change (framework churn) | The dashboard build breaks or needs migration | Pinned lockfile; headless libraries over native markup; the model is framework-independent, so a migration is confined to `src/dashboard/` | M5 and every refresh review |
 | RK-16 | Refresh reviews are skipped | keel drifts from its references and from P4 | The review is an exit criterion from M1a; the registry records dates and HEADs; the "Refresh review currency" measure below | Every milestone |
+| RK-17 | Design iterations are skipped: a rule is tightened without its walk, a term gains a second meaning, a mandate conflict is reconciled downstream | Cycles, deadlocks, dead fields and silent reconciliations return to the documents and reach implementation | The `issues` gate is an exit criterion from M0; the light mode binds every rule change to a walk in the register; the order map is checked for cycles and reachability; the "Design issue currency" measure below | Every milestone |
 
 ## Measures
 
@@ -282,5 +296,6 @@ its denominator.
 | Liveness orphans | 0 | `keel audit` | M3 |
 | Index freshness | `index_commit` distance from head | Index status | M4 |
 | Refresh review currency | Every project entry with a local clone has a review whose scope names the milestone being exited (for example "M1a exit review"), and `scouting.last_run` is dated at or after the previous milestone exit | `docs/reference-projects.yaml` | M1a |
+| Design issue currency | At every milestone exit no issue that blocks that or an earlier milestone is open, every open issue has a class, and a walkthrough whose scope names the exit is recorded; between exits, the count of open issues per class and per blocked milestone | `docs/design-issues.yaml` (the `issues` check with `exit_review` set) | M0 |
 | Dashboard size | Under 2 MB for a 5k-file repository | Build output | M5 |
 | Dashboard JavaScript | Under 600 KB minified, inline | Build output | M5 |

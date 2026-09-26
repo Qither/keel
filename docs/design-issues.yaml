@@ -1,0 +1,252 @@
+# docs/design-issues.yaml: the canonical register of the design iteration discipline (P5,
+# docs/00-mandate.md section 5). Schema: schemas/design-issues.schema.json.
+#
+# It holds every design issue found in keel's own documents, schemas, templates and tables, the standing
+# order map of the design (steps, artifacts, locks), the walkthrough matrix (tracks, actors, sequences) and
+# the append-only walkthrough history. scripts/validate.mjs --only issues checks ids, anchors, statuses,
+# the blocks gate (while exit_review is set), cycles and reachability in the order map, and the glossary.
+#
+# Anchors are a file plus the exact heading text (Markdown) or a JSON pointer (JSON, YAML); never a line
+# number. Classes in precedence order: mandate-conflict, cycle, term-collision, gap, cost. An entry with an
+# anchor in section 1 or 2 of docs/00-mandate.md is mandate-conflict by construction. Statuses: open,
+# analysed, proposed, decided, closed; deferred (owner only); dismissed (with a reason). Closed entries
+# are never deleted. Current state only: no narrative and no history; git is the history.
+version: 1
+exit_review: null
+
+matrix:
+  tracks: [spike, patch, feature, system]
+  actors:
+    - id: board-at-terminal
+      description: A Board member at a terminal, no seat running
+    - id: board-during-wave
+      description: A Board member running a mutating verb while a wave is in flight
+    - id: supervisor
+      description: The supervising Steward process (keel run) that holds the supervisor lock
+    - id: second-steward-process
+      description: A second Steward process (approve, check, land, run --hold) while the supervisor lock is held
+    - id: seat
+      description: A seat in its sparse worktree, reaching keel through keel api or a submit channel
+    - id: hook
+      description: A runtime hook calling keel hook
+    - id: ci-fresh-clone
+      description: A CI job on a fresh clone of the shared remote, with no git common dir state and no refs/keel
+    - id: crashed-supervisor
+      description: A supervisor that died or hung while holding a lock or a claim
+    - id: second-machine
+      description: Another machine that sees committed records and archive projections only
+    - id: dashboard
+      description: The read-only dashboard reading the ledger and the committed files
+  sequences:
+    - id: spike-happy
+      track: spike
+      verbs: [new, run, status]
+    - id: patch-per-change
+      track: patch
+      verbs: [new, approve --stage contract, run, check --gate submit, check --gate verify, land, approve --stage land, land]
+    - id: patch-policy
+      track: patch
+      verbs: [new --policy, approve --request, run, check --gate submit, check --gate verify, land, approve --stage receipt]
+    - id: feature-happy
+      track: feature
+      verbs: [new, run, approve --stage contract, run, check --gate plan, run, check --gate submit, check --gate verify, land --preview, land, approve --stage land, land]
+    - id: system-happy
+      track: system
+      verbs: [new, run, approve --stage contract, run, approve --stage plan, run, check --gate submit, check --gate verify, land --preview, land, approve --stage land, land]
+    - id: hold
+      track: any
+      verbs: [run --hold on, run --hold off]
+    - id: abandon
+      track: any
+      verbs: [approve --rule abandon]
+    - id: override
+      track: any
+      verbs: [approve --rule override]
+    - id: amendment
+      track: any
+      verbs: [approve --amend]
+    - id: crash-resume
+      track: any
+      verbs: [run, audit, run]
+    - id: second-land
+      track: any
+      verbs: [land, approve --stage land, land, land]
+    - id: ci-check-at-tip
+      track: any
+      verbs: [check --gate land --check approval --at <sha>]
+
+order:
+  steps: []
+  artifacts: []
+  locks: []
+
+issues:
+  - id: DI-01
+    title: Clause 11 and P1 say keel never reads a provider value; invariant I2 reads env values in memory
+    statement: >-
+      Clause 11 of the owner's statement and the P1 row say that keel never reads a provider value or a
+      credential file. The exact invariant of the providers document, its I2 clause, ADR-0006 and KP-13
+      say that keel reads env values in memory in exactly two modules, at spawn and at direct-lane call
+      time, and the P1 mapping row restates that reading. The lower documents add qualifiers the clause
+      does not have (in memory, in exactly two modules, never persists); the two texts cannot both hold.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: silent-reconciliation
+    anchors:
+      - { file: docs/00-mandate.md, heading: "1. The owner's statement" }
+      - { file: docs/00-mandate.md, heading: "2. Binding requirements" }
+      - { file: docs/10-providers.md, heading: "1. The exact invariant" }
+      - { file: docs/adr/ADR-0006-provider-values-by-reference.md, heading: "Decision" }
+      - { file: docs/00-vision.md, heading: "KP-13 Provider values belong to the user" }
+
+  - id: DI-02
+    title: The land approval record is committed only in the archive commit that the land gate must pass first
+    statement: >-
+      The recording rule places the land approval record in the archive commit itself, and the gate accepts
+      an approval only when the record already exists in git at its expected place. The land verb checks
+      the land approval on its second run and only then writes the archive commit. The record cannot exist
+      in a commit that is written after the check that requires it.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: rule-tightened
+    anchors:
+      - { file: docs/02-alignment.md, heading: "Board approvals (explicit confirmation, hash binding, invalidation)" }
+      - { file: docs/12-cli-api-mcp.md, heading: "1. 16 verbs and at most 40 modes" }
+      - { file: docs/04-trace-and-state.md, heading: "Land projection and the projection gate" }
+
+  - id: DI-03
+    title: The recommended CI approval check needs a ledger event that a fresh clone never has
+    statement: >-
+      The branch-protection recommendation has CI run the land gate's approval check at the trunk tip. That
+      gate accepts an approval only together with an approval.recorded event on the verified ledger chain.
+      The ledger lives in the git common dir and refs/keel is never pushed, so a fresh CI clone cannot
+      satisfy the condition; the CI check and the local gate need to be two different checks.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: rule-tightened
+    anchors:
+      - { file: docs/14-trust-security.md, heading: "Server-side branch protection recommendations" }
+      - { file: docs/02-alignment.md, heading: "Board approvals (explicit confirmation, hash binding, invalidation)" }
+      - { file: docs/04-trace-and-state.md, heading: "Single writer" }
+
+  - id: DI-04
+    title: Every mutating verb waits for the supervisor lock without exception, so a hold or an abandon cannot reach the holder
+    statement: >-
+      The single-writer rule makes every other mutating verb, keel approve included, wait for the
+      supervisor lock while a seat runs, with no exception. Cancellation says that a Board hold and an
+      abandon ruling cancel the running task. The hold mode and the abandon ruling are mutating verbs, so
+      they wait for the lock that only the run they are meant to stop releases.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: rule-tightened
+    anchors:
+      - { file: docs/04-trace-and-state.md, heading: "Single writer" }
+      - { file: docs/06-parallelism.md, heading: "Cancellation" }
+      - { file: docs/12-cli-api-mcp.md, heading: "1. 16 verbs and at most 40 modes" }
+      - { file: docs/03-lifecycle.md, heading: "Proposal states" }
+
+  - id: DI-05
+    title: Recovery of the supervisor lock and the run after a supervisor crash is undefined
+    statement: >-
+      The single-writer rule defers the recovery of a lock left behind by a crashed process to an
+      implementation detail, and the lease rules cover claims, not the supervisor lock. No document says
+      how a crashed or hung supervisor is detected, who takes over its lock, and how its run and its
+      window of ledger events are closed.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: other
+    anchors:
+      - { file: docs/04-trace-and-state.md, heading: "Single writer" }
+      - { file: docs/06-parallelism.md, heading: "The lease" }
+
+  - id: DI-06
+    title: Dependents at depth 2 are called the impact closure and used to prove that no dependency changed
+    statement: >-
+      Impact follows dependents at depth 2. The same section calls that computation the impact closure and
+      lets evidence be reused for a scope once the closure proves that no dependency of the scope changed;
+      the verification and integration documents rely on that proof. A depth-bounded set cannot prove an
+      unbounded claim; dependents at depth 3 and beyond are outside it.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: term-overloaded
+    anchors:
+      - { file: docs/07-architecture-intelligence.md, heading: "Impact and the ratchet" }
+      - { file: docs/11-verification.md, heading: "2. Source-state binding and land re-execution" }
+      - { file: docs/06-parallelism.md, heading: "Integration queue and land re-run" }
+
+  - id: DI-07
+    title: The architecture model changes only at land, so an approved new dependency fails verify.arch before land
+    statement: >-
+      The declared model changes only through an arch delta applied by the land archive commit, and the
+      verify.arch check judges new violations against the declared model. A contract approval on the
+      system track binds an arch delta that adds a dependency; a correct implementation of that dependency
+      is judged against the trunk model, which does not yet contain it. No target model (trunk model plus
+      the approved delta) is defined for verification and preview.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: no-order-check
+    anchors:
+      - { file: docs/07-architecture-intelligence.md, heading: "Declared model" }
+      - { file: docs/07-architecture-intelligence.md, heading: "Drift and the unknown policy" }
+      - { file: docs/11-verification.md, heading: "gate:verify" }
+
+  - id: DI-08
+    title: Goal progress is requirement coverage, and nothing reads success_signal when a goal closes
+    statement: >-
+      The alignment chain, the RTM, the dashboard overview and the measures table define goal progress as
+      requirements verified at head over the total. A goal's success_signal is a required string that no
+      verb, gate, record or view reads, and nothing is needed to set a goal's status to done. A goal whose
+      requirements are all verified reports full progress whether or not its success signal was observed.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: unread-field
+    anchors:
+      - { file: docs/02-alignment.md, heading: "Alignment chain L0–L11" }
+      - { file: docs/04-trace-and-state.md, heading: "RTM and drift classes" }
+      - { file: docs/08-dashboard.md, heading: "Overview" }
+      - { file: docs/15-roadmap.md, heading: "Measures" }
+      - { file: schemas/goals.schema.json, pointer: "#/$defs/goal/properties/success_signal" }
+
+  - id: DI-09
+    title: The patch track derives exactly one work order and also allows a test fixed first by a test task
+    statement: >-
+      The patch track says the Steward derives exactly one work order, and in the same sentence lets its
+      acceptance come from a test fixed first by a test task on a different declared family. A test task is
+      a work order of kind test, so the patch has two work orders, or it has one and the test task cannot
+      exist. The rule does not say whether a patch that needs a test is raised to feature or is allowed two
+      work orders.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: cardinality
+    anchors:
+      - { file: docs/03-lifecycle.md, heading: "Patch track and policy path" }
+      - { file: docs/11-verification.md, heading: "3. Test independence and red/green proof" }
+
+  - id: DI-10
+    title: A quick-patch on a shared trunk needs a request approval, a land approval and a receipt acknowledgement
+    statement: >-
+      The standing policy limits require a land approval for patches on shared trunks and a receipt
+      acknowledgement after every policy land. On a shared trunk a quick-patch therefore costs three Board
+      touches (request, land, receipt), more than the per-change contract route it is meant to lighten and
+      more than the staffing table's typical count. Policy land (a land on the policy path) and land policy
+      (a standing policy that replaces the per-land approval) are two meanings under one wording.
+    status: open
+    found_by: external-review
+    found_on: 2026-09-26
+    root_cause: term-overloaded
+    anchors:
+      - { file: docs/03-lifecycle.md, heading: "Standing policy limits" }
+      - { file: docs/03-lifecycle.md, heading: "Patch track and policy path" }
+      - { file: docs/01-org-model.md, heading: "Staffing per track" }
+      - { file: docs/17-open-decisions.md, heading: "Adopted by recommendation (reversible, with ADR)" }
+
+walkthroughs: []

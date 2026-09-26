@@ -17,9 +17,9 @@ and architecture intelligence.
 
 - `docs/README.md` holds the reading order and the single-home table: every concept has exactly one home
   document. Update the home, and link to it from elsewhere instead of restating it.
-- `docs/00-mandate.md` is the owner's statement and the source of the ids R1–R5, D1–D7, P1–P4; when any
+- `docs/00-mandate.md` is the owner's statement and the source of the ids R1–R5, D1–D7, P1–P5; when any
   file disagrees with it, the file is wrong. `docs/reference-projects.yaml` is the reference registry for
-  P4.
+  P4, and `docs/design-issues.yaml` is the design-issue register for P5.
 - `schemas/common.schema.json` is the only home of id patterns and shared enums. `src/core/ids.ts` mirrors
   them as types without patterns.
 - Other canonical tables: `org/reserved-actions.yaml`, `runtimes/hook-events.yaml`, the lens sets in
@@ -61,6 +61,13 @@ and architecture intelligence.
   `docs/00-mandate.md` section 4: pull the reference clones to their latest version, diff, re-derive keel
   as a first-time design, scout GitHub for new workflows, prompt the owner to pull candidates locally, merge
   adopted ideas with credits, record in the registry.
+- **Design iteration discipline (P5).** When two statements cannot both hold, a chain cannot complete, a
+  term carries two meanings or a field has no reader, file it in `docs/design-issues.yaml` before fixing
+  anything. Before introducing, tightening or loosening a rule, write the rule's walk (producers,
+  consumers, places, readers) into the register in the same commit. A conflict with `docs/00-mandate.md`
+  section 1 or 2 goes to the owner through `docs/17-open-decisions.md` and is never reworded downstream.
+  The procedure is `docs/00-mandate.md` section 5; `node scripts/validate.mjs --only issues` checks the
+  register.
 - **Bilingual docs (D5).** Human-facing docs (everything under `docs/`, the root README,
   `runtimes/README.md` and `test/README.md`) are English canonical in `<name>.md` with a Simplified Chinese
   mirror in `<name>.zh-CN.md` that has an identical heading structure. Identifiers, file names, schemas,
@@ -85,7 +92,7 @@ npm ci
 npm run check                      # typecheck + validate
 npm run typecheck                  # tsc --noEmit -p tsconfig.json
 node scripts/validate.mjs          # all checks
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references,issues
 ```
 
 Every check prints `<check>: <passed>/<total>` and its errors; any error fails the run. CI runs the same

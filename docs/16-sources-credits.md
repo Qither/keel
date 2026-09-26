@@ -15,7 +15,7 @@ A source is permitted when it is one of:
 - the public documentation of a tool, used to describe how keel drives that tool;
 - a published standard or file format (AGENTS.md, Agent Skills, C4, EARS, SCIP);
 - keel's own design process: the competing blueprint proposals, the research surveys and the review passes;
-- the owner's decisions D1–D7 and standing preferences P1–P4, as stated in [00-mandate.md](00-mandate.md).
+- the owner's decisions D1–D7 and standing preferences P1–P5, as stated in [00-mandate.md](00-mandate.md).
 
 ## Construct → permitted source map
 
@@ -173,6 +173,7 @@ its home document is in the single-home table of [README.md](README.md).
 | Provider path set, exposure rule, approved requests, red/green proof, plain-git reserved-op detection, non-nesting branch names, projection gate | [14-trust-security.md](14-trust-security.md), [05-vcs.md](05-vcs.md) | Compliance, facts and coherence review passes; the alignment judge | Original |
 | Explicit-confirmation approvals: show the change, confirm, re-hash, record with hashes, declared approver and local time; invalidate on any change to bound content; only `keel approve` records | [02-alignment.md](02-alignment.md), [ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.md) | Owner decision D6 | Decision |
 | Names-only provider configuration; TanStack dashboard; git first | [ADR-0006](adr/ADR-0006-provider-values-by-reference.md), [ADR-0008](adr/ADR-0008-read-only-dashboard.md), [ADR-0009](adr/ADR-0009-tanstack-frontend.md), [ADR-0001](adr/ADR-0001-git-primary-jj-optional.md) | Owner decisions P1, P2, D4 | Decision |
+| Design iteration discipline: the design-issue register with classes and statuses, the rule walk (producers, consumers, places, readers and tallies), the standing order map with cycle and reachability checks, the walkthrough matrix, the blocks gate at milestone exits | [00-mandate.md](00-mandate.md) section 5, `docs/design-issues.yaml`, the `issues` check | Owner standing instruction P5; keel's own adversarial review passes | Decision |
 
 ## External projects
 

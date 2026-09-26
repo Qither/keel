@@ -2,8 +2,9 @@
 
 This document is the root of keel's design. It records the owner's statement of what keel is to be and
 restates it as the binding requirements (R1 to R5), decisions (D1 to D7) and standing preferences (P1 to
-P4) that every other document derives from. It also owns the refresh discipline (P4): how keel's design is
-re-examined against its reference projects at every refactor review.
+P5) that every other document derives from. It also owns the refresh discipline (P4): how keel's design is
+re-examined against its reference projects at every refactor review, and the design iteration discipline
+(P5): how a defect found in keel's own design is filed, walked, decided and closed.
 
 Precedence is simple. The owner's statement outranks everything else in this repository. When another
 document, a schema, a template or a data file disagrees with it, that file is wrong and is corrected; this
@@ -50,6 +51,11 @@ designed for the first time. At every refactor, also search GitHub for new, well
 that could be merged into the current workflow; prompt the owner to pull them locally for analysis, and
 merge them into the current workflow. Translate the above into the core design document.
 
+Standing instruction (design iteration): for the design problems that a review of keel finds, design the
+core workflow's design iteration steps and append them to this core design document; do not set out to
+solve the problems first, but complete the iteration steps, and then solve those design problems by
+relying on the iteration steps.
+
 
 ## 2. Binding requirements
 
@@ -75,6 +81,7 @@ each row is in [00-vision.md](00-vision.md).
 | P2 | Standing preference | Every frontend display keel ships is built with TanStack. The libraries are headless, so the markup stays native HTML elements with hand-written CSS; no UI kit, CDN or web font. | Clause 7 |
 | P3 | Standing preference | Borrow ideas, never dependencies or text. | Clause 12 |
 | P4 | Standing preference | Refresh discipline: at every refactor review the reference projects are pulled to their latest version, their additions are analysed, and keel is re-checked and corrected against them as a first-time design; GitHub is searched for new, well-designed workflows; the owner is prompted to pull candidates locally; adopted ideas are merged. Section 4 is the procedure. | Standing instruction |
+| P5 | Standing preference | Design iteration discipline: a defect found in keel's own documents, schemas, templates or tables is filed, classified, walked, routed and closed by the procedure of section 5 before it is fixed; a conflict with the statement is put to the owner and never reconciled by rewording a lower document; no rule is introduced, tightened or loosened without its walk; open issues gate milestone exits. Section 5 is the procedure. | Standing instruction (design iteration) |
 
 ## 3. Precedence and amendment
 
@@ -99,6 +106,8 @@ A higher level wins, and the lower level is corrected. The rules for change:
   `git diff` are the record. `npm run check` must pass in that commit.
 - When a clause is ambiguous, the reading that keeps every other clause true is preferred, and the question
   is put to the owner through [17-open-decisions.md](17-open-decisions.md) rather than resolved silently.
+  When a lower document cannot be read so that a clause stays true, that is a design issue of class
+  `mandate-conflict`, and section 5 files it and routes it to the owner.
 
 
 ## 4. Refresh discipline (P4)
@@ -144,7 +153,9 @@ what was examined and when. Local clones sit next to the keel checkout; keel nev
 3. **Re-derive.** Treat keel as a first-time design. For each principle KP-01 to KP-16 and each construct
    row in [16-sources-credits.md](16-sources-credits.md), ask whether the new evidence confirms it, refines
    it or contradicts it. A contradiction is a correction: a home-document change, plus a superseding ADR when
-   a recorded decision flips. It is never patched around.
+   a recorded decision flips. It is never patched around. A contradiction that is internal to keel's own
+   documents, rather than between keel and a reference, is filed as a design issue under section 5 and
+   corrected through that procedure.
 4. **Scout.** Search GitHub for workflows and agent-orchestration designs published or substantially changed
    since the last review, using the registry's standing queries. A candidate qualifies when it is open
    source or has public documentation, has a licence keel may learn from, shows evidence of real use, and
@@ -177,4 +188,178 @@ per candidate: pull, decline (recorded in the registry with the reason), or defe
 - P1 holds during a review: examining a reference never involves reading the owner's provider or credential
   files, even when the reference project keeps them in a well-known place.
 - A refresh review never changes the statement in section 1.
+
+
+## 5. Design iteration discipline (P5)
+
+The owner's second standing instruction, as a procedure. Section 4 looks outward and re-derives keel against
+its references; this section looks inward. It drives every defect found in keel's own documents, schemas,
+templates and tables to a decision and one closing commit, and it stops a defect of the same shape from
+being written again. The shapes it exists for are four: a rule whose consumers were not re-walked when the
+rule changed; one term carrying two meanings; a chain of steps that cannot complete or a wait that cannot
+be released, which prose alone never shows; and a clause of section 1 reconciled by rewording a lower
+document instead of being put to the owner.
+
+### 5.1 When a design iteration runs
+
+- Whenever anyone (the owner, a maintainer, an agent working on keel, an external review) finds two
+  statements that cannot both hold, a step that needs an artifact a later step produces, a wait that only
+  the waited-for step can end, a term with two meanings, a field that nothing reads, or a path that asks
+  the Board for more confirmations than the mandate needs. The finding is filed (step 1 of section 5.3)
+  before anything is fixed.
+- Before a commit introduces, tightens or loosens a rule in a home document, a schema, a template or an
+  `org/` table. A rule is a precondition ("only when", "requires", "needs"), a wait, lock or refusal
+  ("waits for", "until", "no exception", "refuses"), a place ("is written", "committed", "projected" or
+  "checked" in or from somewhere), a cardinality ("exactly one", "at most", "every", "never"), a measure
+  defined by a formula, or a required field or enum value of a schema. The commit carries the walk of
+  step 3 for that rule. This is the light mode: the only part of the procedure that a rule change may run
+  on its own, and it never skips the walk.
+- When step 3 of a refresh review (section 4.3, Re-derive) finds a contradiction that is internal to keel's
+  documents: it is filed here, not patched there.
+- At the exit review of every milestone from M0, before the refresh review: `exit_review` in the register
+  is set to the milestone, and the `issues` check becomes the exit gate (section 5.2).
+- When the `issues` check of `scripts/validate.mjs` fails for a design reason rather than a typo.
+- Whenever the owner asks for a design review or a refactor, or reports a defect.
+- Not on a translation, a typo, example data or a probe result; those change no rule and cite nothing.
+
+### 5.2 The design-issue register
+
+`docs/design-issues.yaml` is the canonical register, validated by `schemas/design-issues.schema.json`
+through the `examples` check and cross-checked by the `issues` check of `scripts/validate.mjs`. It holds
+four things, all current state and never narrative:
+
+- `issues[]`: one entry per finding, `DI-nn`, with its title, a one-paragraph statement in keel's own
+  terms, the anchors where the conflicting text stands (a file and a heading, or a file and a JSON pointer;
+  never a line number), who found it, its class, status and root cause, the walk of step 3, the terms of
+  step 4, the options and the recommendation, the decision, the milestone it blocks and its closure
+  evidence. Classes, in precedence order: `mandate-conflict` (a clause of section 1, a row of section 2 or
+  a KP against a lower level), `cycle` (a step needs an artifact a later step produces, a wait that only
+  the waited-for step can end, or a place the consumer's machine cannot reach), `term-collision` (one term
+  with two meanings, or two terms for one thing), `gap` (a state the design leaves undefined, a field
+  nothing reads, or a producer too weak for the claim that leans on it) and `cost` (ceremony that asks
+  more than the mandate needs). Statuses: `open`, `analysed`, `proposed`, `decided`, `closed`; `deferred`
+  only by the owner and to a named milestone; `dismissed` with a reason. Closed entries are never deleted.
+- `order`: the standing order map of the design, not a per-issue note. `steps[]` are verbs, gates and phase
+  steps with their `after` edges and the machine they run in (`runs_in`: local, supervisor, seat or clone);
+  `artifacts[]` name the step that produces each one, the steps that require it and where it lives
+  (`where`: the working tree, the git common dir, `refs/keel`, the proposal branch, a trunk commit or the
+  archive commit); `locks[]` name who holds each one, who waits for it and which step releases it. Every
+  entry is anchored to the heading that states it. The `issues` check walks the map: a cycle, or an
+  artifact required by a step whose machine cannot reach where it lives (a clone reaches trunk and archive
+  commits only; a seat reaches its worktree and the proposal branch only), is an error unless the entry is
+  tagged with an open issue; a tag on a closed or dismissed issue is an error, so a closed issue cannot
+  keep tolerating its edge.
+- `matrix`: the walkthrough matrix, track × actor × sequence. The actors are standing: the Board at a
+  terminal, the Board while a wave is in flight, the supervising Steward, a second Steward process while
+  the supervisor lock is held, a seat, a runtime hook, a fresh CI clone, a crashed supervisor, a second
+  machine and the dashboard. The sequences are the happy chain of each track and the interrupts: hold,
+  abandon, override, amendment, crash and resume, a second land, a CI check at the trunk tip.
+- `walkthroughs[]`: the append-only history of walks, oldest first, each naming its trigger, the cells
+  walked and the issues it filed or re-walked.
+
+Filling the order map and walking every cell of the matrix once is the first run of this procedure, the
+baseline walk; the M0 exit criteria in [15-roadmap.md](15-roadmap.md) require it. While `exit_review` is
+set, the `issues` check fails on every issue that blocks that milestone or an earlier one and is not closed,
+deferred or dismissed, and on every open issue that has no class yet.
+
+### 5.3 Procedure
+
+1. **File.** One register entry per finding, status `open`: the title, the statement, the anchors, who
+   found it and the root-cause guess. A compound finding is split, so a cycle and an unreachable place are
+   two entries. The text that section 3 ranks lower is left exactly as it is: nothing is reworded to make
+   a finding disappear, and no document gains a note about it.
+2. **Classify.** Exactly one class, by the precedence of section 5.2. An entry with an anchor in section 1
+   or 2 of this document, or in a KP, is `mandate-conflict` by construction, never by judgment. `blocks`
+   is the earliest milestone whose scope builds a producer or a consumer of the rule, or at which the
+   owner confirms an adopted-by-recommendation row that the fix would change; never merely the milestone
+   that first exercises the rule.
+3. **Walk.** For every rule the entry names, and in the light mode for every rule the commit changes, four
+   facts are written into the register, never only into a commit message:
+   - producers: for each precondition the rule states, the step that produces it, whether that step comes
+     before or after the consumer in the sequence, and whether what it produces is sufficient for the
+     property the rule leans on (complete against depth-bounded, proven against heuristic or advisory,
+     fresh against cached); a producer that comes later or is insufficient is a `cycle` or a `gap`;
+   - consumers: derived from the canonical tables (the verb-and-mode table of
+     [12-cli-api-mcp.md](12-cli-api-mcp.md), the gate catalogue of [11-verification.md](11-verification.md),
+     the documents that link to the rule's home), never from a text search alone; for a rule about a lock,
+     a wait or a refusal, one row per verb mode with what it waits for and what releases it, plus the fixed
+     row "the holder crashes or never releases"; a row whose release is the very outcome the mode exists to
+     cause is a deadlock;
+   - places and actors: where each artifact lives and which actor on which machine runs each consumer;
+     "after X, Y", "X is committed in Y" and "X is checked from Y" are order edges as much as "before" and
+     "requires" are; a place the actor cannot reach is a `cycle`;
+   - readers and tallies: every required field, enum value and formula-defined measure lists at least one
+     reader (a verb, gate, record, view or measure); none is a `gap`; two names for one formula, or a name
+     that claims more than its formula, is a `term-collision`; for a rule about Board checkpoints or work
+     orders, the confirmations and work orders are counted per track, route (per-change contract or policy
+     path) and topology (shared or solo trunk) and compared with every cardinality sentence and with the
+     confirmations measure of [15-roadmap.md](15-roadmap.md).
+   The steps, artifacts and locks the walk names go into the order map, and the `issues` check runs. A
+   commit whose walk turns an edge red does not land unless the same commit files the issue.
+4. **Audit terms.** For every noun the rule leans on (the subject of "proves", "guarantees" or "ensures";
+   the condition after "only when" or "once"), the home definition is quoted beside the claim, with what
+   the claim demands and what the definition provides. A bounded definition under an unbounded claim is a
+   `term-collision` or a `gap`. One term, one meaning, one glossary row, one home: the second meaning gets
+   its own English identifier and its own row in the glossary of [00-vision.md](00-vision.md), and an
+   issue is never closed by a rename while any kept use demands more than the definition provides.
+5. **Route.** The owner decides when the class is `mandate-conflict`, when a fix would flip a decision in
+   the "Resolved by the owner" table of [17-open-decisions.md](17-open-decisions.md), when it would change
+   what a field of a Board-approved artifact (the charter, the goals or the routing) means, or when it
+   would change an adopted-by-recommendation row. Everything else is decided by the maintainers by
+   adopting the recorded recommendation, with a superseding ADR when a recorded decision flips. The light
+   mode is not available when a consumer of the changed rule is a clause of section 1 or a row of
+   section 2: the change does not land, the issue is filed and routed first, and a lower sentence that
+   adds a qualifier the clause lacks ("only", "in memory", "never persists") is evidence of the conflict,
+   never a verdict that the clause holds.
+6. **Prompt the owner.** One message in the form of section 5.4, then stop for every owner-routed issue.
+   Mandate conflicts are listed first and on their own when present, and nothing downstream of one is
+   edited until it is answered.
+7. **Correct.** In order: by class, then by the earliest `blocks`; a lower class on a mechanism that still
+   has a higher-class issue open waits. One commit per issue, or per group of issues that share a rule:
+   the home document and its mirror, every consumer on the walk marked changed or unchanged with a reason,
+   the glossary rows, the schemas, templates, examples and type-only code that implement it, the ADR, the
+   entry in [17-open-decisions.md](17-open-decisions.md), and [15-roadmap.md](15-roadmap.md) when a scope
+   or an exit criterion changes; sections 1 and 2 only from the owner's own words. A cycle is red before
+   green: it is reproduced in the order map, tagged with its issue, before it is removed. Every sentence
+   that introduces a wait names what releases it; every sentence that introduces a precondition names what
+   produces it and where it lives.
+8. **Close.** Status `closed` with the evidence: the validate checks that prove the closure in M0 and, from
+   M1a, the negative control in `test/` that fails when the defect returns (required for a `cycle`); the
+   cells walked become the entry's regression cells. An issue closes only in the commit that changes every
+   consumer on its walk.
+9. **Record.** The walk is appended to `walkthroughs[]` and `npm run check` runs. Every later iteration
+   and every milestone exit walks the regression cells first; a regression reopens the issue rather than
+   filing a new one.
+
+Issues are worked in class order: `mandate-conflict` first, because the answer may change every lower fix;
+then `cycle`, because the design cannot run as written; then `term-collision`, because a collision hides
+other defects; then `gap`; then `cost`. A `cycle` is never deferred by a maintainer, and a
+`mandate-conflict` is never fixed by one.
+
+### 5.4 What the owner is asked
+
+One message per iteration with one table: the issue id and class, the statements that cannot both hold,
+each quoted with its home document and heading, the options, the recommendation and what the issue blocks.
+The owner answers per issue: an option, deferral to a named milestone, the clause restated in the owner's
+own words (section 1 is then rewritten in place from those words, under section 3), or dismissal with a
+reason. When a mandate conflict is present it is listed first and on its own.
+
+### 5.5 Guardrails
+
+- An iteration never changes the statement in section 1 on its own. A conflict with the statement is
+  answered only by the owner, a lower document is never reworded to make the conflict disappear, and a
+  mandate consumer is never judged by the author of the change.
+- Documents state the current design: no home document names an issue, a fix or what it replaced. The
+  register holds the state and git holds the diff.
+- One term, one meaning, one glossary row, one home; the fixed vocabulary of the blueprint is never renamed
+  silently.
+- Anchors are headings and pointers, never line numbers; an anchor that stops resolving fails the check and
+  is repaired, not deleted.
+- `scripts/validate.mjs` stays the single tooling exception and free of product logic: the `issues` check
+  proves presence, single-home, acyclicity and reachability, never behaviour; behaviour is proven by
+  negative controls from M1a.
+- An iteration is not a refresh review: it pulls no reference and adopts no idea. When a defect shows that
+  a reference does something better, the candidate goes into the scouting record of section 4.
+- P1 and D2 hold: no provider value is read to reproduce an issue, and the D2 term list is not extended.
+- The light mode never skips the walk, and the walk is a register entry, never a commit-message note.
 

@@ -14,7 +14,8 @@ designed interface, specified in [12-cli-api-mcp.md](12-cli-api-mcp.md).
 ### Owner (Board member)
 
 1. [00-mandate.md](00-mandate.md): your own statement, verbatim and translated, the ids R1–R5, D1–D7,
-   P1–P4 used everywhere else, and the refresh discipline you will be asked to take part in.
+   P1–P5 used everywhere else, and the refresh and design iteration disciplines you will be asked to take
+   part in.
 2. [00a-owner-guide.md](00a-owner-guide.md): setup, the five daily commands, how often each track needs
    your confirmation, what to read at each checkpoint, and where to look when work is blocked.
 3. [17-open-decisions.md](17-open-decisions.md): the adopted-by-recommendation list you confirm for the M0
@@ -38,7 +39,8 @@ Read [00-mandate.md](00-mandate.md) first, then in numeric order: [00](00-vision
 [13](13-artifacts-schemas.md), [14](14-trust-security.md), [15](15-roadmap.md),
 [16](16-sources-credits.md), [17](17-open-decisions.md), then the ADRs in [adr/](adr/). Keep
 [13-artifacts-schemas.md](13-artifacts-schemas.md) open as the map from artifact to schema, template and
-example, and `reference-projects.yaml` as the reference registry (P4).
+example, `reference-projects.yaml` as the reference registry (P4) and `design-issues.yaml` as the
+design-issue register (P5).
 
 ### Adding a runtime or a provider family
 
@@ -50,7 +52,7 @@ exposure profile in [14-trust-security.md](14-trust-security.md).
 
 | Document | Scope |
 | --- | --- |
-| [00-mandate.md](00-mandate.md) | The owner's statement, binding requirement ids, precedence and amendment rules, refresh discipline (P4) |
+| [00-mandate.md](00-mandate.md) | The owner's statement, binding requirement ids, precedence and amendment rules, refresh discipline (P4), design iteration discipline (P5) |
 | [00-vision.md](00-vision.md) | Positioning and non-goals, how the design meets the mandate, principles KP-01 to KP-16, glossary, end-to-end example |
 | [00a-owner-guide.md](00a-owner-guide.md) | One-page guide for the Board |
 | [01-org-model.md](01-org-model.md) | Board, Steward modules, the five seat contracts, ownership, escalation, staffing per track |
@@ -79,11 +81,12 @@ check the documents that link to it.
 
 | Concept | Home |
 | --- | --- |
-| The owner's statement, verbatim, and the binding statements of R1–R5, D1–D7, P1–P4 | [00-mandate.md](00-mandate.md) |
+| The owner's statement, verbatim, and the binding statements of R1–R5, D1–D7, P1–P5 | [00-mandate.md](00-mandate.md) |
 | Precedence between the statement, principles, home documents, ADRs and data files; amendment rules | [00-mandate.md](00-mandate.md) |
 | Refresh discipline (P4): when it runs, the registry, the procedure, what the owner is asked, guardrails | [00-mandate.md](00-mandate.md) |
+| Design iteration discipline (P5): when it runs, the design-issue register (issues, order map, walkthrough matrix), the procedure, what the owner is asked, guardrails | [00-mandate.md](00-mandate.md) |
 | Positioning, pitch and non-goals | [00-vision.md](00-vision.md) |
-| Requirement mapping: how the design meets R1–R5, D1–D7, P1–P4 | [00-vision.md](00-vision.md) |
+| Requirement mapping: how the design meets R1–R5, D1–D7, P1–P5 | [00-vision.md](00-vision.md) |
 | Principles KP-01 to KP-16 and their sources | [00-vision.md](00-vision.md) |
 | Glossary (one-line definition of every term and id prefix) | [00-vision.md](00-vision.md) |
 | End-to-end example from a goal to a line of code | [00-vision.md](00-vision.md) |
@@ -158,6 +161,7 @@ Canonical data tables are files, not documents. Documents explain them; the file
 | Caps and thresholds, each with a reason | `config/keel.defaults.yaml` |
 | Conformance scenarios | `conformance/scenarios.yaml` |
 | Reference projects and the scouting record | `docs/reference-projects.yaml` |
+| Design issues, the order map, the walkthrough matrix and the walkthrough history | `docs/design-issues.yaml` |
 
 ## Conventions used in these docs
 

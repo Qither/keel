@@ -4,6 +4,9 @@ This document tracks every design decision that was put to the owner, in three g
 resolved, decisions adopted by recommendation, and decisions that are still open. An adopted decision is
 reversible: changing it means rewriting its ADR or its home document, and this list; the history of the
 change is the git history of those files. An open decision lists its options, the recommendation, and what it blocks.
+A defect in keel's own design is a design issue with a `DI-nn` id in `docs/design-issues.yaml`
+([00-mandate.md](00-mandate.md) section 5); an issue of class `mandate-conflict`, or one whose fix would flip a
+decision below, is put to the owner here under "Truly open" with its id.
 
 keel's own design ADRs (`docs/adr/ADR-0001` … `ADR-0009`) are a separate sequence from the `ADR-<5>` ids
 that keel mints for target projects.
@@ -24,10 +27,11 @@ other file.
 | Frontend stack | TanStack on React, headless over native markup, pre-rendered and bundled (P2). Native HTML with vanilla JavaScript and no library was declined. | [ADR-0009](adr/ADR-0009-tanstack-frontend.md), [08-dashboard.md](08-dashboard.md) |
 | Reference set and model list | rtk joins the reference list, Kiro is public documentation only (R1); OpenCode joins the model list (R3); git primary, jj an optional enhancement (R4). | [00-mandate.md](00-mandate.md), [16-sources-credits.md](16-sources-credits.md) |
 | Refresh discipline | P4: the procedure in 00-mandate.md section 4, the registry `docs/reference-projects.yaml`, a refresh review at every milestone exit. | [00-mandate.md](00-mandate.md), [15-roadmap.md](15-roadmap.md) |
-| Core design document | The owner's statement is recorded verbatim with the ids R1–R5, D1–D7, P1–P4 and outranks every other file. | [00-mandate.md](00-mandate.md) |
+| Design iteration discipline | P5: the procedure in 00-mandate.md section 5, the register `docs/design-issues.yaml` with its schema and the `issues` check, the design-issue gate at every milestone exit from M0; the known defects are filed there as open issues before any of them is fixed. | [00-mandate.md](00-mandate.md), [15-roadmap.md](15-roadmap.md) |
+| Core design document | The owner's statement is recorded verbatim with the ids R1–R5, D1–D7, P1–P5 and outranks every other file. | [00-mandate.md](00-mandate.md) |
 
 The M0 scope rule (D1: design documents and skeleton only, `scripts/validate.mjs` as the single tooling
-exception) and the standing preferences P1–P4 are stated in [00-mandate.md](00-mandate.md) and mapped in
+exception) and the standing preferences P1–P5 are stated in [00-mandate.md](00-mandate.md) and mapped in
 [00-vision.md](00-vision.md).
 
 ## Adopted by recommendation (reversible, with ADR)

@@ -88,9 +88,9 @@ knows only environment variable names, protocol ids, aliases and a names-only pr
 dereferences environment values only in memory, at spawn time and at direct-lane call time
 ([10-providers.md](10-providers.md)).
 
-## Requirement mapping R1–R5 / D1–D7 / P1–P4
+## Requirement mapping R1–R5 / D1–D7 / P1–P5
 
-R1 to R5 are the owner's requirements, D1 to D7 the fixed decisions, and P1 to P4 the owner's standing
+R1 to R5 are the owner's requirements, D1 to D7 the fixed decisions, and P1 to P5 the owner's standing
 preferences; their statements and provenance live in [00-mandate.md](00-mandate.md). Each row names how
 and where the design meets one of them.
 
@@ -112,6 +112,7 @@ and where the design meets one of them.
 | P2 | Every frontend display keel ships is built with TanStack; the libraries are headless, so the markup stays native HTML elements with hand-written CSS; no UI kit, CDN or web font | TanStack on the React adapter, pre-rendered to static HTML that is readable without JavaScript and then hydrated; libraries bundled at package build and never runtime dependencies; one self-contained read-only file with no external requests | [08](08-dashboard.md), [ADR-0008](adr/ADR-0008-read-only-dashboard.md), [ADR-0009](adr/ADR-0009-tanstack-frontend.md) |
 | P3 | Borrow ideas, not dependencies | No OpenSpec CLI dependency; codegraph, SCIP and jj are optional adapters; no text or code copied from ELv2 or non-OSS sources | [16](16-sources-credits.md) |
 | P4 | Refresh discipline: at every refactor review the reference projects are pulled to their latest version, their additions are analysed, and keel is re-checked and corrected against them as a first-time design; GitHub is searched for new well-designed workflows, the owner is prompted to pull candidates locally, and adopted ideas are merged | The procedure in [00-mandate.md](00-mandate.md) section 4; the reference registry `docs/reference-projects.yaml`, validated against `schemas/reference-registry.schema.json` by the `examples` check (mapped in `schemas/examples.map.json`) and cross-referenced with the mandate and the credits by the `references` check; a refresh review in every milestone exit from M1a | [00-mandate](00-mandate.md), [15](15-roadmap.md), [16](16-sources-credits.md) |
+| P5 | Design iteration discipline: a defect found in keel's own documents, schemas, templates or tables is filed, classified, walked, routed and closed by the procedure of section 5 before it is fixed; a conflict with the statement is put to the owner and never reconciled by rewording a lower document; no rule is introduced, tightened or loosened without its walk; open issues gate milestone exits | The procedure in [00-mandate.md](00-mandate.md) section 5; the design-issue register `docs/design-issues.yaml`, validated against `schemas/design-issues.schema.json` by the `examples` check and cross-checked by the `issues` check (ids, anchors, statuses, the blocks gate while `exit_review` is set, cycles and reachability in the order map, the glossary); the baseline walk and the `issues` gate in the exit criteria of every milestone from M0 | [00-mandate](00-mandate.md), [15](15-roadmap.md) |
 
 ## Principles KP-01…KP-16 (with sources)
 
@@ -511,6 +512,19 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | element brief | 架构元素简报 | A 2 to 4 KiB summary of an element compiled into briefs | [07](07-architecture-intelligence.md) |
 | change feed | 变更流 | Newest-first land and round events and series points touching an element | [07](07-architecture-intelligence.md) |
 
+### Design of keel itself
+
+| Term | zh-CN | Meaning | Home |
+| --- | --- | --- | --- |
+| design iteration | 设计迭代 | One run of the P5 procedure: file, classify, walk, audit terms, route, prompt the owner, correct, close, record | [00-mandate](00-mandate.md) |
+| design issue | 设计问题 | `DI-nn` in `docs/design-issues.yaml`: a defect in keel's own design with its class (mandate-conflict, cycle, term-collision, gap, cost), status, anchors, walk and closure | [00-mandate](00-mandate.md) |
+| design-issue register | 设计问题登记表 | `docs/design-issues.yaml`: the issues, the order map, the walkthrough matrix and the walkthrough history; validated by `schemas/design-issues.schema.json` and the `issues` check | [00-mandate](00-mandate.md) |
+| rule walk | 规则走查 | The four facts written for a rule: producers and their sufficiency, consumers derived from the canonical tables, places and actors, readers and tallies | [00-mandate](00-mandate.md) |
+| order map | 顺序图 | The standing steps, artifacts and locks of the design with produced-by, required-by, after and released-by edges; the `issues` check finds cycles and unreachable places in it | [00-mandate](00-mandate.md) |
+| walkthrough matrix | 走查矩阵 | Track × actor × sequence; the cells a design iteration and every milestone exit walk | [00-mandate](00-mandate.md) |
+| baseline walk | 基线走查 | The first run of the P5 procedure: the order map filled and every cell of the matrix walked once; an M0 exit criterion | [00-mandate](00-mandate.md) |
+| light mode | 轻量模式 | The part of the P5 procedure a rule change may run alone: the walk of the changed rule, in the same commit, never skipped | [00-mandate](00-mandate.md) |
+
 ### Id prefixes
 
 | Prefix | zh-CN | Record | Home |
@@ -524,6 +538,7 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | `EV-` / `VD-` / `TR-` / `IM-` | 证据 / 评审结论 / 分诊 / 影响面 | Evidence, verdict, triage record, impact record | [04](04-trace-and-state.md) |
 | `AP-` / `AM-` / `OV-` / `RL-` / `Q-` | 批准 / 修订案 / 豁免 / 裁定 / 提问 | Approval, amendment, override, ruling, question | [04](04-trace-and-state.md) |
 | `RUN-` / `EVT-` | 运行 / 事件 | Run, ledger event (26-character ULIDs) | [04](04-trace-and-state.md) |
+| `DI-` | 设计问题 | Design issue in keel's own register (keel's own sequence, like its design ADRs; not minted for target projects) | [00-mandate](00-mandate.md) |
 
 ## End-to-end example: from G-03 to one line of code
 

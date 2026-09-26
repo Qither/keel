@@ -59,9 +59,9 @@ keel 不是：
 
 keel 从不打开模型提供方（provider）的值文件、运行时凭据文件或共享的运行时设置文件。它只知道环境变量名、协议 id、别名以及一个仅含名称的模型提供方路径集，并且只在内存中、在拉起时和直连通道调用时解引用环境变量的值（[10-providers.zh-CN.md](10-providers.zh-CN.md)）。
 
-## 需求映射 R1–R5 / D1–D7 / P1–P4
+## 需求映射 R1–R5 / D1–D7 / P1–P5
 
-R1 到 R5 是所有者的需求，D1 到 D7 是固定决策，P1 到 P4 是所有者的常设偏好；它们的陈述及其出处位于 [00-mandate.zh-CN.md](00-mandate.zh-CN.md)。每一行都指出设计如何以及在何处满足它。
+R1 到 R5 是所有者的需求，D1 到 D7 是固定决策，P1 到 P5 是所有者的常设偏好；它们的陈述及其出处位于 [00-mandate.zh-CN.md](00-mandate.zh-CN.md)。每一行都指出设计如何以及在何处满足它。
 
 | 编号 | 需求或决策 | keel 如何满足 | 归属 |
 | --- | --- | --- | --- |
@@ -81,6 +81,7 @@ R1 到 R5 是所有者的需求，D1 到 D7 是固定决策，P1 到 P4 是所�
 | P2 | keel 交付的每个前端展示都用 TanStack 构建；这些库是无头（headless）的，因此标记仍是原生 HTML 元素加手写 CSS；不用 UI 套件、CDN 或 Web 字体 | 在 React 适配器上使用 TanStack，预渲染为不开 JavaScript 也可阅读的静态 HTML，然后水合（hydrate）；库在包构建时打包，绝不作为运行时依赖；单个自包含的只读文件，无外部请求 | [08](08-dashboard.zh-CN.md)、[ADR-0008](adr/ADR-0008-read-only-dashboard.zh-CN.md)、[ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md) |
 | P3 | 借鉴思想，而非依赖 | 不依赖 OpenSpec CLI；codegraph、SCIP 和 jj 都是可选适配器；不从 ELv2 或非开源来源复制文本或代码 | [16](16-sources-credits.zh-CN.md) |
 | P4 | 刷新纪律：每次重构评审时，把参考项目拉取到最新版本，分析其新增设计，并把 keel 当作初次设计一样对照它们重新检查和纠偏；在 GitHub 上搜索新的、设计良好的工作流，提示所有者把候选项目拉取到本地，并融合所采纳的思想 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 4 节中的流程；参考项目登记表 `docs/reference-projects.yaml`，由 `examples` 检查按 `schemas/reference-registry.schema.json` 校验（映射见 `schemas/examples.map.json`），并由 `references` 检查与纲领和致谢交叉核对；从 M1a 起每个里程碑的退出标准都包含一次刷新评审 | [00-mandate](00-mandate.zh-CN.md)、[15](15-roadmap.zh-CN.md)、[16](16-sources-credits.zh-CN.md) |
+| P5 | 设计迭代纪律：在 keel 自身的文档、schema、模板或表中发现的缺陷，先按第 5 节的流程登记、归类、走查、分流和关闭，然后才修正；与声明的冲突交给所有者，绝不通过改写下游文档来调和；任何规则的引入、收紧或放松都必须带有其走查；开放的问题作为里程碑退出的门禁 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 5 节中的流程；设计问题登记表 `docs/design-issues.yaml`，由 `examples` 检查按 `schemas/design-issues.schema.json` 校验，并由 `issues` 检查交叉核对（编号、锚点、状态、`exit_review` 设置期间的阻塞门禁、顺序图中的环与可达性、术语表）；从 M0 起每个里程碑的退出条件都包含基线走查和 `issues` 门禁 | [00-mandate](00-mandate.zh-CN.md)、[15](15-roadmap.zh-CN.md) |
 
 ## 原则 KP-01…KP-16（附来源）
 
@@ -423,6 +424,19 @@ keel 不依赖 OpenSpec CLI，也不复制任何 ELv2 或非开源的代码或�
 | element brief | 架构元素简报 | 编译进简报的一段 2 到 4 KiB 的架构元素摘要 | [07](07-architecture-intelligence.zh-CN.md) |
 | change feed | 变更流 | 触及某个架构元素的落地与轮次事件以及序列点，按最新在前排列 | [07](07-architecture-intelligence.zh-CN.md) |
 
+### keel 自身的设计
+
+| 术语 | 中文 | 含义 | 归属 |
+| --- | --- | --- | --- |
+| design iteration | 设计迭代 | P5 流程的一次运行：登记、归类、走查、审计术语、分流、提示所有者、修正、关闭、记录 | [00-mandate](00-mandate.zh-CN.md) |
+| design issue | 设计问题 | `docs/design-issues.yaml` 中的 `DI-nn`：keel 自身设计中的一个缺陷，带有类别（mandate-conflict、cycle、term-collision、gap、cost）、状态、锚点、走查和关闭证据 | [00-mandate](00-mandate.zh-CN.md) |
+| design-issue register | 设计问题登记表 | `docs/design-issues.yaml`：问题、顺序图、走查矩阵和走查历史；由 `schemas/design-issues.schema.json` 和 `issues` 检查校验 | [00-mandate](00-mandate.zh-CN.md) |
+| rule walk | 规则走查 | 为一条规则写下的四项事实：生产方及其充分性、从规范表推导的消费方、位置与行动者、读者与计数 | [00-mandate](00-mandate.zh-CN.md) |
+| order map | 顺序图 | 设计的常设步骤、产物和锁，带有 produced-by、required-by、after 和 released-by 边；`issues` 检查在其中发现环和不可到达的位置 | [00-mandate](00-mandate.zh-CN.md) |
+| walkthrough matrix | 走查矩阵 | 轨道 × 行动者 × 序列；设计迭代和每次里程碑退出所走的格 | [00-mandate](00-mandate.zh-CN.md) |
+| baseline walk | 基线走查 | P5 流程的第一次运行：填满顺序图并把矩阵的每个格走过一遍；M0 的一项退出条件 | [00-mandate](00-mandate.zh-CN.md) |
+| light mode | 轻量模式 | P5 流程中规则变更可以单独运行的部分：在同一 commit 中对被改动规则的走查，从不跳过 | [00-mandate](00-mandate.zh-CN.md) |
+
 ### 编号前缀
 
 | 前缀 | 中文 | 记录 | 归属 |
@@ -436,6 +450,7 @@ keel 不依赖 OpenSpec CLI，也不复制任何 ELv2 或非开源的代码或�
 | `EV-` / `VD-` / `TR-` / `IM-` | 证据 / 评审结论 / 分诊 / 影响面 | 证据、评审结论、分诊记录、影响面记录 | [04](04-trace-and-state.zh-CN.md) |
 | `AP-` / `AM-` / `OV-` / `RL-` / `Q-` | 批准 / 修订案 / 豁免 / 裁定 / 提问 | 批准、修订案、豁免、裁定、提问 | [04](04-trace-and-state.zh-CN.md) |
 | `RUN-` / `EVT-` | 运行 / 事件 | 运行、账本事件（26 个字符的 ULID） | [04](04-trace-and-state.zh-CN.md) |
+| `DI-` | 设计问题 | keel 自身登记表中的设计问题（keel 自己的序列，如同其设计 ADR；不为目标项目生成） | [00-mandate](00-mandate.zh-CN.md) |
 
 ## 端到端示例：从 G-03 到一行代码
 

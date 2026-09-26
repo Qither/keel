@@ -2,7 +2,7 @@
 
 > 英文原文（规范版本）：[17-open-decisions.md](17-open-decisions.md)。本文是其简体中文镜像，两者不一致时以英文版为准。
 
-本文档跟踪提交给所有者的每一项设计决策，分为三组：所有者已解决的决策、按建议采纳的决策，以及仍然开放的决策。已采纳的决策是可逆的：更改它意味着重写其 ADR 或其归属文档，以及本清单；该更改的历史就是这些文件的 git 历史。开放决策会列出其选项、建议以及它阻塞的内容。
+本文档跟踪提交给所有者的每一项设计决策，分为三组：所有者已解决的决策、按建议采纳的决策，以及仍然开放的决策。已采纳的决策是可逆的：更改它意味着重写其 ADR 或其归属文档，以及本清单；该更改的历史就是这些文件的 git 历史。开放决策会列出其选项、建议以及它阻塞的内容。keel 自身设计中的缺陷是 `docs/design-issues.yaml` 中带 `DI-nn` 编号的设计问题（[00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 5 节）；类别为 `mandate-conflict` 的问题，或其修正会翻转下表中某项决定的问题，连同其编号在本文档“仍然开放”下交给所有者。
 
 keel 自身的设计 ADR（`docs/adr/ADR-0001` … `ADR-0009`）与 keel 为目标项目生成的 `ADR-<5>` id 是两个独立的序列。
 
@@ -21,9 +21,10 @@ keel 自身的设计 ADR（`docs/adr/ADR-0001` … `ADR-0009`）与 keel 为目�
 | 前端技术栈 | React 上的 TanStack，以无头（headless）方式覆盖原生标记，预渲染并打包（P2）。不使用任何库的原生 HTML 加原生 JavaScript 被否决。 | [ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md), [08-dashboard.zh-CN.md](08-dashboard.zh-CN.md) |
 | 参考项目集与模型列表 | rtk 加入参考项目列表，Kiro 只参考公开文档（R1）；OpenCode 加入模型列表（R3）；git 为主，jj 为可选增强（R4）。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [16-sources-credits.zh-CN.md](16-sources-credits.zh-CN.md) |
 | 刷新纪律 | P4：00-mandate.zh-CN.md 第 4 节中的流程、参考项目登记表 `docs/reference-projects.yaml`，以及每个里程碑退出时的刷新评审。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
-| 核心设计文档 | 所有者声明以 R1–R5、D1–D7、P1–P4 这些 id 逐字记录，其优先顺序高于其他所有文件。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
+| 设计迭代纪律 | P5：00-mandate.zh-CN.md 第 5 节中的流程、带有 schema 和 `issues` 检查的登记表 `docs/design-issues.yaml`、从 M0 起每个里程碑退出时的设计问题门禁；已知缺陷在修正任何一个之前先作为开放问题登记在那里。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
+| 核心设计文档 | 所有者声明以 R1–R5、D1–D7、P1–P5 这些 id 逐字记录，其优先顺序高于其他所有文件。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 
-M0 范围规则（D1：只有设计文档和骨架，`scripts/validate.mjs` 是唯一的工具例外）以及常设偏好 P1–P4 在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中陈述，并在 [00-vision.zh-CN.md](00-vision.zh-CN.md) 中映射。
+M0 范围规则（D1：只有设计文档和骨架，`scripts/validate.mjs` 是唯一的工具例外）以及常设偏好 P1–P5 在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中陈述，并在 [00-vision.zh-CN.md](00-vision.zh-CN.md) 中映射。
 
 ## 按建议采纳（可逆，附 ADR）
 

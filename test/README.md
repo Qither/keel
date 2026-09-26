@@ -28,7 +28,7 @@ the tests named here. The full verification design (gates, negative controls, co
 
 | Layer | What it covers | Arrives | Runs where |
 | --- | --- | --- | --- |
-| Skeleton validation | Schemas compile; examples and fixtures validate; strict subset; bilingual docs; D2, P1 and D1 audit; the docs/13 manifest; the reference registry (`references` check, P4) | M0 | CI (`npm run check`) |
+| Skeleton validation | Schemas compile; examples and fixtures validate; strict subset; bilingual docs; D2, P1 and D1 audit; the docs/13 manifest; the reference registry (`references` check, P4); the design-issue register (`issues` check, P5: ids, anchors, statuses, the blocks gate, cycles and reachability in the order map, the glossary) | M0 | CI (`npm run check`) |
 | Unit and golden | Normalization (LF, BOM, NFC); id patterns; the brief compiler's golden hash, identical on a CRLF and an LF checkout; ledger canonical form and chain verification; trailer parsing | M1a | CI |
 | Governance | The approval flow in a scratch repository with a scripted confirmation: record build, hash binding, invalidation on change, the changed-during-confirmation refusal, the rejection of fabricated approvals, over-invalidation control; trace check range and epoch | M1b | CI |
 | End to end | The real CLI in a scratch repository against the loopback fakes and fake runtime binaries that replay recorded streams | M2 onward | CI |

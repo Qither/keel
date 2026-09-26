@@ -27,7 +27,7 @@ keel 是一个本地优先的 TypeScript/Node CLI 设计，用于在普通 git �
 - `skills/` 和 `templates/` 中的技能、模板与提示词；
 - `examples/acme-notes/` 中的一个黄金示例项目，以及 `test/fixtures/` 中的测试夹具。
 
-唯一声明的工具例外是 `scripts/validate.mjs`，它检查骨架本身。目前还没有 `keel` 可执行文件；文档中出现的命令是设计好的接口。从 M1a 到 M8 的路线图及各里程碑的退出标准见 [docs/15-roadmap.zh-CN.md](docs/15-roadmap.zh-CN.md)。所有文档都由之派生的所有者声明，连同编号 R1–R5、D1–D7 和 P1–P4，位于 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)。
+唯一声明的工具例外是 `scripts/validate.mjs`，它检查骨架本身。目前还没有 `keel` 可执行文件；文档中出现的命令是设计好的接口。从 M1a 到 M8 的路线图及各里程碑的退出标准见 [docs/15-roadmap.zh-CN.md](docs/15-roadmap.zh-CN.md)。所有文档都由之派生的所有者声明，连同编号 R1–R5、D1–D7 和 P1–P5，位于 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)。
 
 ## 一屏看懂 keel 做什么
 
@@ -47,7 +47,7 @@ keel 不是什么（智能体运行时、LLM 路由器、沙箱、托管服务�
 
 | 路径 | 内容 |
 | --- | --- |
-| `docs/` | 设计文档：根文档是 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)；从 [docs/README.zh-CN.md](docs/README.zh-CN.md) 开始，其中有阅读顺序和单一归属表；`docs/reference-projects.yaml` 是参考项目登记表（P4） |
+| `docs/` | 设计文档：根文档是 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)；从 [docs/README.zh-CN.md](docs/README.zh-CN.md) 开始，其中有阅读顺序和单一归属表；`docs/reference-projects.yaml` 是参考项目登记表（P4）；`docs/design-issues.yaml` 是设计问题登记表（P5） |
 | `docs/adr/` | keel 自身的架构决策记录（从 ADR-0001 起） |
 | `schemas/` | JSON Schema（draft 2020-12）；`common.schema.json` 是编号模式和共享枚举的唯一归属 |
 | `src/` | 与 schema 和接口相对应的纯类型 TypeScript；M0 中没有运行时代码 |
@@ -72,7 +72,7 @@ keel 不是什么（智能体运行时、LLM 路由器、沙箱、托管服务�
 npm ci
 npm run check                                  # typecheck + validate, as CI runs it
 node scripts/validate.mjs --only audit         # one check
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references,issues
 ```
 
 CI 在 windows-latest 和 ubuntu-latest 上，以 Node 22.13 和 24 运行相同的命令。

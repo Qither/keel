@@ -68,6 +68,7 @@ keel/
   scripts/validate.mjs              the declared D1 tooling exception
   docs/                             design documents, each with a .zh-CN.md mirror; docs/adr/
   docs/reference-projects.yaml      reference registry for the refresh discipline (P4)
+  docs/design-issues.yaml           design-issue register for the design iteration discipline (P5)
   schemas/                          JSON Schema 2020-12 files and examples.map.json
   src/                              type-only TypeScript
   org/                              seat contracts, reserved actions, checkpoints
@@ -84,7 +85,7 @@ keel/
 
 ## 3. 产物 ↔ schema ↔ 模板/示例
 
-下列表格是仓库清单。每行的第一个单元格列出仓库路径；它们合起来覆盖除 `package-lock.json`（仍然列出）和 `*.zh-CN.md` 镜像（与其英文规范文件列在一起）之外的每个文件。对于示例文件，`validate` 实际检查的绑定是 `schemas/examples.map.json`；这里的“示例”列指明预期的示例。`docs/reference-projects.yaml` 是一个位于 `docs/` 下的 YAML 数据文件，由 `examples` 检查按其 schema 校验，并由第 6 节的 `references` 检查交叉核对。
+下列表格是仓库清单。每行的第一个单元格列出仓库路径；它们合起来覆盖除 `package-lock.json`（仍然列出）和 `*.zh-CN.md` 镜像（与其英文规范文件列在一起）之外的每个文件。对于示例文件，`validate` 实际检查的绑定是 `schemas/examples.map.json`；这里的“示例”列指明预期的示例。`docs/reference-projects.yaml` 和 `docs/design-issues.yaml` 是位于 `docs/` 下的 YAML 数据文件，由 `examples` 检查按各自的 schema 校验，并由第 6 节的 `references` 和 `issues` 检查交叉核对。
 
 <!-- keel:manifest:start -->
 
@@ -110,8 +111,9 @@ keel/
 | 路径 | 归属内容 |
 | --- | --- |
 | `docs/README.md`, `docs/README.zh-CN.md` | 阅读顺序、文档索引、单一归属表 |
-| `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | 所有者声明、约束性编号、优先顺序、刷新纪律 |
+| `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | 所有者声明、约束性编号、优先顺序、刷新纪律、设计迭代纪律 |
 | `docs/reference-projects.yaml` | 参考项目登记表与搜寻记录（P4）；schema `reference-registry` |
+| `docs/design-issues.yaml` | 设计问题登记表：问题、顺序图、走查矩阵与历史（P5）；schema `design-issues` |
 | `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | 定位、设计如何满足纲领、原则、术语表、端到端示例 |
 | `docs/00a-owner-guide.md`, `docs/00a-owner-guide.zh-CN.md` | 所有者的单页指南 |
 | `docs/01-org-model.md`, `docs/01-org-model.zh-CN.md` | 董事会、Steward、席位、所有权、升级、人员配置 |
@@ -187,6 +189,7 @@ keel/
 | `schemas/generated-lock.schema.json` | `.keel/generated.lock.json` | 无 | 无 | stable |
 | `schemas/api-envelope.schema.json` | CLI JSON 信封与诊断（[12-cli-api-mcp.zh-CN.md](12-cli-api-mcp.zh-CN.md)） | 无 | 无 | stable |
 | `schemas/reference-registry.schema.json` | `docs/reference-projects.yaml`（P4 登记表） | 无 | `docs/reference-projects.yaml` | stable |
+| `schemas/design-issues.schema.json` | `docs/design-issues.yaml`（P5 登记表） | 无 | `docs/design-issues.yaml` | stable |
 
 ### 纯类型 TypeScript
 
@@ -396,7 +399,7 @@ D1：M0 交付文档和骨架，不含产品逻辑，也没有 `bin`。唯一声
 ```sh
 npm run check                                    # typecheck + validate (what CI runs)
 node scripts/validate.mjs                        # all checks
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references,issues
 ```
 
 输出为 `<check>: <passed>/<total> <unit>`，后跟 `x <error>` 行；任何错误都以退出码 1 结束，参数错误以退出码 2 结束。
@@ -410,6 +413,7 @@ node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,ref
 | `audit` | D2 术语列表（在路径和内容中）、P1 密钥形态标记、真实的模型提供方 API 主机、`docs/**`、`README*.md` 和 `AGENTS.md` 之外的非占位 URL 主机、禁止的凭据文件名；D1：`package.json` 中没有 `bin` 和 `dependencies`，且每个 `src/` 文件都只含纯类型语句 | 含义：一个错误但只使用了允许词汇的设计也会通过 |
 | `manifest` | 第 3 节标记表格中的每个路径都存在，并且除 `package-lock.json` 和 `*.zh-CN.md` 之外的每个仓库文件都被覆盖 | “用途”文本是否准确 |
 | `references` | 解析 `docs/reference-projects.yaml`；每个 `named_by_owner` 为 true 的项目都在 `docs/00-mandate.md` 和 `docs/16-sources-credits.md` 中被点名；`local_clone` 为 null 或仓库之外的相对路径，且从不被打开 | 评审是否真的发生过；上游状态 |
+| `issues` | 解析 `docs/design-issues.yaml`；编号连续；每个锚点都解析到存在的文件以及标题（Markdown）或指针（JSON、YAML）；锚点落在纲领第 1 或第 2 节的记录其类别强制为 `mandate-conflict`，该类问题必须在 `docs/17-open-decisions.md` 中被点名，且从不按建议决定；只有所有者能推迟；`exit_review` 设置期间，每个开放问题都已归类，且没有问题阻塞该里程碑或更早的里程碑；顺序图中没有环，也没有产物被其所在机器无法到达其存放位置的步骤所需要，除非该条目标记了一个开放的问题，且没有标记指向已关闭的问题；`docs/00-vision.md` 的术语表每个术语只有一行，包括已关闭问题保留和改名的术语；走查历史只追加且其格都能解析 | 走查是否彻底、陈述是否为真；行为（自 M1a 起由负对照证明） |
 
 `npm run typecheck`（`tsc --noEmit -p tsconfig.json`）覆盖 TypeScript：strict 模式、NodeNext 模块解析、`verbatimModuleSyntax` 和 `isolatedModules`。它与 `audit` 检查一起强制 `src/` 只包含 `import type`、`export type`、类型别名、接口、`export {}` 和注释。
 
