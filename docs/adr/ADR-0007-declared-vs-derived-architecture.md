@@ -70,7 +70,7 @@ flowchart LR
 
 ## Consequences
 
-- Intent stays reviewable and signed; derived facts stay replaceable and labelled.
+- Intent stays reviewable and Board-approved; derived facts stay replaceable and labelled.
 - keel depends on no particular engine; codegraph and SCIP are optional external adapters.
 - Architecture checks may be inert on a project without an index or a model, and keel says so instead of
   showing green.

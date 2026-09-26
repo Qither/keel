@@ -2,7 +2,7 @@
 
 > 英文原文（规范版本）：[03-lifecycle.md](03-lifecycle.md)。本文是其简体中文镜像，两者不一致时以英文版为准。
 
-本文档负责一次变更如何在 keel 中推进：轨道（track）及其棘轮、七个阶段、patch 轨道与策略路径、提案与任务状态机、常设策略（standing policy）、活性不变量以及预算。每道门禁（gate）内部的检查只在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中编目；谁签署什么见 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)。
+本文档负责一次变更如何在 keel 中推进：轨道（track）及其棘轮、七个阶段、patch 轨道与策略路径、提案与任务状态机、常设策略（standing policy）、活性不变量以及预算。每道门禁（gate）内部的检查只在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中编目；谁批准什么见 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)。
 
 ## 轨道信号与只升不降的棘轮（含无索引回退）
 
@@ -60,11 +60,11 @@ flowchart LR
 
 ### 阶段 0 受理（Intake）
 
-- **进入条件。** 董事会在任何 keel 运行之外执行 `keel new "<title>" [--goal G-nn] [--track …] [--policy <name>]`。请求引用一个 active 状态的目标。策略路径需要一个董事会签名的请求信封。
+- **进入条件。** 董事会在任何 keel 运行之外执行 `keel new "<title>" [--goal G-nn] [--track …] [--policy <name>]`。请求引用一个 active 状态的目标。策略路径需要董事会对请求的批准。
 - **执行者。** Steward：铸造编号、检查锚点、预测影响面、对轨道分类。
 - **产出。** 从主干创建的分支 `keel/<P>/main` 和规划工作树 `<workspace_root>/<P>.plan`；带受理信号的 `proposal.yaml`；账本事件 `proposal.created`（含来源）和 `track.decided`。对于 spike，产品席位随后在草稿工作树中只读作答并提交 `answer.md`；提案不经落地即关闭。
-- **门禁。** `gate:frame` 的受理部分：目标处于 active 状态、章程是最新的，且在策略路径上请求已签名。
-- **董事会。** 在策略路径上签署请求。降低轨道需要 `--rule track`。
+- **门禁。** `gate:frame` 的受理部分：目标处于 active 状态、章程是最新的，且在策略路径上请求已获批准。
+- **董事会。** 在策略路径上批准请求。降低轨道需要 `--rule track`。
 
 ### 阶段 1 框定（Frame；system 轨道上兼做设计）
 
@@ -72,7 +72,7 @@ flowchart LR
 - **执行者。** 产品席位；system 上还有架构席位；来自不同声明的模型家族（declared family）的评审镜头（spec，system 上再加 architecture）。
 - **产出。** `intent.md` 的冻结块和 `spec.delta.yaml`；system 上还有 `arch.delta.yaml`、带义务的 `decisions/ADR-*.md` 以及类型化的 `keel arch plan` 操作。
 - **门禁。** `gate:frame`：确定性检查，外加一项针对综合后的评审镜头评审结论的独立框定评审检查。
-- **董事会。** 契约批准，即 `keel approve <P> --stage contract`，它签署 `contract_hash`、`keel/<P>/main` 提交和链头（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
+- **董事会。** 契约批准，即 `keel approve <P> --stage contract`，它绑定 `contract_hash`、`keel/<P>/main` 提交和链头（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
 
 ### 阶段 2 规划（Plan）
 
@@ -80,7 +80,7 @@ flowchart LR
 - **执行者。** 规划席位；Steward（影响面、波次、路由快照）；一个针对 ACC → 命令表和测试任务的定义（此时尚未编写任何测试）运行验证缺口评审镜头的评审席位。
 - **产出。** `plan.yaml`；`workorders/T<n>.yaml`，包括测试任务和 `frozen_tests`；`routing.snapshot.yaml`；影响面记录 `IM-*`（位于 `.git/keel/records`，在落地时投影）。
 - **门禁。** `gate:plan`，就绪度为 PASS、CONCERNS 或 FAIL。
-- **董事会。** 需要时进行计划批准，即 `keel approve <P> --stage plan`：system 上始终需要；feature 上当某个波次宽度大于 1 或路由偏离签名的路由配置时需要。计划获批（或被判定无需批准）后，规划工作树被删除；之后可以重新创建。
+- **董事会。** 需要时进行计划批准，即 `keel approve <P> --stage plan`：system 上始终需要；feature 上当某个波次宽度大于 1 或路由偏离已批准的路由时需要。计划获批（或被判定无需批准）后，规划工作树被删除；之后可以重新创建。
 
 ### 阶段 3 构建（Build）
 
@@ -129,10 +129,10 @@ patch 是一次至多一个会话、五个文件、约 100 行代码的变更，
 
 契约来自以下两条途径之一：
 
-| 途径 | 签署的内容 | 适用情形 |
+| 途径 | 批准的内容 | 适用情形 |
 | --- | --- | --- |
 | 逐变更契约 | 对一个冻结块的契约批准，该冻结块由请求、锚点和所引用的场景以确定性方式派生（需要新 ACC 时由产品席位起草） | 任何 patch；只要需要新 ACC 就必须采用 |
-| 策略路径 | 一个董事会签名的请求信封（`keel new --policy <name>`）、一份董事会签名的常设策略，以及确定性派生的字段 | 只有当策略的每个谓词都成立且不需要新 ACC 时 |
+| 策略路径 | 一份董事会已批准的请求记录（`keel new --policy <name>`）、一份董事会已批准的常设策略，以及确定性派生的字段 | 只有当策略的每个谓词都成立且不需要新 ACC 时 |
 
 **策略落地**有额外要求，因为在变更构建之前没有任何人类看过它：
 
@@ -142,7 +142,7 @@ patch 是一次至多一个会话、五个文件、约 100 行代码的变更，
 
 ```mermaid
 flowchart LR
-  N["keel new --policy quick-patch"] --> S["董事会签署逐字请求"]
+  N["keel new --policy quick-patch"] --> S["董事会查看并批准逐字请求"]
   S --> W["Steward 派生一份工单"]
   W --> B["构建：engineer、gate:submit"]
   B --> V["验证：红绿证明、policy 镜头集"]
@@ -236,19 +236,19 @@ stateDiagram-v2
 
 ## 常设策略的限制
 
-常设策略是一个董事会签名的文件 `.keel/policies/<name>.yaml`（schema 为 `schemas/policy.schema.json`，模板为 `templates/project/policies/quick-patch.yaml`），用 `keel approve --policy <name>` 签署（信封类型 `policy`）。策略可以撤销，每份回执（receipt）都列出它所使用的策略。
+常设策略是一个董事会已批准的文件 `.keel/policies/<name>.yaml`（schema 为 `schemas/policy.schema.json`，模板为 `templates/project/policies/quick-patch.yaml`），用 `keel approve --policy <name>` 批准（记录种类 `policy`）。策略可以撤销，每份回执（receipt）都列出它所使用的策略。
 
 已采纳的默认值（[17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md)）：
 
-- **quick-patch**：至多 5 个文件和 100 行代码；一个架构元素或未映射的路径；不触及受保护 glob、INV 或义务；签名的请求；红前/绿后证明；`policy` 镜头集。
-- **patch 的落地策略**：在共享主干上需要落地批准；在单人仓库上为签名的落地策略加回执确认。
+- **quick-patch**：至多 5 个文件和 100 行代码；一个架构元素或未映射的路径；不触及受保护 glob、INV 或义务；已批准的请求；红前/绿后证明；`policy` 镜头集。
+- **patch 的落地策略**：在共享主干上需要落地批准；在单人仓库上为已批准的落地策略加回执确认。
 
 常设策略永远不能做的事：
 
 - 批准由 LLM 起草的验收：新 ACC 始终需要逐变更的契约批准；
 - 适用于 feature 或 system 工作：如果棘轮在提交时上调了轨道，策略即不再适用，常规检查点随之恢复；
-- 豁免暴露规则、签名检查、追溯检查或落地重跑；
-- 自行发起变更：指明该变更的请求始终由董事会签署。
+- 豁免暴露规则、批准检查、追溯检查或落地重跑；
+- 自行发起变更：指明该变更的请求始终由董事会批准。
 
 策略落地之后，董事会用 `keel approve <P> --stage receipt` 确认回执。该确认不阻塞，但未确认的回执会阻塞下一个触及相同架构元素的变更；路径未映射时，则阻塞下一个触及相同路径 glob 的变更。
 

@@ -28,9 +28,9 @@ the tests named here. The full verification design (gates, negative controls, co
 
 | Layer | What it covers | Arrives | Runs where |
 | --- | --- | --- | --- |
-| Skeleton validation | Schemas compile; examples and fixtures validate; strict subset; bilingual docs; D2, P1 and D1 audit; the docs/13 manifest | M0 | CI (`npm run check`) |
+| Skeleton validation | Schemas compile; examples and fixtures validate; strict subset; bilingual docs; D2, P1 and D1 audit; the docs/13 manifest; the reference registry (`references` check, P4) | M0 | CI (`npm run check`) |
 | Unit and golden | Normalization (LF, BOM, NFC); id patterns; the brief compiler's golden hash, identical on a CRLF and an LF checkout; ledger canonical form and chain verification; trailer parsing | M1a | CI |
-| Governance | Envelope build and `ssh-keygen -Y` verify against a scratch `allowed_signers`; the agent-loaded key refusal; trace check range and epoch | M1b | CI |
+| Governance | The approval flow in a scratch repository with a scripted confirmation: record build, hash binding, invalidation on change, the changed-during-confirmation refusal, the rejection of fabricated approvals, over-invalidation control; trace check range and epoch | M1b | CI |
 | End to end | The real CLI in a scratch repository against the loopback fakes and fake runtime binaries that replay recorded streams | M2 onward | CI |
 | Conformance plumbing | The plumbing scenarios of `conformance/scenarios.yaml` against scripted fakes | M2 (M6 for the full set) | CI |
 | Conformance behaviour | The behaviour scenarios, at least 5 repetitions each with a no-guidance control, on the user's real routes | M6 | The user, opt-in (`keel doctor --conformance`) |
@@ -92,8 +92,14 @@ check with the pinned reason.
 
 | Check | Seeded fault | Pinned failure | Arrives |
 | --- | --- | --- | --- |
-| `land.signature` and `keel approve` | A passphrase signer key loaded into the ssh-agent (socket or the Windows agent pipe) | Exit 6: agent-loaded signer key | M1b |
-| `land.signature` | A one-byte edit of the frozen block after contract approval | Contract approval invalid | M1b |
+| dispatch, `land.approval`, policy-path intake | The subject has no approval record, or the record has no `approval.recorded` event | The protected step does not proceed: exit 3 with `missing-approval` | M1b |
+| `keel approve` | A scripted confirmation of a document | The record binds the subject, the normalized hash of every bound artifact, the declared approver (from `board.approver` or `--as`) and the local time; the ledger event names the record | M1b |
+| `land.approval` | A one-byte edit of the frozen block after contract approval | Contract approval invalid (`missing-approval`: artifact changed) | M1b |
+| `land.approval` | The receipt draft edited after the land approval | Land refused; the draft is presented again | M1b |
+| `keel approve` | A bound artifact rewritten by the harness between the display and the confirmation keystroke | Refusal `changed-during-confirmation`; no record, no event | M1b |
+| `frame.approvals` | An unrelated file changed and unrelated ledger events appended after a document approval | The approval stays valid (over-invalidation control) | M1b |
+| `frame.approvals`, ingest | A seat drop that says "approved", a result with a completion claim, and a JSON file dropped under `.keel/approvals/` without a ledger event | None is accepted as an approval; dispatch refuses; the file is reported by `keel doctor --section approvals` | M1b (drop and file), M2 (ingest) |
+| `keel init`, `keel approve` | A scratch environment with no SSH key, no agent, no `SSH_AUTH_SOCK` and no hardware | Both complete; no key, signer or hardware prompt appears | M1b |
 | ledger chain verification | An edited ledger line | Chain break | M1a |
 | `submit.scope` | A work order whose `write_set` glob matches zero paths | Zero-match scope | M2 |
 | `submit.reserved-op` | A seeded push to a configured remote; a seeded branch move | Detected through `git ls-remote`; detected through the ref snapshot | M2 |
@@ -148,17 +154,17 @@ Conventions a test must know:
   but consistent across files. The brief's byte count is real.
 - `ledger.sample.json` is a JSON array (JSONL is validated from M1). Its `prev` and `hash` links are real:
   `hash` is the sha256 of the compact JSON of the event without `hash`, with object keys sorted. Each
-  stage envelope binds the chain head before its `approval.recorded` event (the example ships the contract
-  envelope). When M1a pins the canonical form, the sample is regenerated with it.
-- `.keel/signatures/example.contract.json` stands for the content-addressed file
-  `.keel/signatures/<blob-sha256>.contract.json` that the ledger names; its signature and every key in the
-  example are fake.
+  stage record cites the chain head before its `approval.recorded` event (the example ships the contract
+  record). When M1a pins the canonical form, the sample is regenerated with it.
+- `.keel/approvals/example.contract.json` stands for the content-addressed file
+  `.keel/approvals/<record-sha256>.contract.json` that the ledger names; the approver name in the example is
+  the declared name `board-owner`, and every hash is illustrative.
 - The ULIDs of runs and events sort in event order; their time parts are not derived from the `ts` fields.
 
 Golden tests planned on it (M1a and M1b): the brief compiler reproduces the body of
 `workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/inputs/brief.md` from the declared files; ledger
 chain verification passes on the sample and fails after a one-character edit; the trace walk from
-`src/store/tags.ts` reaches `G-03`; the receipt renderer turns `receipt.json` and the land envelope into the
+`src/store/tags.ts` reaches `G-03`; the receipt renderer turns `receipt.json` and the land approval record into the
 archived `receipt.md`, ACC to command table included.
 
 ## Never in a test

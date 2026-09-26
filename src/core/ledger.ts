@@ -7,14 +7,15 @@
  * `$(git rev-parse --git-common-dir)/keel/ledger/<yyyy-mm>.jsonl`, one event per line, one file per month,
  * with one chain across months. It is the only truth store for events: state (proposal, task and element
  * status, the current track, claims and leases) is computed from events and never stored. `hash` is the
- * sha256 of the canonical JSON of the event without `hash`; `prev` is the previous event's hash. Board
- * envelopes include the chain head, so an edit before a signed head is detectable. Records hold
+ * sha256 of the canonical JSON of the event without `hash`; `prev` is the previous event's hash. Approval
+ * records include the chain head, so an edit before a recorded head is detectable by a consistency check
+ * (not resisted against a writer that can rewrite records and hashes; docs/14-trust-security.md). Records hold
  * environment variable NAMES, aliases and `${ENV:NAME}` placeholders only. Implemented from M1a.
  */
 import type { AckDiff } from "./ack.js";
 import type { AckId } from "./brief.js";
 import type { CheckId } from "./gates.js";
-import type { ApprovalKind, AskRoute, SshFingerprint, Until } from "./governance.js";
+import type { ApprovalKind, AskRoute, Until } from "./governance.js";
 import type {
   AmendmentId,
   ApprovalId,
@@ -66,8 +67,9 @@ import type { ClaimRecord, LandMethod, VcsBackendId } from "../vcs/vcs.js";
 // ---- Envelope parts ----
 
 /**
- * Who acted. For seats: the seat, runtime, declared family (the Board-signed declaration from routing,
- * never a verified fact), profile alias and run.
+ * Who acted. For seats: the seat, runtime, declared family (the Board-approved declaration from routing,
+ * never a verified fact), profile alias and run. `board` is written only by `keel approve` after an
+ * explicit confirmation; an actor field alone never makes an event an approval.
  */
 export interface Actor {
   kind: "board" | "steward" | "seat";
@@ -119,14 +121,17 @@ export interface HoldChangedData {
   on: boolean;
 }
 
-/** `approval.recorded`: a verified Board envelope. */
+/**
+ * `approval.recorded`: written by the `keel approve` process that wrote the record, under the writer lock
+ * and outside any run window. A record without this event is not an approval.
+ */
 export interface ApprovalRecordedData {
   approval: ApprovalId;
   kind: ApprovalKind;
   stage: ApprovalStage | null;
   rule: RuleKind | null;
-  envelope: RepoPath;
-  fingerprint: SshFingerprint;
+  record: RepoPath;
+  approver: string;
 }
 
 /** `amendment.recorded`. */
@@ -289,7 +294,7 @@ export interface ConformanceRecordedData {
   status: ConformanceStatus;
 }
 
-/** `land.completed`: carries the landed sha, which the signed receipt draft cannot name. */
+/** `land.completed`: carries the landed sha, which the approved receipt draft cannot name. */
 export interface LandCompletedData {
   landed: GitOid;
   trunk: string;
@@ -379,7 +384,7 @@ export type UnsealedLedgerEvent<T extends LedgerEventType = LedgerEventType> = {
 
 // ---- Chain ----
 
-/** The hash of the newest event; every Board envelope includes it. */
+/** The hash of the newest event; every approval record includes it. */
 export type ChainHead = Sha256;
 
 /** One link of the chain as stored. */
@@ -410,7 +415,8 @@ export type LedgerLockPath = "keel/locks/ledger.lock";
 
 /**
  * The supervisor lock: held by the `keel run` process that supervises seats, so that while a seat runs
- * only that process appends (`keel approve` excepted: its events are Board-signed envelopes).
+ * only that process appends. Every other mutating verb, `keel approve` included, waits for it; there is
+ * no exception, because an approval record no longer verifies itself.
  */
 export type SupervisorLockPath = "keel/locks/supervisor.lock";
 
@@ -428,14 +434,14 @@ export interface LedgerAnchor {
 
 /**
  * The window check at ingest: every event appended while the seat ran must be one of the supervisor's own
- * appends or a Board-signed approval whose envelope verifies; anything else is `blocked(reserved_op)`.
+ * appends; anything else, an `approval.recorded` event included, is foreign and makes the run
+ * `blocked(reserved_op)`.
  */
 export interface LedgerWindowCheck {
   run: RunId;
   anchor_before: LedgerAnchor;
   anchor_after: LedgerAnchor;
   own_appends: EventId[];
-  board_signed: EventId[];
   foreign: EventId[];
   ok: boolean;
 }

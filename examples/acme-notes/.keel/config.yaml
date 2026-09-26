@@ -5,8 +5,9 @@
 # acme-notes is a fictional TypeScript notes service. The golden path in this example is proposal
 # P-7F3K9Q (note tags). Commit ids and hashes in these files are illustrative (see test/README.md).
 #
-# No provider endpoint, key or model name appears in any configuration layer. The Board-signed
-# .keel/routing.yaml names environment variables only.
+# No provider endpoint, key or model name appears in any configuration layer. The Board-approved
+# .keel/routing.yaml names environment variables only. The owner's .keel/local.yaml (not shown; gitignored)
+# sets board.approver to "board-owner", the name every approval record in this example carries.
 
 vcs:
   # git is fully sufficient; jj stays off until the Board opts in.

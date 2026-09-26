@@ -41,7 +41,7 @@
   "additionalProperties": false,
   "$defs": {
     "exitCode": {
-      "description": "0 ok, 1 gate failed, 2 usage, 3 needs a human, 4 claim conflict, 5 stale state or dirty checked-out trunk, 6 environment (including an agent-loaded signer key).",
+      "description": "0 ok, 1 gate failed, 2 usage, 3 needs a human, 4 claim conflict, 5 stale state or dirty checked-out trunk, 6 environment (missing or too old git, refusal under KEEL_RUN).",
       "enum": [0, 1, 2, 3, 4, 5, 6]
     },
     "diagnostic": {

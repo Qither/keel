@@ -5,8 +5,11 @@
 # personal, never secrets). Tables deep-merge, arrays keyed by id replace whole entries, unknown keys are
 # errors. Every key is optional here; leave out what the team does not change.
 #
-# Provider endpoints, API keys and model names never go here or in local.yaml. The Board-signed
+# Provider endpoints, API keys and model names never go here or in local.yaml. The Board-approved
 # .keel/routing.yaml names environment variables only; the values live in your own environment.
+#
+# board.approver (the name recorded in every approval you confirm) belongs in .keel/local.yaml, the
+# personal layer; when it is unset, `keel approve` asks for the name at confirmation.
 
 vcs:
   # auto | git | jj. auto picks jj only when every jj precondition holds and jj_opt_in is true
@@ -36,7 +39,7 @@ index:
   backend: none
 
 land:
-  # Name of a Board-signed standing land policy in .keel/policies/, or null to require a land approval
+  # Name of a Board-approved standing land policy in .keel/policies/, or null to require a land approval
   # per change (recommended on shared trunks).
   policy: null
 

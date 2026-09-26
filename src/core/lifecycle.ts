@@ -105,13 +105,13 @@ export interface ProposalStatus {
 
 // ---- Checkpoints ----
 
-/** The four stage checkpoints the Board signs with `keel approve <P> --stage <stage>`. */
+/** The four stage checkpoints the Board approves with `keel approve <P> --stage <stage>`. */
 export type CheckpointStage = ApprovalStage;
 
 /**
  * When a checkpoint applies on a track (`required_on` in org/checkpoints.yaml): always, never, unless the
- * change runs on the policy path, only when a wave is wider than 1 or routing deviates, as the signed land
- * policy decides, or after every land made under a standing policy (receipt acknowledgement).
+ * change runs on the policy path, only when a wave is wider than 1 or routing deviates, as the approved
+ * land policy decides, or after every land made under a standing policy (receipt acknowledgement).
  */
 export type CheckpointRequirement =
   | "always"
@@ -134,21 +134,21 @@ export interface Checkpoint {
   /** Printed verbatim by `keel approve` before the typed confirmation. */
   read: readonly string[];
   ask_yourself: readonly string[];
-  do_not_sign_when: readonly string[];
+  do_not_approve_when: readonly string[];
 }
 
-/** A Board signature that is not a stage checkpoint (`other_signatures` in org/checkpoints.yaml). */
-export interface OtherSignature {
-  kind: "request" | "doc" | "rule";
+/** A Board approval that is not a stage checkpoint (`other_approvals` in org/checkpoints.yaml). */
+export interface OtherApproval {
+  kind: "request" | "doc" | "policy" | "rule";
   command: string;
   read: readonly string[];
-  do_not_sign_when: readonly string[];
+  do_not_approve_when: readonly string[];
 }
 
-/** org/checkpoints.yaml: the four stage checkpoints plus the other signatures. */
+/** org/checkpoints.yaml: the four stage checkpoints plus the other approvals. */
 export interface CheckpointTable {
   stages: readonly Checkpoint[];
-  other_signatures: readonly OtherSignature[];
+  other_approvals: readonly OtherApproval[];
 }
 
 // ---- Blocking, asks, escalation ----
@@ -169,9 +169,9 @@ export type RemedyStep = "add-context" | "tier-up" | "split-task" | "planner-rul
 // ---- Proposal intake (proposal.yaml) ----
 
 /** How a proposal was authorized at intake. */
-export type ProposalOrigin = "board-signed" | "contract-approved";
+export type ProposalOrigin = "board-requested" | "contract-approved";
 
-/** The verbatim request; on the policy path the Board signs it (`keel new --policy`). */
+/** The verbatim request; on the policy path the Board approves it (`keel new --policy`). */
 export interface IntakeRequest {
   text: string;
   policy: Slug | null;
@@ -271,7 +271,7 @@ export interface IntentScope {
 
 /**
  * The frozen block as parsed deterministically. Any byte change after contract approval invalidates the
- * approval; acceptance changes only through an amendment the Board re-signs.
+ * approval; acceptance changes only through an amendment the Board approves again.
  */
 export interface FrozenIntent {
   problem: string;

@@ -28,10 +28,11 @@ Windows.
    chain hash held by the Steward-owned anchor ref `refs/keel/ledger/head`, which it CAS-updates after
    every append. Every process, including a new `keel land`, checks against the anchor, not its memory.
    `refs/keel` is in the pre-spawn ref snapshot, so a seat that moves the anchor makes a reserved-operation
-   finding; at ingest the supervising Steward accepts only its own appends and Board-signed approvals in
-   the run window ([04-trace-and-state.md](../04-trace-and-state.md)).
-3. Every Board envelope includes the ledger chain head, so any later edit of events before a signed head is
-   detectable.
+   finding; at ingest the supervising Steward accepts only its own appends in the run window
+   ([04-trace-and-state.md](../04-trace-and-state.md)).
+3. Every approval record includes the ledger chain head, so any later edit of events before a recorded head
+   is detectable as an inconsistency (a consistency check, not a defence against a writer that rewrites the
+   records too; [ADR-0005](ADR-0005-explicit-confirmation-approvals.md)).
 4. Claim state, leases, heartbeats and the current track are ledger events. Claim refs are only
    create-only CAS locks holding a token. Proposal, task and element status is computed from events and
    never stored.
@@ -45,7 +46,7 @@ Windows.
 ```mermaid
 flowchart TB
   subgraph declared["Declared plane (committed, .keel/)"]
-    d1["charter, goals, routing, policies, signers, signatures, specs, decisions, arch, archive"]
+    d1["charter, goals, routing, policies, approvals, specs, decisions, arch, archive"]
   end
   subgraph vcs["VCS-embedded plane"]
     v1["Steward commits with trailers"]
@@ -64,11 +65,11 @@ flowchart TB
 
 - One store serves all worktrees and survives `git clean -fdx`; worktree diffs and jj snapshots never see
   it.
-- Integrity rests on the hash chain and its anchor ref, signatures, ingest capture with the window check
+- Integrity rests on the hash chain and its anchor ref, approval records checked against current content, ingest capture with the window check
   and land re-execution, not on unreachability. The argument, and the residual limit of a process that
   outlives its run, is in [14-trust-security.md](../14-trust-security.md).
 - Exposure is reported honestly: most native Windows routes report `exposed`, and receipts say so.
-- The store is local to one clone. Other machines see only committed signatures and archive projections;
+- The store is local to one clone. Other machines see only committed approval records and archive projections;
   multi-machine collaboration is open ([17-open-decisions.md](../17-open-decisions.md)).
 - Derived data (`trace.db`, index cache, dashboard) can be deleted and rebuilt; `keel audit --rebuild`
   compares incremental and full builds by set difference.
@@ -93,5 +94,5 @@ flowchart TB
 - Gas Town Refinery: verify the merged batch, which grounds land re-execution.
 - Blueprint proposal C: the git-common-dir control plane.
 - The compliance and facts review passes: control-plane exposure on native Windows, the chain head in
-  envelopes.
+  approval records.
 - See [16-sources-credits.md](../16-sources-credits.md).

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/receipt.schema.json",
   "title": "keel receipt",
-  "description": "The receipt projection, .keel/archive/<yyyy>/<P>-<slug>/receipt.json (L11); receipt.md renders it for the Board. The signed draft names the integrated commit and the expected trunk tip; the landed commit goes in the land.completed event, and receipt.md is never edited after signing. Projections are never trusted as input.",
+  "description": "The receipt projection, .keel/archive/<yyyy>/<P>-<slug>/receipt.json (L11); receipt.md renders it for the Board. The approved draft names the integrated commit and the expected trunk tip; the landed commit goes in the land.completed event, and receipt.md is never edited after the land approval. Projections are never trusted as input.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M3",
   "type": "object",
@@ -161,7 +161,7 @@
       }
     },
     "approvals": {
-      "description": "The approvals that existed before land: contract, plan, request and rulings. The land approval is never listed: it signs the receipt draft, and its id is a hash over an envelope that contains the draft hash, so the draft cannot name it. receipt.md shows the land approval in its Signed quote section, which the archive commit fills from the land envelope.",
+      "description": "The approvals that existed before land: contract, plan, request and rulings. The land approval is never listed: it binds the receipt draft hash, and its id is a hash over a record that contains the draft hash, so the draft cannot name it. receipt.md shows the land approval in its Land approval section, which the archive commit fills from the land approval record.",
       "type": "array",
       "items": { "$ref": "common.schema.json#/$defs/approvalId" }
     },

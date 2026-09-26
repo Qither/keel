@@ -5,8 +5,8 @@ hash-chained ledger, the id scheme, commit trailers, the trace check, the RTM, l
 redaction. Other documents link here instead of restating it.
 
 Related homes: the gate catalogue is in [11-verification.md](11-verification.md) (including the
-source-state binding of evidence and land re-execution), signed approvals are in
-[02-alignment.md](02-alignment.md), signing-key hygiene and the threat model are in
+source-state binding of evidence and land re-execution), Board approvals are in
+[02-alignment.md](02-alignment.md), what an approval record proves and the threat model are in
 [14-trust-security.md](14-trust-security.md), and git and jj mechanics are in [05-vcs.md](05-vcs.md).
 The decision to keep the control plane in the git common directory is
 [ADR-0003](adr/ADR-0003-control-plane-in-git-common-dir.md).
@@ -20,7 +20,7 @@ never stored.
 ```mermaid
 flowchart LR
   subgraph declared["Declared plane: .keel/ (committed)"]
-    gov["charter, goals, routing, policies,<br/>board/allowed_signers, signatures"]
+    gov["charter, goals, routing, policies,<br/>approvals"]
     living["specs, decisions, arch"]
     archive["archive/yyyy/P-slug/ (projections)"]
   end
@@ -45,30 +45,30 @@ flowchart LR
 
 | Plane | Location | Holds | Written by |
 | --- | --- | --- | --- |
-| Declared | `.keel/` in the repository | Governance documents, living specs, promoted ADRs, the architecture model, committed signature envelopes, archived projections | Board edits (effective once signed and committed by a Steward governance commit); the land archive commit; seats only for in-flight proposal files on the proposal branch |
+| Declared | `.keel/` in the repository | Governance documents, living specs, promoted ADRs, the architecture model, committed approval records, archived projections | Board edits (effective once approved and committed by a Steward governance commit); the land archive commit; seats only for in-flight proposal files on the proposal branch |
 | VCS-embedded | git commits and refs | Trailers on Steward commits, claim locks, shadow snapshots, optional git notes | The Steward only |
 | Local control plane | `$(git rev-parse --git-common-dir)/keel/` (`.git/keel/` in a normal clone) | The ledger, in-flight records, compiled briefs, run records, conformance results, derived caches, locks | The Steward only |
 
 ### Declared plane
 
 The declared plane is `.keel/`, committed with the code, schema-validated and reviewed like code. It holds
-`config.yaml`, `charter.md`, `goals.yaml`, `routing.yaml`, `policies/`, `board/allowed_signers`,
-`signatures/`, `specs/`, `decisions/`, `arch/` and `archive/`. The full layout and the schema of each file
+`config.yaml`, `charter.md`, `goals.yaml`, `routing.yaml`, `policies/`, `approvals/`, `specs/`,
+`decisions/`, `arch/` and `archive/`. The full layout and the schema of each file
 are in [13-artifacts-schemas.md](13-artifacts-schemas.md).
 
 Write rules:
 
 - Living specs (`.keel/specs/<area>/spec.yaml`), the architecture model (`.keel/arch/`) and promoted ADRs
   (`.keel/decisions/`) change only through the land archive commit.
-- Governance documents (charter, goals, routing, policies, allowed signers) reach trunk only through a
-  Steward governance commit, made by `keel approve --doc <path>` after the Board signs.
+- Governance documents (charter, goals, routing, policies) reach trunk only through a Steward governance
+  commit, made by `keel approve --doc <path>` after the Board views the diff and confirms.
 - In-flight proposal files (`.keel/proposals/<P>-<slug>/...`) exist only on the proposal branch
   `keel/<P>/main`, authored in the planning worktree. Approvals bind their normalized blob hashes at a
   specific commit of that branch.
-- Signature envelopes are committed as soon as they are signed ([02-alignment.md](02-alignment.md)): a
-  proposal's contract, plan and request envelopes and its rulings on `keel/<P>/main` (they reach trunk with
-  the archive commit), document, policy and receipt envelopes on trunk, and the land envelope in the
-  archive commit.
+- Approval records are committed as soon as they are written ([02-alignment.md](02-alignment.md)): a
+  proposal's contract, plan and request records and its rulings on `keel/<P>/main` (they reach trunk with
+  the archive commit), document, policy and receipt records on trunk, and the land record in the archive
+  commit.
 - Task and verify worktrees are sparse and exclude `/.keel/proposals/` (see [05-vcs.md](05-vcs.md)), so
   proposal files are absent from seat worktrees. A seat sees only its compiled brief or review packet
   ([02-alignment.md](02-alignment.md)).
@@ -112,8 +112,8 @@ Properties of this location:
   OS write boundary, which on native Windows is most of them. `keel doctor` reports
   `control_plane_exposure` (`sandboxed` or `exposed`) per runtime and OS, and every receipt carries it.
 
-Integrity therefore rests on the hash chain, committed signatures, capture at ingest and land
-re-execution, not on seats being unable to reach the directory. [14-trust-security.md](14-trust-security.md)
+Integrity therefore rests on the hash chain, committed approval records checked against current content,
+capture at ingest and land re-execution, not on seats being unable to reach the directory. [14-trust-security.md](14-trust-security.md)
 states the limits.
 
 Seats write only through their submit channel (final message, MCP `keel_submit`, or the run outbox;
@@ -170,7 +170,7 @@ illustrative.
 | `prev` | Hash of the previous event in the chain. |
 | `ts` | RFC 3339 timestamp. |
 | `type` | Event type from the union in the schema, for example `proposal.created`, `track.decided`, `ack.recorded`, `ruling.made`, `question.asked`, `result.submitted`, `vcs.op` (a ref or commit change the Steward made), `land.completed`. |
-| `actor` | Who acted: `kind` (Board, Steward or seat), and for seats the seat, runtime, declared family, profile alias and run. The family is the Board-signed declaration from routing, never a verified fact. |
+| `actor` | Who acted: `kind` (Board, Steward or seat), and for seats the seat, runtime, declared family, profile alias and run. The family is the Board-approved declaration from routing, never a verified fact. `board` appears only on events `keel approve` writes; the field alone makes nothing an approval. |
 | `subject` | The id the event is about (`P`, `P.Tn`, `R-...`, `el:...`, ...). |
 | `refs` | Hash and version bindings: brief, prompt (PG), contract hash, charter version, commit, tree, and the jj operation id when jj is enabled. |
 | `data` | Type-specific payload, restricted by the typed-field whitelist (section "Redaction and field whitelist"). |
@@ -203,15 +203,18 @@ moves the anchor makes a ref change, and `refs/keel` is part of the pre-spawn re
 ([05-vcs.md](05-vcs.md)).
 
 Window check at ingest. While a seat runs, only its supervising Steward process (the `keel run` process
-that spawned it; `keel run <P> --wave` supervises every run of a wave) appends to the ledger. Other
-mutating verbs wait for the supervisor lock `<git-common-dir>/keel/locks/supervisor.lock`, except
-`keel approve`, whose events are Board-signed envelopes that verify themselves. The supervisor keeps the
-ids and hashes of its own appends in memory. At the ingest of every run, after the seat's process tree has
-ended, it walks the events appended during the run window: each must be one of its own appends or a
-Board-signed approval whose envelope verifies. Any other event, and any anchor move that does not match,
-is unexplained: the run is `blocked(reserved_op)` (`submit.reserved-op`), and the Board sees the foreign
-events. A later process therefore trusts events that were appended in a verified window or while no seat
-ran.
+that spawned it; `keel run <P> --wave` supervises every run of a wave) appends to the ledger. Every other
+mutating verb, `keel approve` included, waits for the supervisor lock
+`<git-common-dir>/keel/locks/supervisor.lock`; there is no exception, because an approval record no
+longer verifies itself. A Board member who runs `keel approve` while a wave is in flight is told which run
+holds the lock and that the approval is recorded once the window ends. The supervisor keeps the ids and
+hashes of its own appends in memory. At the ingest of every run, after the seat's process tree has ended,
+it walks the events appended during the run window: each must be one of its own appends. Any other event,
+an `approval.recorded` included, and any anchor move that does not match, is unexplained: the run is
+`blocked(reserved_op)` (`submit.reserved-op`), and the Board sees the foreign events. A later process
+therefore trusts events that were appended in a verified window or while no seat ran, and an approval
+record is authority only together with an `approval.recorded` event appended that way
+([02-alignment.md](02-alignment.md)).
 
 How a lock left behind by a crashed process is recovered is an M1a implementation detail. The rule it
 must keep is that no append happens without re-verifying the tail against the anchor.
@@ -220,16 +223,18 @@ must keep is that no append happens without re-verifying the tail against the an
 
 - `keel audit` verifies the whole chain on its default pass. A negative control edits one event and must
   see `chain-break`.
-- Every Board envelope includes the chain head at signing time (`ledger_chain_head`,
-  [02-alignment.md](02-alignment.md)). An edit to any event before a signed head is therefore detectable,
-  even by someone who recomputes every later hash, because the signed head no longer appears in the chain.
+- Every approval record includes the chain head at recording time (`ledger_chain_head`,
+  [02-alignment.md](02-alignment.md)). An edit to any event before a recorded head is therefore detectable
+  by someone who recomputes only the later hashes, because the recorded head no longer appears in the
+  chain. This is a consistency check: a writer that also rewrites the records is not detected, and that
+  actor is out of scope ([14-trust-security.md](14-trust-security.md)).
 - The chain alone does not prevent a writer with file access from appending forged events after the last
-  signed head. The anchor and the window check at ingest close that path for seats; claim state is
+  recorded head. The anchor and the window check at ingest close that path for seats; claim state is
   re-derived and cross-checked, verdicts are captured at ingest, and land re-executes acceptance instead of
   trusting records ([11-verification.md](11-verification.md)). The residual limit, a process that outlives
   its run window, is stated in [14-trust-security.md](14-trust-security.md).
 
-The ledger is local to one machine in v1. Other clones see committed signature envelopes and land
+The ledger is local to one machine in v1. Other clones see committed approval records and land
 projections; multi-machine collaboration is an open decision
 ([17-open-decisions.md](17-open-decisions.md)).
 
@@ -274,15 +279,15 @@ the record's normalized bytes.
 | `VD` | Lens verdict | The verdict as captured at ingest |
 | `TR` | Triage record | The planner's triage record |
 | `IM` | Impact record | Predicted or actual impact ([07-architecture-intelligence.md](07-architecture-intelligence.md)) |
-| `AP` | Approval | A Board-signed envelope |
+| `AP` | Approval | An approval record written by `keel approve` |
 | `AM` | Amendment | An amendment record derived from git |
 | `OV` | Override | A Board override (waivers are overrides) |
 | `RL` | Ruling | A seat or Board ruling |
 | `Q` | Question | An ask |
 
 Hashes that are not ids (`contract_hash`, `rev_hash`, `workorder_hash`, `source_tree`, `env_fp`, the chain
-hashes) are full lowercase sha256 values. Signature envelopes are stored as
-`.keel/signatures/<blob-sha256>.<kind>.json`.
+hashes) are full lowercase sha256 values. Approval records are stored as
+`.keel/approvals/<record-sha256>.<kind>.json`.
 
 ## Steward commits and trailers
 
@@ -294,7 +299,7 @@ touching the seat's work is in [05-vcs.md](05-vcs.md). There are three kinds:
 | --- | --- | --- |
 | Round commit | `keel/<P>/t/<n>`, one per submit round `<P>.T<n>.r<k>` | Round trailers |
 | Governance commit | trunk, made by `keel approve --doc <path>` | `Keel-Doc`, `Keel-Approval` |
-| Archive commit | `keel/<P>/main` at land, then trunk | `Keel-Doc` (the archived `receipt.md`), `Keel-Approval` (the land approval, or on a policy land the signed request) |
+| Archive commit | `keel/<P>/main` at land, then trunk | `Keel-Doc` (the archived `receipt.md`), `Keel-Approval` (the land approval, or on a policy land the approved request) |
 
 Round trailers:
 
@@ -363,7 +368,7 @@ Inside the range, every commit must be one of the three Steward commit kinds abo
 `untraced-commit`. A human commit after the epoch is adopted explicitly, in one of two ways:
 
 - through the patch track, so the change gets a proposal, a round and trailers; or
-- through a signed `keel approve <commit> --rule override --quote "..."`, which records the commit and the
+- through an approved `keel approve <commit> --rule override --note "..."`, which records the commit and the
   reason in an `OV` record.
 
 The walk, for each requirement in scope:
@@ -379,14 +384,14 @@ flowchart RL
   evidence["EV at head"] --> tests
   verdict["VD bound to commit + contract_hash"] --> round
   element["element el:..."] -- "realized_in" --> req
-  approval["AP / OV / RL (signatures, rulings)"] --> task
+  approval["AP / OV / RL (approvals, rulings)"] --> task
 ```
 
 `keel trace <file:line|symbol|commit|R-...|G-...|P-...|el:...>` walks the same graph from any node:
 
 1. blame (`git blame`, or `jj file annotate` on the jj backend; verify by probe) gives the commit;
 2. trailers give the round, task, ACC and requirements, then the goal;
-3. ledger records give evidence, verdicts, signatures and rulings;
+3. ledger records give evidence, verdicts, approvals and rulings;
 4. path lift gives the element, its owner, obligations and rules
    ([07-architecture-intelligence.md](07-architecture-intelligence.md)).
 
@@ -430,9 +435,9 @@ Trace drift classes:
 | `realization-mismatch` | The elements that covering commits touch differ from the requirement's `realized_in` | Fails the trace check; shared with architecture drift |
 | `citation-drift` | An ADR's symbol citation or anchor no longer matches the code | The decision's acceptance is void until re-accepted |
 | `charter-lag` | An artifact stamped with an older `charter_version` | The frame gate flags a MAJOR or MINOR lag |
-| `unsigned-approval` | A governance document or checkpoint without a valid envelope | Dispatch or land refuses |
+| `missing-approval` | A governance document or checkpoint without a valid approval: no record, no `approval.recorded` event, a subject mismatch, a bound artifact whose current hash differs from the record, a superseding amendment or an expiry | Dispatch or land refuses; the item returns to the Board with the change shown |
 | `unacknowledged-receipt` | A policy land whose receipt the Board has not acknowledged | Blocks the next change touching the same elements, or the same path globs when unmapped |
-| `chain-break` | The ledger chain does not verify | Board item; approvals whose signed head is not on the verified chain fail |
+| `chain-break` | The ledger chain does not verify | Board item; approvals whose recorded head is not on the verified chain fail |
 
 The first seven are the classes the trace check fails on. The consequences for gates are catalogued in
 [11-verification.md](11-verification.md); the architecture drift classes are in
@@ -447,7 +452,7 @@ reaches trunk). The archive commit:
 - promotes accepted proposal ADRs to `.keel/decisions/`;
 - appends one series point to `.keel/arch/series.jsonl`
   ([07-architecture-intelligence.md](07-architecture-intelligence.md));
-- commits the land approval envelope under `.keel/signatures/`;
+- commits the land approval record under `.keel/approvals/`;
 - moves the proposal folder to `.keel/archive/<yyyy>/<P>-<slug>/` and writes the projections next to it.
 
 ```text
@@ -459,14 +464,14 @@ reaches trunk). The archive commit:
   triage/                TR-<sha12>.json
   reports/               impact, drift and trace reports
   receipt.json           machine-readable receipt
-  receipt.md             the receipt the Board read and signed
+  receipt.md             the receipt the Board read and approved
 ```
 
 Rules for projections:
 
-- They are durable, shareable history and are never trusted as input. Signatures are re-verified from
-  `.keel/signatures/`, and evidence is re-executed, never read back from an archive.
-- `receipt.md` is never edited after signing. The signed draft names the integrated commit and the expected
+- They are durable, shareable history and are never trusted as input. Approvals are re-checked from
+  `.keel/approvals/` and the ledger, and evidence is re-executed, never read back from an archive.
+- `receipt.md` is never edited after the land approval. The approved draft names the integrated commit and the expected
   trunk tip; the landed sha goes into the `land.completed` ledger event, which avoids a receipt that has to
   name its own commit.
 - The archive commit touches only `.keel/**`, and the source tree hash excludes `.keel/**`

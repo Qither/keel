@@ -205,12 +205,12 @@ actions:
       - pretooluse-hook
       - env-hardening
 
-  - id: board-signature
-    summary: Produce or relay a Board signature (ssh-keygen -Y sign with a Board key). SSH_AUTH_SOCK and KEEL_BOARD_* never reach a seat.
+  - id: board-approval
+    summary: Produce, relay or record a Board approval (running keel approve, or writing under .keel/approvals/). Approvals come only from a Board member at an interactive terminal outside any keel run.
     stop_class: security_sensitive
     patterns:
-      - ssh-keygen -Y sign
-      - ssh-add
+      - keel approve
+      - .keel/approvals/
     detect:
       - tool-events
     prevent:

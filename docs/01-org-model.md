@@ -19,7 +19,7 @@ reviewers ([07-architecture-intelligence.md](07-architecture-intelligence.md)).
 
 ```mermaid
 flowchart TB
-  Board["Board: humans with ssh signing keys"]
+  Board["Board: humans who confirm shown changes"]
   subgraph Steward["Steward: keel core, deterministic, never calls a model"]
     direction LR
     compiler --- dispatcher --- runner --- integrator --- cartographer --- auditor
@@ -29,7 +29,7 @@ flowchart TB
     product --- architect --- planner --- engineer --- reviewer
   end
   Repo[("git repository and ledger")]
-  Board -- "keel approve: signed envelopes" --> Steward
+  Board -- "keel approve: approval records" --> Steward
   Steward -- "briefs, sparse worktrees, per-run config" --> Seats
   Seats -- "ACK, rulings, asks, results: data, never authority" --> Steward
   Steward -- "commits, gates, land, ledger events" --> Repo
@@ -56,7 +56,7 @@ A seat contract lists:
 - the independence rule;
 - the assumption the seat encodes, so that a seat can be retired with evidence.
 
-At dispatch, the Steward resolves a route {runtime, profile alias, tier} for the seat from the Board-signed
+At dispatch, the Steward resolves a route {runtime, profile alias, tier} for the seat from the Board-approved
 `.keel/routing.yaml`. The route is frozen into the run record together with the route's exposure profile and
 the seat's conformance status. A route that fails the seat's exposure rule is refused with
 `blocked(runtime_unavailable)`; there is no acknowledgement path around it
@@ -69,45 +69,48 @@ Coordination is deterministic: consumes/produces edges between artifacts, a task
 Borrowed from: MetaGPT (roles as typed subscribers to artifact kinds), BMAD-METHOD (ticket DAG), Paperclip
 (atomic checkout where a conflict is final).
 
-## Board powers and the four stage signatures
+## Board powers and the four stage approvals
 
-The Board is one or more humans identified by ssh signing keys in `.keel/board/allowed_signers`. The root
-signer's fingerprint is pinned in the signed charter, and `keel init` records trust on first use with a
-quoted consent. Changes to `allowed_signers` must be signed by an existing signer.
+The Board is one or more humans who run `keel approve` at an interactive terminal, view the shown change
+and confirm it explicitly. Each approval is recorded with the subject, the content hashes, the declared
+approver name and the local time ([02-alignment.md](02-alignment.md)); there is no signer list, key or
+account system, and the approver name is a declared identity, not an authenticated one
+([14-trust-security.md](14-trust-security.md)).
 
 The Board alone does the following, all through `keel approve`:
 
-- **Signs documents**: charter, goals, routing (including each alias's declared family) and
-  `allowed_signers`, with `keel approve --doc <path>`, and standing policies with
-  `keel approve --policy <name>` (envelope kind `policy`). Each reaches trunk as a Steward governance commit
-  carrying `Keel-Doc` and `Keel-Approval` ([04-trace-and-state.md](04-trace-and-state.md)).
-- **Signs policy-path requests**: `keel new --policy <name>` makes the Board sign the verbatim request, one
-  touch ([02-alignment.md](02-alignment.md)).
-- **Signs the four stage checkpoints** (table below).
+- **Approves documents**: charter, goals and routing (including each alias's declared family), with
+  `keel approve --doc <path>`, and standing policies with `keel approve --policy <name>` (record kind
+  `policy`). Each reaches trunk as a Steward governance commit carrying `Keel-Doc` and `Keel-Approval`
+  ([04-trace-and-state.md](04-trace-and-state.md)).
+- **Approves policy-path requests**: `keel new --policy <name>` shows the Board the verbatim request and
+  records its approval, one confirmation ([02-alignment.md](02-alignment.md)).
+- **Approves the four stage checkpoints** (table below).
 - **Issues every Board ruling** with `keel approve <subject> --rule <kind>` (table below).
 - **Authorizes reserved actions**, such as pushing to a shared remote ([05-vcs.md](05-vcs.md)).
 - **Sets every provider endpoint, key and model name** in its own environment, outside keel.
 
-The Board may not approve through an agent or a relayed message, sign an artifact whose current hash
-differs from the one presented, sign with a key loaded in an ssh-agent (unless it is a FIDO2 `-sk` key), or
-expose provider values to keel or to any assistant. No seat reviews the Board; the auditor module reports
-unsigned, expired and stale items, unacknowledged receipts and agent-loadable signer keys.
+The Board may not approve through an agent or a relayed message, approve an artifact whose current hash
+differs from the one presented (keel refuses to record such a confirmation), or expose provider values to
+keel or to any assistant. No seat reviews the Board; the auditor module reports unapproved, invalidated,
+expired and stale items and unacknowledged receipts.
 
 ### Checkpoint stages
 
 | Stage | Binds | Required | Blocking |
 | --- | --- | --- | --- |
 | contract | The frozen intent plus `spec.delta.yaml` (plus `arch.delta.yaml` on system), as `contract_hash`; the `keel/<P>/main` commit; the ledger chain head | patch without a policy path, feature, system | Yes |
-| plan | `plan.yaml`, the work orders, `routing.snapshot.yaml` and the budget | Always on system; on feature only when a wave is wider than 1 or routing deviates from the signed routing; never on patch | Yes |
+| plan | `plan.yaml`, the work orders, `routing.snapshot.yaml` and the budget | Always on system; on feature only when a wave is wider than 1 or routing deviates from the approved routing; never on patch | Yes |
 | land | The receipt draft, which names the integrated commit and the expected trunk tip, and the chain head | feature and system; on patch, as the land policy says | Yes on feature and system |
 | receipt | Acknowledgement of the receipt of a change that landed under a standing policy | After every policy land | No, but an unacknowledged receipt blocks the next change that touches the same elements, or the same path globs when the paths are unmapped |
 
-The envelope format and how signatures are verified are in [02-alignment.md](02-alignment.md). What the
-Board reads at each stage is in [00a-owner-guide.md](00a-owner-guide.md).
+The record format and how the Steward checks approvals are in [02-alignment.md](02-alignment.md). What
+the Board reads at each stage is in [00a-owner-guide.md](00a-owner-guide.md).
 
-`keel approve` requires interactive confirmation: a TTY, or a typed confirmation code under Git Bash mintty.
-It refuses under `KEEL_RUN` or `KEEL_RUN_ID`, exits 6 while any allowed signer key is agent-listed and is not
-`-sk`, and needs the key's passphrase or a hardware touch ([14-trust-security.md](14-trust-security.md)).
+`keel approve` shows the change first, then requires an explicit confirmation: the confirmation word at a
+TTY, or a shown confirmation code under Git Bash mintty. It refuses under `KEEL_RUN` or `KEEL_RUN_ID` and
+under a keel-run ancestor, waits for the supervisor lock while a seat runs, and refuses to record a
+confirmation whose subject changed while it was on screen ([14-trust-security.md](14-trust-security.md)).
 
 ### Board rulings
 
@@ -122,11 +125,11 @@ It refuses under `KEEL_RUN` or `KEEL_RUN_ID`, exits 6 while any allowed signer k
 | `--rule unverified` | Accept, per change, a judge seat whose conformance status is unverified | `RL-` |
 | `--rule abandon` | Abandon a proposal | `RL-` |
 
-Waivers are overrides; there is no separate waiver record. Every ruling is a signed envelope and a ledger
+Waivers are overrides; there is no separate waiver record. Every ruling is an approval record and a ledger
 event.
 
-Borrowed from: old-coder (quotable consent), superpowers (approval binds only the presented artifact),
-edikt (expiring overrides; idea only), OpenSSH (`ssh-keygen -Y`, `allowed_signers`, FIDO2 `-sk` keys).
+Borrowed from: old-coder (consent bound to a version), superpowers (approval binds only the presented
+artifact), edikt (expiring overrides; idea only).
 
 ## Steward modules (not employees)
 
@@ -138,24 +141,24 @@ tool-less review lenses, is a separate child process that the Steward spawns lik
 | Module | Responsibilities |
 | --- | --- |
 | compiler | Mints ids; normalizes and hashes artifacts; computes `contract_hash`; compiles briefs and the PG hash; recompiles at submit and at each gate ([02-alignment.md](02-alignment.md)) |
-| dispatcher | Resolves signed routing, compatibility, the exposure rule and conformance status; acquires claims; creates sparse worktrees; snapshots refs before each spawn; spawns runtimes headless with per-run config; ingests submit-channel drops |
+| dispatcher | Resolves approved routing, compatibility, the exposure rule and conformance status; acquires claims; creates sparse worktrees; snapshots refs before each spawn; spawns runtimes headless with per-run config; ingests submit-channel drops |
 | runner | Runs declared commands in clean sparse detached checkouts; records evidence; produces red/green proofs; re-executes the full acceptance matrix at land ([11-verification.md](11-verification.md)) |
 | integrator | Makes every commit, with trailers; restacks task rounds; previews integration; writes the archive commit; updates trunk by ff-only or CAS ([05-vcs.md](05-vcs.md)) |
 | cartographer | Classifies the track and recomputes it at submit; queries the IndexProvider; computes impact and drift; compiles element briefs ([07-architecture-intelligence.md](07-architecture-intelligence.md)) |
-| auditor | Keeps the hash-chained ledger and verifies the chain; checks liveness; sweeps leases and overrides; runs the trace check; reports unsigned, expired or stale items and agent-loadable signer keys ([04-trace-and-state.md](04-trace-and-state.md)) |
+| auditor | Keeps the hash-chained ledger and verifies the chain; checks liveness; sweeps leases and overrides; runs the trace check; reports unapproved, invalidated, expired or stale items ([04-trace-and-state.md](04-trace-and-state.md)) |
 
 The Steward may:
 
 - write the control plane `.git/keel/**` as its sole writer;
 - create and remove keel-provenance worktrees and refs under `refs/keel/*`;
-- commit on `keel/*` branches, and CAS-update trunk after a verified land approval or a signed land policy;
+- commit on `keel/*` branches, and CAS-update trunk after a verified land approval or an approved land policy;
 - run declared commands in detached verify checkouts;
 - run read-only `git ls-remote` against configured remotes.
 
 The Steward may not:
 
 - call any LLM in its own process;
-- approve, or accept an unsigned, invalid or agent-key-signed approval;
+- approve, or accept as an approval anything that `keel approve` did not record (a seat's claim, a file, a ledger line) or whose bound content has changed;
 - auto-resolve conflicts (`-X ours` or `-X theirs`) or rewrite landed history;
 - open provider, credential or shared settings files, or dereference environment values outside
   `src/providers/env-policy.ts` and the direct lane's request builder.
@@ -203,7 +206,7 @@ answers requirement asks, and runs spikes, which produce `answer.md`.
   planning worktree from its result); read code, specs, element pages and predicted impact;
   `keel api ack|ask|rule|submit`.
 - May not: edit source or tests; edit the frozen block after contract approval except through an amendment
-  the Board re-signs; write living specs; approve anything.
+  the Board approves again; write living specs; approve anything.
 - Reviewed by: the frame gate, a spec lens from a different declared family, and the Board at contract
   approval.
 - Suggested runtimes: claude-code (plan mode, submit via `--json-schema`), codex (`-s read-only`, submit via
@@ -280,8 +283,8 @@ Every artifact and field has exactly one writer. Everything else reads.
 | Artifact | Sole writer |
 | --- | --- |
 | Living specs `.keel/specs/**`, arch model `.keel/arch/{model.yaml, rules.yaml, baseline.json}`, promoted ADRs `.keel/decisions/**` | The land archive commit (Steward), from approved deltas |
-| Charter, goals, routing, policies, `allowed_signers` | The Board (edits take effect only once signed and committed through a governance commit) |
-| Signature envelopes `.keel/signatures/**` | The Board through `keel approve`; committed by the Steward |
+| Charter, goals, routing, policies | The Board (edits take effect only once approved and committed through a governance commit) |
+| Approval records `.keel/approvals/**` | The Board through `keel approve`; committed by the Steward |
 | `proposal.yaml` (intake signals only) | Steward |
 | `intent.md`, `spec.delta.yaml` | product content, written from its result by the Steward |
 | `arch.delta.yaml`, proposal `decisions/ADR-*.md` | architect content, written from its result by the Steward |
@@ -297,7 +300,7 @@ Every artifact and field has exactly one writer. Everything else reads.
 | Shared runtime settings and provider values | The user only; keel never reads or writes them |
 
 The track, claim leases and heartbeats are ledger events, not file fields. `receipt.md` is never edited after
-signing.
+the land approval.
 
 ## Escalation path, four stop classes, remedy ladder
 
@@ -367,10 +370,10 @@ loop), Paperclip (budgets that warn at 80% and stop at 100%, never silently swit
 There is one right-sizing axis, the track ([03-lifecycle.md](03-lifecycle.md)). The lens sets are defined
 in `org/seats/reviewer.yaml` and explained in [11-verification.md](11-verification.md).
 
-| Track | Seats | Review | Board checkpoints | Typical Board touches |
+| Track | Seats | Review | Board checkpoints | Typical Board confirmations |
 | --- | --- | --- | --- | --- |
 | spike | product (read-only, scratch worktree) | none | none; no land | 0 |
-| patch | engineer; product only when new ACC are needed | the `patch` lens set (one lens), or the `policy` set (two lenses) on a policy land | contract (or a signed request on the policy path); land per land policy; receipt acknowledgement after a policy land | 1 to 2 |
+| patch | engineer; product only when new ACC are needed | the `patch` lens set (one lens), or the `policy` set (two lenses) on a policy land | contract (or an approved request on the policy path); land per land policy; receipt acknowledgement after a policy land | 1 to 2 |
 | feature | product, planner, 1..N engineers, the Steward | frame: `frame` set; plan: `plan` set; build: `quick` set; all on a different declared family | contract, land; plan only when a wave is wider than 1 or routing deviates | 2 |
 | system | product, architect, planner, 1..N engineers, the Steward | frame: `frame_system` set; plan: `plan` set; build: `thorough` set with a frontier intent auditor | contract (with arch delta and failure model), plan (always), land | 3 |
 
@@ -389,7 +392,7 @@ must echo and who checks it, never by a name, a backstory or a department.
   models mis-assigning and dropping work, so keel's routing, claims and state transitions are code
   ([KP-04](00-vision.md#kp-04-control-is-code-production-is-llm)).
 - **Departments without mechanisms are noise.** Every organizational element keel keeps has an enforcement
-  point: a writable glob, an ACK id set, a gate or a signature.
+  point: a writable glob, an ACK id set, a gate or an approval record.
 - **Seats must be retirable.** Each contract records the assumption it encodes (for example, that a separate
   planner catches coverage gaps an engineer would miss), so a seat, a lens or a review layer can be removed
   when measured yield does not justify it.

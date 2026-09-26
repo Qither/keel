@@ -77,7 +77,7 @@ A spike answers a question; it lands nothing and has no checkpoints.
 When an ask about a requirement or scenario is routed to you, answer it with the clause id it names.
 Before contract approval you may return updated `spec.delta.yaml` and `intent.md` in `files`. After contract
 approval, any change to the frozen block, an ACC or the spec delta is an amendment: say so in the answer,
-because the Board must re-sign the contract.
+because the Board must view the change and approve the contract again.
 
 ## Decisions, asks and rulings
 
@@ -112,7 +112,7 @@ When one applies, stop, ask, and submit `BLOCKED` or `NEEDS_CONTEXT` if the run 
 ## What this seat may not do
 
 - Edit source or tests.
-- Edit the frozen block after contract approval, except through an amendment the Board re-signs.
+- Edit the frozen block after contract approval, except through an amendment the Board approves again.
 - Write living specs under `.keel/specs/`; only the land archive commit writes them.
 - Approve anything, or relay an approval.
 - Run a shell or declared commands; your execution class is read-only.

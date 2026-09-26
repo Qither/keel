@@ -16,9 +16,9 @@ M0 不提供任何测试，也不提供产品代码。它提供的是这份计�
 
 | 层次 | 覆盖内容 | 到位时间 | 运行位置 |
 | --- | --- | --- | --- |
-| 骨架校验 | schema 编译；示例和夹具通过校验；严格子集；双语文档；D2、P1 和 D1 审计；docs/13 清单 | M0 | CI（`npm run check`） |
+| 骨架校验 | schema 编译；示例和夹具通过校验；严格子集；双语文档；D2、P1 和 D1 审计；docs/13 清单；参考项目登记表（`references` 检查，P4） | M0 | CI（`npm run check`） |
 | 单元与黄金测试 | 规范化（LF、BOM、NFC）；id 模式；简报编译器的黄金哈希，在 CRLF 和 LF 检出上完全相同；账本规范形式与链验证；提交尾注解析 | M1a | CI |
-| 治理 | 信封构建以及针对临时 `allowed_signers` 的 `ssh-keygen -Y` 验证；拒绝加载在 agent 中的密钥；追溯检查的范围和纪元 | M1b | CI |
+| 治理 | 在临时仓库中用脚本化确认演练批准流程：记录构建、哈希绑定、变更后失效、changed-during-confirmation 拒绝、拒绝伪造的批准、过度失效对照；追溯检查的范围和纪元 | M1b | CI |
 | 端到端 | 在临时仓库中针对回环假服务和回放录制输出流的假运行时二进制运行真实 CLI | M2 起 | CI |
 | 一致性测评管道 | `conformance/scenarios.yaml` 中针对脚本化假服务的管道场景 | M2（完整集合在 M6） | CI |
 | 一致性测评行为 | 在用户的真实路由上运行行为场景，每个至少重复 5 次，并配一个无指引对照 | M6 | 用户，主动开启（`keel doctor --conformance`） |
@@ -64,8 +64,14 @@ M0 不提供任何测试，也不提供产品代码。它提供的是这份计�
 
 | 检查 | 植入的故障 | 固定的失败结果 | 到位时间 |
 | --- | --- | --- | --- |
-| `land.signature` 与 `keel approve` | 一把口令签名者密钥被加载进 ssh-agent（套接字或 Windows agent 管道） | 退出码 6：签名者密钥被加载在 agent 中 | M1b |
-| `land.signature` | 契约批准之后对冻结块做一个字节的编辑 | 契约批准无效 | M1b |
+| 派发、`land.approval`、策略路径的接收 | 主题没有批准记录，或该记录没有 `approval.recorded` 事件 | 受保护的步骤不继续：退出码 3，附 `missing-approval` | M1b |
+| `keel approve` | 对一份文档的脚本化确认 | 记录绑定主题、每个被绑定产物的规范化哈希、声明的批准人（来自 `board.approver` 或 `--as`）和本地时间；账本事件指明该记录 | M1b |
+| `land.approval` | 契约批准之后对冻结块做一个字节的编辑 | 契约批准无效（`missing-approval`：产物已变更） | M1b |
+| `land.approval` | 落地批准之后被编辑过的回执草稿 | 落地被拒绝；草稿被再次呈现 | M1b |
+| `keel approve` | 测试框架在展示与确认按键之间改写了一个被绑定产物 | 拒绝 `changed-during-confirmation`；没有记录，没有事件 | M1b |
+| `frame.approvals` | 文档批准之后一个无关文件被改动，并追加了无关的账本事件 | 批准保持有效（过度失效对照） | M1b |
+| `frame.approvals`、摄入 | 一份写着“已批准”的席位投递、一份带完成声明的结果，以及在没有账本事件的情况下放到 `.keel/approvals/` 下的 JSON 文件 | 没有一个被当作批准接受；派发拒绝；该文件由 `keel doctor --section approvals` 报告 | M1b（投递和文件），M2（摄入） |
+| `keel init`、`keel approve` | 一个没有 SSH 密钥、没有 agent、没有 `SSH_AUTH_SOCK`、没有硬件的临时环境 | 两者都完成；不出现任何密钥、签名者或硬件提示 | M1b |
 | 账本链验证 | 一行被编辑过的账本 | 链断裂 | M1a |
 | `submit.scope` | 一份 `write_set` glob 匹配零个路径的工单 | 零匹配范围 | M2 |
 | `submit.reserved-op` | 植入一次向已配置远端的推送；植入一次分支移动 | 通过 `git ls-remote` 检测到；通过引用快照检测到 | M2 |
@@ -106,11 +112,11 @@ G-03 -> R-notes-4QX7B#S1, #S2 -> P-7F3K9Q#ACC-01, #ACC-02
 - 暴露面画像为 claude-code 和 opencode 显示 `tool_env_exposure: scrubbed`。M0 的描述符还无法产生这一状态：该拼接图假设环境变量清洗能力探测（docs/10-providers.zh-CN.md 第 4 节）已针对这些运行时版本在示例机器上通过。没有它，T1 和 T2 会以 `blocked(runtime_unavailable)` 被拒绝。
 - 归档中有 `receipt.json`、董事会阅读过的渲染后 `receipt.md`，以及回执中列出的每一份 EV 和 VD 记录。`ledger.slice.jsonl` 没有提供：它是 M3 的黄金输出，而完整的账本位于 `git-common-dir/keel/ledger.sample.json`。
 - 提交 id、树、`contract_hash`、`rev_hash`、`source_tree`、`env_fp`、blob 哈希、简报的各章节哈希以及内容寻址 id（`BR`、`PG`、`AP`、`EV`、`VD`、`RL`、`IM`）都是示意值，但在各文件之间保持一致。简报的字节数是真实的。
-- `ledger.sample.json` 是一个 JSON 数组（从 M1 起校验 JSONL）。其中 `prev` 和 `hash` 的链接是真实的：`hash` 是去掉 `hash` 后、对象键排序后的事件紧凑 JSON 的 sha256。每个阶段信封都绑定其 `approval.recorded` 事件之前的链头（该示例提供了契约信封）。当 M1a 固定规范形式时，会用它重新生成这份样例。
-- `.keel/signatures/example.contract.json` 代表账本所指的内容寻址文件 `.keel/signatures/<blob-sha256>.contract.json`；其签名以及示例中的每把密钥都是假的。
+- `ledger.sample.json` 是一个 JSON 数组（从 M1 起校验 JSONL）。其中 `prev` 和 `hash` 的链接是真实的：`hash` 是去掉 `hash` 后、对象键排序后的事件紧凑 JSON 的 sha256。每条阶段记录都引用其 `approval.recorded` 事件之前的链头（该示例提供了契约记录）。当 M1a 固定规范形式时，会用它重新生成这份样例。
+- `.keel/approvals/example.contract.json` 代表账本所指的内容寻址文件 `.keel/approvals/<record-sha256>.contract.json`；示例中的批准人名称是声明的名称 `board-owner`，每个哈希都是示意值。
 - 运行和事件的 ULID 按事件顺序排序；它们的时间部分并非由 `ts` 字段推导而来。
 
-基于它计划的黄金测试（M1a 和 M1b）：简报编译器根据声明文件重现 `workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/inputs/brief.md` 的正文；账本链验证在样例上通过，并在改动一个字符后失败；从 `src/store/tags.ts` 出发的追溯遍历能到达 `G-03`；回执渲染器把 `receipt.json` 和落地信封渲染成归档的 `receipt.md`，其中包括 ACC 到命令的对照表。
+基于它计划的黄金测试（M1a 和 M1b）：简报编译器根据声明文件重现 `workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/inputs/brief.md` 的正文；账本链验证在样例上通过，并在改动一个字符后失败；从 `src/store/tags.ts` 出发的追溯遍历能到达 `G-03`；回执渲染器把 `receipt.json` 和落地批准记录渲染成归档的 `receipt.md`，其中包括 ACC 到命令的对照表。
 
 ## 测试中绝不允许
 

@@ -26,7 +26,7 @@ dereference env values to spawn a runtime or call a provider from the direct lan
      `src/direct/client.ts` (unwrapping an opaque handle from env-policy at call time);
    - keel never persists, prints, logs, hashes or puts a value in argv;
    - a CI lint allows exactly these two modules to reference provider env names or unwrap the handle.
-2. The committed, Board-signed `.keel/routing.yaml` holds names only: per alias a protocol from the common
+2. The committed, Board-approved `.keel/routing.yaml` holds names only: per alias a protocol from the common
    enum, a declared family, an auth mode (`env`, `runtime-login`, `runtime-profile`), env var NAMES
    (defaulting to `KEEL_PROFILE_<ALIAS>_BASE_URL`, `_API_KEY`, `_MODEL_FRONTIER` and so on), and a revision
    the user bumps when the model behind an alias changes.
@@ -46,7 +46,7 @@ dereference env values to spawn a runtime or call a provider from the direct lan
 
 ## Consequences
 
-- The user can change providers without touching committed files beyond the signed alias revision.
+- The user can change providers without touching committed files beyond the approved alias revision.
 - Families are declared by the Board and shown as "declared", never "verified"; keel cannot inspect the
   endpoint.
 - Many native Windows routes will not qualify for code-executing seats; those seats fall to routes with a

@@ -20,7 +20,7 @@
   .opencode/agents/keel-<seat>.md   keel-owned agent files (keel sync)
   .keel/                            declared plane (committed)
     config.yaml  local.yaml (gitignored)  charter.md  goals.yaml  routing.yaml
-    policies/  board/allowed_signers  signatures/  specs/  decisions/  arch/
+    policies/  approvals/  specs/  decisions/  arch/
     proposals/<P>-<slug>/           only on keel/<P>/main until land
     archive/<yyyy>/<P>-<slug>/      projections written by the archive commit
     generated.lock.json
@@ -31,12 +31,11 @@
 | 路径 | 平面 | 格式 | 写入者 | schema |
 | --- | --- | --- | --- | --- |
 | `.keel/config.yaml`（+ `.keel/local.yaml`，已 gitignore） | 声明 | YAML，分层：先是包默认值，然后是团队，然后是个人；表深度合并，按 id 作键的数组整体替换，未知键视为错误 | 董事会（Board）（`local.yaml`：个人，绝不含机密） | `schemas/config.schema.json` |
-| `.keel/charter.md` | 声明 | Markdown + YAML frontmatter | 董事会，签名 | `schemas/charter.schema.json` |
-| `.keel/goals.yaml` | 声明 | YAML | 董事会，签名 | `schemas/goals.schema.json` |
-| `.keel/routing.yaml` | 声明 | YAML，仅名称 | 董事会，签名；没有有效签名时派发会拒绝 | `schemas/routing.schema.json` |
-| `.keel/policies/<name>.yaml` | 声明 | YAML | 董事会，签名 | `schemas/policy.schema.json` |
-| `.keel/board/allowed_signers` | 声明 | OpenSSH allowed_signers | 董事会；变更由现有签名者签名 | 格式由 OpenSSH 确定（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)） |
-| `.keel/signatures/<blob-sha256>.<kind>.json` | 声明 | 带 ssh 签名的 JSON 分离式信封 | `keel approve`；一经签名即由 Steward 提交：提交到主干（文档、策略、回执）、`keel/<P>/main`（契约、计划、请求、裁定），或放入归档提交（落地） | `schemas/approval.schema.json` |
+| `.keel/charter.md` | 声明 | Markdown + YAML frontmatter | 董事会，已批准 | `schemas/charter.schema.json` |
+| `.keel/goals.yaml` | 声明 | YAML | 董事会，已批准 | `schemas/goals.schema.json` |
+| `.keel/routing.yaml` | 声明 | YAML，仅名称 | 董事会，已批准；没有有效的文档批准时派发会拒绝 | `schemas/routing.schema.json` |
+| `.keel/policies/<name>.yaml` | 声明 | YAML | 董事会，已批准 | `schemas/policy.schema.json` |
+| `.keel/approvals/<record-sha256>.<kind>.json` | 声明 | JSON 批准记录（对象、产物哈希、声明的批准人、本地时间、链头） | `keel approve`，在董事会显式确认之后；一经写出即由 Steward 提交：提交到主干（文档、策略、回执）、`keel/<P>/main`（契约、计划、请求、裁定），或放入归档提交（落地） | `schemas/approval.schema.json` |
 | `.keel/specs/<area>/spec.yaml` | 声明 | YAML | 仅由落地（land）归档提交写入 | `schemas/spec.schema.json` |
 | `.keel/decisions/ADR-<5>-<slug>.md` | 声明 | Markdown + frontmatter + `## Obligations` | 在落地时晋升 | `schemas/decision.schema.json` |
 | `.keel/arch/model.yaml`、`rules.yaml`、`baseline.json`、`series.jsonl` | 声明 | YAML、JSON、JSONL | 架构席位在落地时通过 `arch.delta` 写入；Steward 追加 series | `arch-model`、`arch-rules`、`arch-baseline`；`arch-report`（M4 桩） |
@@ -68,6 +67,7 @@ keel/
   .github/workflows/ci.yml          windows-latest and ubuntu-latest, Node 22.13 and 24
   scripts/validate.mjs              the declared D1 tooling exception
   docs/                             design documents, each with a .zh-CN.md mirror; docs/adr/
+  docs/reference-projects.yaml      reference registry for the refresh discipline (P4)
   schemas/                          JSON Schema 2020-12 files and examples.map.json
   src/                              type-only TypeScript
   org/                              seat contracts, reserved actions, checkpoints
@@ -84,7 +84,7 @@ keel/
 
 ## 3. 产物 ↔ schema ↔ 模板/示例
 
-下列表格是仓库清单。每行的第一个单元格列出仓库路径；它们合起来覆盖除 `package-lock.json`（仍然列出）和 `*.zh-CN.md` 镜像（与其英文规范文件列在一起）之外的每个文件。对于示例文件，`validate` 实际检查的绑定是 `schemas/examples.map.json`；这里的“示例”列指明预期的示例。
+下列表格是仓库清单。每行的第一个单元格列出仓库路径；它们合起来覆盖除 `package-lock.json`（仍然列出）和 `*.zh-CN.md` 镜像（与其英文规范文件列在一起）之外的每个文件。对于示例文件，`validate` 实际检查的绑定是 `schemas/examples.map.json`；这里的“示例”列指明预期的示例。`docs/reference-projects.yaml` 是一个位于 `docs/` 下的 YAML 数据文件，由 `examples` 检查按其 schema 校验，并由第 6 节的 `references` 检查交叉核对。
 
 <!-- keel:manifest:start -->
 
@@ -110,7 +110,9 @@ keel/
 | 路径 | 归属内容 |
 | --- | --- |
 | `docs/README.md`, `docs/README.zh-CN.md` | 阅读顺序、文档索引、单一归属表 |
-| `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | 定位、需求映射、原则、术语表、端到端示例 |
+| `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | 所有者声明、约束性编号、优先顺序、刷新纪律 |
+| `docs/reference-projects.yaml` | 参考项目登记表与搜寻记录（P4）；schema `reference-registry` |
+| `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | 定位、设计如何满足纲领、原则、术语表、端到端示例 |
 | `docs/00a-owner-guide.md`, `docs/00a-owner-guide.zh-CN.md` | 所有者的单页指南 |
 | `docs/01-org-model.md`, `docs/01-org-model.zh-CN.md` | 董事会、Steward、席位、所有权、升级、人员配置 |
 | `docs/02-alignment.md`, `docs/02-alignment.zh-CN.md` | 对齐链、简报（brief）、ACK（复述确认）、批准、修订案（amendment）、裁定（ruling） |
@@ -119,13 +121,13 @@ keel/
 | `docs/05-vcs.md`, `docs/05-vcs.zh-CN.md` | Vcs 接口、git 机制、落地情形、保留操作、jj |
 | `docs/06-parallelism.md`, `docs/06-parallelism.zh-CN.md` | 波次（wave）、认领（claim）、Windows 进程模型、集成 |
 | `docs/07-architecture-intelligence.md`, `docs/07-architecture-intelligence.zh-CN.md` | 声明的与派生的架构、搜索、漂移、影响面（impact） |
-| `docs/08-dashboard.md`, `docs/08-dashboard.zh-CN.md` | 只读的原生 HTML 看板（dashboard） |
+| `docs/08-dashboard.md`, `docs/08-dashboard.zh-CN.md` | 只读的 TanStack 看板（dashboard） |
 | `docs/09-runtimes.md`, `docs/09-runtimes.zh-CN.md` | 生成接入面、描述符、进程派生契约、通道、梯级（rung）、一致性测评 |
 | `docs/10-providers.md`, `docs/10-providers.zh-CN.md` | 仅存名称的模型提供方（provider）、暴露规则、协议、假服务 |
 | `docs/11-verification.md`, `docs/11-verification.zh-CN.md` | 门禁（gate）目录、证据（evidence）、评审镜头、发现项（finding）裁决权 |
 | `docs/12-cli-api-mcp.md`, `docs/12-cli-api-mcp.zh-CN.md` | 动词与模式、信封、退出码、api、MCP、钩子 |
 | `docs/13-artifacts-schemas.md`, `docs/13-artifacts-schemas.zh-CN.md` | 本文档 |
-| `docs/14-trust-security.md`, `docs/14-trust-security.zh-CN.md` | 威胁模型、签名卫生、暴露面画像（exposure profile）、局限 |
+| `docs/14-trust-security.md`, `docs/14-trust-security.zh-CN.md` | 威胁模型、批准记录能证明什么、暴露面画像（exposure profile）、局限 |
 | `docs/15-roadmap.md`, `docs/15-roadmap.zh-CN.md` | M0 至 M8 及其退出条件 |
 | `docs/16-sources-credits.md`, `docs/16-sources-credits.zh-CN.md` | 致谢、许可证、来源与形态审计 |
 | `docs/17-open-decisions.md`, `docs/17-open-decisions.zh-CN.md` | 已采纳与待定的决策 |
@@ -133,10 +135,11 @@ keel/
 | `docs/adr/ADR-0002-node-windows-native.md`, `docs/adr/ADR-0002-node-windows-native.zh-CN.md` | Node 内置模块加 `yaml` 和 `ajv`；原生 Windows |
 | `docs/adr/ADR-0003-control-plane-in-git-common-dir.md`, `docs/adr/ADR-0003-control-plane-in-git-common-dir.zh-CN.md` | 控制平面位置、哈希链、如实报告暴露面 |
 | `docs/adr/ADR-0004-steward-commits-and-submit-channels.md`, `docs/adr/ADR-0004-steward-commits-and-submit-channels.zh-CN.md` | 席位从不提交；最终消息、MCP、发件箱 |
-| `docs/adr/ADR-0005-signed-board-approvals.md`, `docs/adr/ADR-0005-signed-board-approvals.zh-CN.md` | `ssh-keygen -Y`、已提交的信封、agent 失败即关闭 |
+| `docs/adr/ADR-0005-explicit-confirmation-approvals.md`, `docs/adr/ADR-0005-explicit-confirmation-approvals.zh-CN.md` | 显式确认批准：展示、确认、重新哈希、记录（D6） |
 | `docs/adr/ADR-0006-provider-values-by-reference.md`, `docs/adr/ADR-0006-provider-values-by-reference.zh-CN.md` | P1 不变量（invariant）与暴露规则 |
 | `docs/adr/ADR-0007-declared-vs-derived-architecture.md`, `docs/adr/ADR-0007-declared-vs-derived-architecture.zh-CN.md` | keel YAML 模型加 IndexProvider 端口 |
-| `docs/adr/ADR-0008-read-only-dashboard.md`, `docs/adr/ADR-0008-read-only-dashboard.zh-CN.md` | 没有第二条批准路径 |
+| `docs/adr/ADR-0008-read-only-dashboard.md`, `docs/adr/ADR-0008-read-only-dashboard.zh-CN.md` | 只读看板、serve 边界、没有第二条批准路径 |
+| `docs/adr/ADR-0009-tanstack-frontend.md`, `docs/adr/ADR-0009-tanstack-frontend.zh-CN.md` | TanStack on React、无头（headless）、预渲染、打包产物（P2） |
 
 ### Schema
 
@@ -150,7 +153,7 @@ keel/
 | `schemas/charter.schema.json` | 章程（charter）frontmatter 与 INV 义务（obligation） | `templates/project/charter.md` | `examples/acme-notes/.keel/charter.md` | stable |
 | `schemas/goals.schema.json` | `.keel/goals.yaml` | `templates/project/goals.yaml` | `examples/acme-notes/.keel/goals.yaml` | stable |
 | `schemas/routing.schema.json` | `.keel/routing.yaml`：配置档、席位、策略 | `templates/project/routing.yaml` | `examples/acme-notes/.keel/routing.yaml` | stable |
-| `schemas/routing-snapshot.schema.json` | 每个提案的 `routing.snapshot.yaml`，在计划批准时签名 | 无（由 Steward 写入） | `examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/routing.snapshot.yaml` | stable |
+| `schemas/routing-snapshot.schema.json` | 每个提案的 `routing.snapshot.yaml`，在需要计划批准时由该计划批准绑定 | 无（由 Steward 写入） | `examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/routing.snapshot.yaml` | stable |
 | `schemas/policy.schema.json` | `.keel/policies/<name>.yaml` | `templates/project/policies/quick-patch.yaml` | `examples/acme-notes/.keel/policies/quick-patch.yaml` | stable |
 | `schemas/seat.schema.json` | `org/seats/*.yaml`，包括执行类别、ACK id 集、评审镜头集、假设 | 无 | `org/seats/*.yaml` | stable |
 | `schemas/reserved-actions.schema.json` | `org/reserved-actions.yaml` | 无 | `org/reserved-actions.yaml` | stable |
@@ -174,7 +177,7 @@ keel/
 | `schemas/verdict.schema.json` | 评审镜头的评审结论（verdict）（严格子集） | `templates/prompts/lens-*.md` | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/verdicts/VD-5b1d2e3f4a6c.json` | stable |
 | `schemas/triage.schema.json` | 规划席位的分诊记录 | 无 | 无 | stable |
 | `schemas/evidence.schema.json` | EV 记录、源状态绑定、红/绿证明 | 无 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/evidence/EV-3a9c0e1b2d4f.json` | stable |
-| `schemas/approval.schema.json` | 已签名信封（stage、doc、policy、request、rule、tofu），包括链头；裁定携带其预算上限或轨道变更 | `templates/project/signatures/README.md` | `examples/acme-notes/.keel/signatures/example.contract.json` | stable |
+| `schemas/approval.schema.json` | 批准记录（stage、doc、policy、request、rule）：对象、产物哈希、备注、声明的批准人、链头、本地时间；裁定携带其预算上限或轨道变更 | `templates/project/approvals/README.md` | `examples/acme-notes/.keel/approvals/example.contract.json` | stable |
 | `schemas/governance-record.schema.json` | 裁定（ruling）、修订案（amendment）和豁免（override）记录，降级（degraded）与未验证确认记录 | 无 | 无 | stable |
 | `schemas/claim.schema.json` | 认领锁令牌与工作区 | 无 | 无 | stable |
 | `schemas/ledger-event.schema.json` | 带 `prev`/`hash` 链的账本事件联合类型 | 无 | `examples/acme-notes/git-common-dir/keel/ledger.sample.json` | stable |
@@ -183,6 +186,7 @@ keel/
 | `schemas/conformance.schema.json` | 链路与行为场景及其结果 | 无 | `conformance/scenarios.yaml` | stub（M6） |
 | `schemas/generated-lock.schema.json` | `.keel/generated.lock.json` | 无 | 无 | stable |
 | `schemas/api-envelope.schema.json` | CLI JSON 信封与诊断（[12-cli-api-mcp.zh-CN.md](12-cli-api-mcp.zh-CN.md)） | 无 | 无 | stable |
+| `schemas/reference-registry.schema.json` | `docs/reference-projects.yaml`（P4 登记表） | 无 | `docs/reference-projects.yaml` | stable |
 
 ### 纯类型 TypeScript
 
@@ -199,7 +203,7 @@ keel/
 | `src/core/ack.ts` | `Ack`、`AckDiff` | M0 |
 | `src/core/gates.ts` | `PhaseGate`、`CheckId`、`CheckResult`、`Readiness`（不含规则值） | M0 |
 | `src/core/evidence.ts` | `EvidenceRecord`、`SourceStateBinding`、`RedGreenProof` | M0 |
-| `src/core/governance.ts` | `SignedEnvelope`、`ChangeRequest`、`Approval`、`Amendment`、`Ruling`、`Override`、`StandingPolicy`、`Signer` | M0 |
+| `src/core/governance.ts` | `ApprovalRecord`、`ChangeRequest`、`Approval`、`ApprovalInvalidity`、`ConfirmationStep`、`Amendment`、`Ruling`、`Override`、`StandingPolicy` | M0 |
 | `src/core/trace-graph.ts` | 追溯节点与边、`RtmRow`、`TraceDriftKind` | M0 |
 | `src/core/liveness.ts` | `LivenessHold`、`TrackRecord` | M0 |
 | `src/org/seats.ts` | `SeatContract`、`ExecutionClass`、`Independence` | M0 |
@@ -274,8 +278,7 @@ keel/
 | `templates/project/goals.yaml` | `.keel/goals.yaml` | `schemas/goals.schema.json` |
 | `templates/project/routing.yaml` | 带占位别名、声明的模型家族（declared family）和环境变量名称的 `.keel/routing.yaml` | `schemas/routing.schema.json` |
 | `templates/project/policies/quick-patch.yaml` | 带红/绿与评审镜头谓词的常设策略（standing policy） | `schemas/policy.schema.json` |
-| `templates/project/allowed_signers.example` | 董事会签名者格式 | OpenSSH allowed_signers |
-| `templates/project/signatures/README.md` | 说明已提交信封的目录 | `schemas/approval.schema.json` |
+| `templates/project/approvals/README.md` | 说明已提交的批准记录目录 | `schemas/approval.schema.json` |
 | `templates/project/arch-model.yaml` | `.keel/arch/model.yaml` | `schemas/arch-model.schema.json` |
 | `templates/project/arch-rules.yaml` | `.keel/arch/rules.yaml` | `schemas/arch-rules.schema.json` |
 | `templates/proposal/proposal.yaml` | 提案受理信号 | `schemas/proposal.schema.json` |
@@ -286,7 +289,7 @@ keel/
 | `templates/proposal/workorder.yaml` | 带 ACC 到命令对照表的工单 | `schemas/workorder.schema.json` |
 | `templates/proposal/decision.md` | 带 `## Obligations` 的 ADR | `schemas/decision.schema.json` |
 | `templates/proposal/answer.md` | spike 答复 | 无（纯文本） |
-| `templates/proposal/receipt.md` | 回执（receipt）：AGENT 章节加渲染出的已签名引文 | `schemas/receipt.schema.json`（JSON 孪生文件） |
+| `templates/proposal/receipt.md` | 回执（receipt）：AGENT 章节加渲染出的 Land approval（落地批准）一节 | `schemas/receipt.schema.json`（JSON 孪生文件） |
 | `templates/runtime/AGENTS.block.md.tmpl` | 托管指针区块 | `schemas/generated-lock.schema.json`（锁条目） |
 | `templates/runtime/CLAUDE.md.tmpl` | `@AGENTS.md` 桥接 | 锁条目 |
 | `templates/runtime/claude-run-settings.json.tmpl` | 每次运行的钩子、允许的工具、拒绝规则 | keel 自有的每次运行文件 |
@@ -321,8 +324,7 @@ keel/
 | `examples/acme-notes/.keel/goals.yaml` | 目标 G-03 | `goals`（yaml） |
 | `examples/acme-notes/.keel/routing.yaml` | 工程席位在 claude-code 上（env），评审席位在 opencode 上且声明的模型家族为 google，GLM 经由 opencode；仅名称 | `routing`（yaml） |
 | `examples/acme-notes/.keel/policies/quick-patch.yaml` | 常设策略 | `policy`（yaml） |
-| `examples/acme-notes/.keel/board/allowed_signers` | 一个假的占位签名者密钥 | OpenSSH 格式（未映射） |
-| `examples/acme-notes/.keel/signatures/example.contract.json` | 带假签名的示意契约信封 | `approval`（json） |
+| `examples/acme-notes/.keel/approvals/example.contract.json` | 带声明的批准人的示意契约批准记录 | `approval`（json） |
 | `examples/acme-notes/.keel/specs/notes/spec.yaml` | 需求（requirement）R-notes-4QX7B | `spec`（yaml） |
 | `examples/acme-notes/.keel/decisions/ADR-7KQ2B-tag-storage.md` | 带 `## Obligations` 的 ADR | `decision`（md-frontmatter） |
 | `examples/acme-notes/.keel/arch/model.yaml` | 架构元素（element） | `arch-model`（yaml） |
@@ -339,12 +341,12 @@ keel/
 | `examples/acme-notes/workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/outbox/0001-ack.json` | 匹配的 ACK 投递文件 | `ack`（json） |
 | `examples/acme-notes/workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/outbox/0002-result.json` | 结果投递文件 | `result`（json） |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.json` | 回执投影 | `receipt`（json） |
-| `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md` | 董事会阅读并签署的回执，由 `receipt.json` 渲染而成，其中的 Signed quote 一节取自落地信封 | 未映射（渲染后的 Markdown） |
+| `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md` | 董事会阅读并批准的回执，由 `receipt.json` 渲染而成，其中的 Land approval（落地批准）一节取自落地记录 | 未映射（渲染后的 Markdown） |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/verdicts/VD-*.json` | 回执中列出的每一份跨家族评审结论：spec、计划阶段的 verification-gap、测试任务的 verification-gap、blind-diff 以及构建阶段的 verification-gap | `verdict`（json） |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/evidence/EV-*.json` | 带源状态绑定的运行器证据：测试任务为红（`verify.test-red`），构建任务为绿 | `evidence`（json） |
 | `examples/acme-notes/commit-message.txt` | 展示全部尾注的 Steward 提交 | `common#/$defs/trailers`（示意文本） |
 | `examples/providers.env.example` | 仅占位变量名称 | 未映射（名称列表） |
-| `examples/dashboard/sample.html` | 静态原生 HTML 模型；M5 外壳与 CSS 延后 | 未映射（HTML） |
+| `examples/dashboard/sample.html` | 手写的静态样稿，展示 M5 TanStack 页面所复现的标记与令牌规则 | 未映射（HTML） |
 
 ### 测试
 
@@ -373,7 +375,7 @@ M0 为 M1 至 M3 的产物提供完整的 schema 和类型，并为 M4 及以后
 M0 中的延后项：
 
 - 桩：`schemas/arch-report.schema.json` 和 `src/arch/*.ts`（M4），`src/dashboard/model.ts`（M5），`schemas/conformance.schema.json` 和 `src/direct/client.ts`（M6），`src/vcs/jj.ts`（M7），`schemas/plan.schema.json` 中的战役计划（M8）；
-- 完全不提供：建议性的 git/jj 垫片和可选的 `commit-msg` 钩子（M2），以及看板（dashboard）HTML 外壳和 CSS（M5；M0 只有 `examples/dashboard/sample.html`）；
+- 完全不提供：建议性的 git/jj 垫片和可选的 `commit-msg` 钩子（M2），以及看板（dashboard）的 TanStack 外壳、CSS 和包构建时的打包产物（M5；M0 只有 `examples/dashboard/sample.html`）；
 - 仅作示意：示例运行中的简报哈希（直到 M1 黄金测试）以及以 JSON 数组形式表示的账本样例（自 M1 起校验 JSONL）。
 
 ## 5. 以数据形式表达的迁移
@@ -382,8 +384,8 @@ schema 会演进；迁移是声明式数据，而绝不是改写历史的代码�
 
 - 每条带版本的记录都携带其 schema 版本：账本事件携带 `v`（见 [04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)），JSON 信封携带 `v`，生成的文件在锁文件中携带其生成器版本。
 - 一次迁移是一条数据记录，指明 `from` 和 `to` 版本、适用的 schema，以及一组字段操作（重命名、带默认值地添加、重映射某个枚举值、删除）。任何迁移都不运行任意代码。
-- 账本行从不被改写，因为哈希链以及已签名信封中的链头会因此断裂。读取者在读取时使用迁移记录对旧事件进行向上转换。
-- 董事会签过名的声明平面文件，通过产生新的字节和新的签名来迁移：Steward 提议迁移后的文件，董事会用 `keel approve --doc` 签名，然后由一次治理提交让它落地。旧签名对旧字节仍然有效。
+- 账本行从不被改写，因为哈希链以及批准记录中的链头会因此断裂。读取者在读取时使用迁移记录对旧事件进行向上转换。
+- 董事会批准过的声明平面文件，通过产生新的字节和新的批准来迁移：Steward 提议迁移后的文件，董事会查看并用 `keel approve --doc` 批准，然后由一次治理提交让它落地。旧记录仍是旧字节的有效历史。
 - 派生数据（`.git/keel/cache/`、`trace.db`、索引）会被重建，从不迁移。
 - M0 不提供任何迁移文件；M1 之后的第一次 schema 变更会引入迁移目录及其 schema。
 
@@ -394,7 +396,7 @@ D1：M0 交付文档和骨架，不含产品逻辑，也没有 `bin`。唯一声
 ```sh
 npm run check                                    # typecheck + validate (what CI runs)
 node scripts/validate.mjs                        # all checks
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
 ```
 
 输出为 `<check>: <passed>/<total> <unit>`，后跟 `x <error>` 行；任何错误都以退出码 1 结束，参数错误以退出码 2 结束。
@@ -407,6 +409,7 @@ node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
 | `i18n` | `docs/` 下的每个 `.md`、根目录 `README.md`、`runtimes/README.md` 以及 `test/README.md` 都有一个标题层级序列完全相同的 `.zh-CN.md` 镜像；没有孤立的镜像 | 翻译质量；其他 Markdown（模板、技能、智能体指南） |
 | `audit` | D2 术语列表（在路径和内容中）、P1 密钥形态标记、真实的模型提供方 API 主机、`docs/**`、`README*.md` 和 `AGENTS.md` 之外的非占位 URL 主机、禁止的凭据文件名；D1：`package.json` 中没有 `bin` 和 `dependencies`，且每个 `src/` 文件都只含纯类型语句 | 含义：一个错误但只使用了允许词汇的设计也会通过 |
 | `manifest` | 第 3 节标记表格中的每个路径都存在，并且除 `package-lock.json` 和 `*.zh-CN.md` 之外的每个仓库文件都被覆盖 | “用途”文本是否准确 |
+| `references` | 解析 `docs/reference-projects.yaml`；每个 `named_by_owner` 为 true 的项目都在 `docs/00-mandate.md` 和 `docs/16-sources-credits.md` 中被点名；`local_clone` 为 null 或仓库之外的相对路径，且从不被打开 | 评审是否真的发生过；上游状态 |
 
 `npm run typecheck`（`tsc --noEmit -p tsconfig.json`）覆盖 TypeScript：strict 模式、NodeNext 模块解析、`verbatimModuleSyntax` 和 `isolatedModules`。它与 `audit` 检查一起强制 `src/` 只包含 `import type`、`export type`、类型别名、接口、`export {}` 和注释。
 

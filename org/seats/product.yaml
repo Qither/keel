@@ -54,7 +54,7 @@ may:
   - ask the clause owner when a question falls outside them
 may_not:
   - edit source or tests
-  - edit the frozen block after contract approval, except through an amendment the Board re-signs
+  - edit the frozen block after contract approval, except through an amendment the Board approves again
   - write living specs (only the land archive commit does)
   - approve anything, or relay an approval
   - run a shell or declared commands (execution class read-only)

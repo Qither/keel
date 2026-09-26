@@ -97,8 +97,6 @@ export type QuestionId = ContentId<"Q">;
  * docs/11-verification.md. The namespace is separate from ledger event types such as `land.completed`.
  */
 export type CheckId = `${Gate}.${string}`;
-/** An OpenSSH SHA256 key fingerprint (`sshFingerprint`). */
-export type SshFingerprint = `SHA256:${string}`;
 
 /** RUN-<ulid> (`runId`). */
 export type RunId = `RUN-${Ulid}`;

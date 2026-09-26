@@ -89,7 +89,7 @@
         "record": { "const": "amendment" },
         "proposal": { "$ref": "common.schema.json#/$defs/proposalId" },
         "original": {
-          "description": "The original frozen text, verbatim from the signed blob.",
+          "description": "The original frozen text, verbatim from the approved blob.",
           "type": "string",
           "minLength": 1
         },
@@ -112,7 +112,7 @@
           "items": { "$ref": "common.schema.json#/$defs/approvalId" }
         },
         "authority": {
-          "description": "The new contract approval that accepts the amendment; null until signed.",
+          "description": "The new contract approval that accepts the amendment; null until the Board approves again.",
           "anyOf": [{ "$ref": "common.schema.json#/$defs/approvalId" }, { "type": "null" }]
         },
         "recorded_at": { "$ref": "common.schema.json#/$defs/isoDateTime" }

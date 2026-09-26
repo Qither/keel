@@ -1,5 +1,5 @@
 /**
- * Board-signed routing: provider profiles by NAME, seat routes, declared families, the resolved route,
+ * Board-approved routing: provider profiles by NAME, seat routes, declared families, the resolved route,
  * protocol compatibility, and the per-proposal routing snapshot.
  *
  * @packageDocumentation
@@ -92,7 +92,7 @@ export interface RoutingPolicy {
   allow_degraded: boolean;
 }
 
-/** `.keel/routing.yaml`, Board-signed; dispatch refuses without a valid signature. */
+/** `.keel/routing.yaml`, Board-approved; dispatch refuses without a valid document approval. */
 export interface RoutingFile {
   profiles: Record<ProfileAlias, ProviderProfile>;
   seats: Partial<Record<Seat, SeatRoute>>;
@@ -126,7 +126,7 @@ export interface CompatibilityVerdict {
 
 /** Why a route cannot be dispatched; every refusal is `blocked(runtime_unavailable)` with this reason. */
 export type RouteRefusal =
-  | "routing-unsigned"
+  | "routing-unapproved"
   | "no-route"
   | "incompatible-protocol"
   | "runtime-missing"
@@ -151,14 +151,14 @@ export interface SnapshotRoute {
   exposure: ExposureProfile;
 }
 
-/** A deviation from the signed routing; on feature it makes plan approval required. */
+/** A deviation from the approved routing; on feature it makes plan approval required. */
 export interface RoutingDeviation {
   seat: Seat;
   tasks: TaskLocalId[];
   reason: string;
 }
 
-/** `.keel/proposals/<P>-<slug>/routing.snapshot.yaml`, written by the Steward, signed with the plan. */
+/** `.keel/proposals/<P>-<slug>/routing.snapshot.yaml`, written by the Steward, bound by the plan approval when one is required. */
 export interface RoutingSnapshot {
   proposal: ProposalId;
   routing: { blob: Sha256; approval: ApprovalId };

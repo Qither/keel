@@ -22,7 +22,7 @@
 | `unknown` | 检查已运行但无法判定，例如索引过期；每项检查都说明如何处理 `unknown` |
 | `waived` | 一项未过期的董事会（Board）豁免（override）（`keel approve <subject> --rule override --until ...`）点名了该检查及其对象 |
 
-只有当每项必需检查都为 `pass` 或 `waived` 时，门禁才通过。`not_run` 绝不显示为 `pass`。验证董事会权威或 P1 的检查（`frame.signatures`、`land.signature`、`land.projection`）不能被豁免。结果是账本事件；看板（dashboard）会分别显示这五种状态。
+只有当每项必需检查都为 `pass` 或 `waived` 时，门禁才通过。`not_run` 绝不显示为 `pass`。验证董事会权威或 P1 的检查（`frame.approvals`、`land.approval`、`land.projection`）不能被豁免。结果是账本事件；看板（dashboard）会分别显示这五种状态。
 
 ```mermaid
 flowchart LR
@@ -37,7 +37,7 @@ flowchart LR
 
 ### gate:frame
 
-在契约检查点之前运行。受理检查（`frame.goal-active`、`frame.charter-current`，以及策略路径上的 `frame.signatures`）在 `keel new` 时也会运行。
+在契约检查点之前运行。受理检查（`frame.goal-active`、`frame.charter-current`，以及策略路径上的 `frame.approvals`）在 `keel new` 时也会运行。
 
 | 检查 | 验证内容 | 失败条件 | 起始里程碑 |
 | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ flowchart LR
 | `frame.acc-coverage` | 每个验收项（ACC）都覆盖 R 或 R#S，并指明可行的证据模式 | ACC 未覆盖或模式不可行 | M1a |
 | `frame.open-questions` | 冻结意图（frozen intent）的 Open questions 列表为空 | 存在任何未决问题 | M1a |
 | `frame.charter-current` | 产物标注的是当前 `charter_version` | 落后一个 MAJOR 或 MINOR 版本 | M1a |
-| `frame.signatures` | 治理文档（章程（charter）、目标、路由、策略、allowed_signers）带有有效签名；在策略路径上，还有董事会签名的请求 | 签名缺失、无效或过期 | M1b |
+| `frame.approvals` | 治理文档（章程（charter）、目标、路由、策略）具有有效的批准：由 `keel approve` 写出的批准记录及其 `approval.recorded` 事件，且当前内容哈希等于记录中的哈希；在策略路径上，还有董事会对逐字请求的请求批准 | 批准缺失，或某个被绑定产物的当前哈希与记录不同 | M1b |
 | `frame.skills-trigger-only` | 技能描述只陈述触发条件 | 某条描述携带了流程内容 | M1a |
 | `frame.budgets` | 提案预算在其目标预算之内；手册预算成立 | 超出预算 | M1a |
 | `frame.arch-to-be` | 在 system 轨道（track）上：目标态（to-be）模型通过 `rules.yaml`；基线（baseline）增长被标记出来供契约审阅 | 出现新的规则违反，或基线增长未被标记 | M4 |
@@ -84,7 +84,7 @@ flowchart LR
 | `submit.frozen-paths` | 未改动 `frozen_tests`、受保护的 glob 或 `.keel/**` | 任何触碰 | M2 |
 | `submit.fake-completion` | 没有 `.skip`、`.only`、`xit`、`it.todo`、经过滤的测试运行、TODO-implement 标记或未实现的桩 | 任何命中 | M3 |
 | `submit.ratchet` | 根据 diff 和影响面重新计算的实际轨道不高于记录的轨道；没有索引时采用路径回退规则 | 轨道更高：`blocked(track_raised)` | M3 |
-| `submit.reserved-op` | ref 快照、工作树（worktree）HEAD、reflog 尾部以及 `git ls-remote` 的差异均干净（使用 jj 时还包括操作日志）；运行窗口期间追加的每个账本事件都是监督进程自己的追加或董事会签名审批，且账本锚点相符（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)） | 任何不是 keel 做出的变化：`blocked(reserved_op)` | M2 |
+| `submit.reserved-op` | ref 快照、工作树（worktree）HEAD、reflog 尾部以及 `git ls-remote` 的差异均干净（使用 jj 时还包括操作日志）；运行窗口期间追加的每个账本事件都是监督进程自己的追加，且账本锚点相符（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)） | 任何不是 keel 做出的变化：`blocked(reserved_op)` | M2 |
 | `submit.provider-path-events` | 没有任何 `tool_use` 事件触及模型提供方（provider）路径集，并且没有任何已变更或未跟踪的工作树路径匹配该路径集、`.env*` 或凭据文件基名（在任何暂存之前的仅名称清单） | 任何触及或匹配；该路径永远不会被暂存 | M2 |
 | `submit.subagent-events` | 构建类席位（seat）没有产生派生子智能体事件 | 任何派生 | M2 |
 | `submit.obligations-cheap` | 低成本的 INV 和 ADR 义务检查 | 某项低成本检查失败 | M3 |
@@ -111,7 +111,7 @@ flowchart LR
 | 检查 | 验证内容 | 失败条件 | 起始里程碑 |
 | --- | --- | --- | --- |
 | `land.trace` | 范围 `merge-base(trunk, keel/<P>/main)..tip` 以及 `trace.since` 之后的历史都能回溯到已批准的需求和目标 | [04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md) 中任何一种漂移类别失败 | M1b 逻辑，M3 门禁 |
-| `land.signature` | 针对回执（receipt）草稿哈希和链头的落地批准，或者一份已签名的落地策略加一份已签名的请求再加红/绿证明；签名者依据最后一次董事会签名的主干修订中的 `allowed_signers` 进行验证；除非是 FIDO2 `-sk` 密钥，否则签名密钥均不得加载在 ssh-agent 中 | 签名缺失或无效；密钥加载在 agent 中（退出码 6） | M1b 逻辑，M3 门禁 |
+| `land.approval` | 一份记录绑定了回执（receipt）草稿哈希的落地批准（且其 `approval.recorded` 事件位于已验证的链上），或者一份已批准的落地策略加一份已批准的请求再加红/绿证明；草稿的当前哈希等于记录中的哈希 | 批准缺失；草稿哈希与记录不同；批准的对象或阶段不匹配 | M1b 逻辑，M3 门禁 |
 | `land.ancestry` | 主干是归档提交的祖先；检出了主干的工作树是干净的 | 不是祖先；检出的主干有未提交改动（退出码 5） | M3 |
 | `land.re-execution` | 在集成提交的全新分离检出上，于进程内重新运行完整的验收矩阵 | 任何失败的行 | M3 |
 | `land.preview` | 集成预览为绿色且无冲突 | 预览为红色或有冲突 | M3 |
@@ -152,7 +152,7 @@ feature 与 system 轨道：
 
 1. ACC 到验收命令及矩阵行的对照表在构建之前就在工单中固定下来。
 2. `frozen_tests` 被排除在构建者的 `write_set` 之外（`plan.test-independence`、`submit.frozen-paths`）。
-3. 缺失的测试会成为一个在不同的声明的模型家族（declared family）上执行、且先落地的测试任务（`test` 类型的工单）。测试任务使用董事会签名的 `seats.engineer.test_route`（[10-providers.zh-CN.md](10-providers.zh-CN.md)）；若未配置，在其他家族上运行测试任务属于路由偏离，需要计划审批。
+3. 缺失的测试会成为一个在不同的声明的模型家族（declared family）上执行、且先落地的测试任务（`test` 类型的工单）。测试任务使用董事会批准的 `seats.engineer.test_route`（[10-providers.zh-CN.md](10-providers.zh-CN.md)）；若未配置，在其他家族上运行测试任务属于路由偏离，需要计划审批。
 4. 在规划门禁上，一个跨家族的 verification-gap 评审镜头检查 ACC 到命令的对照表以及测试任务的定义（`plan.verification-gap`）；此时尚未编写任何测试。
 5. 测试任务由 `verify.test-red`（被引用的行在其提交上为红，其他一切不变）和 `test_task` 评审镜头集来验证：一个 verification-gap 评审镜头在不同于测试任务和规划席位的家族上，阅读冻结测试的输出，判断这些测试能否证明每条 ACC。`verify.evidence` 不适用于测试任务。只有在此之后，测试任务才会落到 `keel/<P>/main` 上，其测试成为构建任务的 `frozen_tests`。
 6. 构建者新增的测试只有在某个 verification-gap 评审镜头通过后才计入验收（`verify.evidence`）。
@@ -197,7 +197,7 @@ feature 与 system 轨道：
 
 独立性：
 
-- 评审席位的声明的模型家族必须按评审镜头逐一与被评审产物作者席位的家族不同：spec 镜头对照产品席位，architecture 镜头对照架构席位，verification-gap 镜头对照规划席位和测试任务，构建阶段的镜头对照工程席位。因此评审席位的 `independent_of` 列出 product、architect、planner 和 engineer（`org/seats/reviewer.yaml`）。家族来自董事会签名的路由（[10-providers.zh-CN.md](10-providers.zh-CN.md)），并在回执、看板和 `verify.review` 中显示为“declared”（声明的）。声明的工程席位家族（构建路由，以及在使用时的测试路由）和评审席位家族是落地信封的一部分。
+- 评审席位的声明的模型家族必须按评审镜头逐一与被评审产物作者席位的家族不同：spec 镜头对照产品席位，architecture 镜头对照架构席位，verification-gap 镜头对照规划席位和测试任务，构建阶段的镜头对照工程席位。因此评审席位的 `independent_of` 列出 product、architect、planner 和 engineer（`org/seats/reviewer.yaml`）。家族来自董事会批准的路由（[10-providers.zh-CN.md](10-providers.zh-CN.md)），并在回执、看板和 `verify.review` 中显示为“declared”（声明的）。声明的工程席位家族（构建路由，以及在使用时的测试路由）和评审席位家族是落地批准记录的一部分。
 - 如果只有一个家族可用，独立性为 `degraded`（降级），每次变更都需要 `keel approve <P> --rule degraded`。评审通道不可用意味着“未批准”，绝不意味着“已跳过”。
 
 一致性测评状态（conformance status）（按席位、运行时、别名和修订号；取值 `verified`、`failed` 或 `unverified`；场景见 [09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)）自 M3 起把关评审：
@@ -253,8 +253,11 @@ stateDiagram-v2
 
 | 检查 | 植入的故障 | 固定的失败结果 |
 | --- | --- | --- |
-| `land.signature`（及 `keel approve`） | 一个带口令的签名密钥被加载到 ssh-agent 中（套接字或 Windows agent 管道） | 以退出码 6 拒绝：签名密钥已加载在 agent 中 |
-| `land.signature` | 契约批准之后对冻结区块做一个字节的编辑 | 契约批准无效 |
+| `land.approval` | 契约批准之后对冻结区块做一个字节的编辑 | 契约批准无效（`missing-approval`：产物已变更） |
+| `land.approval` | 落地批准记录写入之后被编辑过的回执草稿 | 落地被拒绝；草稿再次显示，等待一次新的批准 |
+| `keel approve` | 一个被绑定的产物在显示与确认按键之间被重写 | 拒绝并给出 `changed-during-confirmation`；不记录任何内容 |
+| `frame.approvals` | 一条放入 `.keel/approvals/` 下、却没有 `approval.recorded` 事件的批准记录，以及一个写着“approved”的席位投递文件 | 不被视为权威；派发拒绝 |
+| `frame.approvals` | 文档批准之后，一个无关文件被改动、且追加了无关的账本事件 | 批准保持有效（针对过度失效的负对照） |
 | `submit.scope` | 一个 `write_set` glob 匹配零个路径的工单 | 零匹配范围 |
 | `land.ancestry` | 一个检出了主干且有未提交改动的工作树 | 以退出码 5 拒绝 |
 | `keel doctor --section vcs` | 嵌套的 ref 名称（分支 `keel/<P>` 与 `keel/<P>/main` 并存） | 目录/文件 ref 冲突 |

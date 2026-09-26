@@ -2,7 +2,7 @@
 # (schemas/workorder.schema.json), written by the planner seat. The engineer never reads this file: keel
 # compiles it into the task's brief. Hash values are illustrative.
 #
-# T1 is the test-first task. The signed seats.engineer.test_route sends it to the glm-main alias on
+# T1 is the test-first task. The approved seats.engineer.test_route sends it to the glm-main alias on
 # opencode (declared family zhipu), a declared family different from T2's builder (anthropic), and it
 # lands on keel/P-7F3K9Q/main before T2 starts. Its tests then become T2's frozen_tests
 # (plan.test-independence).

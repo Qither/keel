@@ -8,7 +8,7 @@
 # Repository-specific values are not defaulted here: vcs.trunk, vcs.remotes, workspace_root (computed as
 # ../<repo>.ws/ when unset) and trace.since are written into the team layer by `keel init`.
 #
-# Provider endpoints, API keys and model names never appear in any configuration layer. The Board-signed
+# Provider endpoints, API keys and model names never appear in any configuration layer. The Board-approved
 # .keel/routing.yaml names environment variables only (docs/10-providers.md).
 
 vcs:
@@ -97,5 +97,5 @@ arch:
   unknown: default
 
 land:
-  # reason: without a Board-signed standing land policy, every land needs a land approval.
+  # reason: without a Board-approved standing land policy, every land needs a land approval.
   policy: null

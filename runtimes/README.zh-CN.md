@@ -45,7 +45,7 @@ GLM 和 Gemini 家族模型是模型提供方家族（声明的模型家族 `zhi
 | `{allowed_tools}` | 由席位契约及其执行类别推导出的工具允许列表 |
 | `{session_id}` | keel 铸造或从输出流中读到的会话 id |
 | `{seat}` | 席位 id，例如 `engineer` |
-| `{alias}` | 董事会签名的 `.keel/routing.yaml` 中的路由配置档别名 |
+| `{alias}` | 董事会批准的 `.keel/routing.yaml` 中的路由配置档别名 |
 | `{runtime_profile}` | 路由配置档的 `runtime_profile.profile` 名称（在用户自己的运行时配置中定义的名称） |
 | `{mode_argv}` | 所选模式的 `argv` |
 | `{budget_argv}` | 描述符的预算标志加上工单的上限 |

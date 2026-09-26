@@ -17,7 +17,7 @@ Track feature; origin contract-approved; charter 1.0.0; trunk `main`.
 - Contract hash: `e90e8774ddb2fd72a1ba81b6149dd88cf5a721460a1ab3b0afd09be0cde09bea`
 - Standing policies used: none
 - Approvals before land: AP-2d9e4f6a8b0c (the land approval
-  is in the Signed quote section)
+  is in the Land approval section)
 
 ## ACC -> command table
 
@@ -104,8 +104,9 @@ authority and was not verified by keel.
 - engineer (RUN-01J9Z8M0N00B8F8BH3C84ZZE5X, DONE): "Added tests/notes/tags.test.ts with one row per scenario of R-notes-4QX7B, each named with its scenario tag. Both rows fail until TagStore.addTag exists."
 - engineer (RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A, DONE): "Added normalizeTag and TagStore.addTag in src/store/tags.ts, exported TagStore from src/store/index.ts, and made NoteStore.load default a missing tags array to an empty list. Both frozen tag tests pass locally."
 
-## Signed quote
+## Land approval
+
+Approved by board-owner (declared) at 2026-09-23T10:30:00Z (land approval AP-7a1c3e5f9b2d, chain head
+`beba6a5e345a8c77ef0d5f71a05e9da8e9f451977600ec75e41d481dffc85a23`).
 
 > Land as recorded: tags are stored normalized and once per note; the minor finding stays deferred.
-
-Signed by board-owner@example.com at 2026-09-23T10:30:00Z (land approval AP-7a1c3e5f9b2d, chain head `0b358628ff0bea1f0aa412f140d3fc687396bb0802306bfd9fb4adb98e9c7565`).

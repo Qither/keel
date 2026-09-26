@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/policy.schema.json",
   "title": "keel standing policy",
-  "description": "A Board-signed standing policy in .keel/policies/<id>.yaml. A contract policy (for example quick-patch) stands in for the per-change contract approval of a change started with keel new --policy <id>, whose verbatim request the Board signs; a land policy stands in for the per-change land approval and is named by config land.policy. Every predicate is checked by code on the actual diff; a change that fails one needs the per-change approval instead. Policies are revocable, apply only with a valid signature, and every receipt lists the policies it used.",
+  "description": "A Board-approved standing policy in .keel/policies/<id>.yaml. A contract policy (for example quick-patch) stands in for the per-change contract approval of a change started with keel new --policy <id>, whose verbatim request the Board approves; a land policy stands in for the per-change land approval and is named by config land.policy. Every predicate is checked by code on the actual diff; a change that fails one needs the per-change approval instead. Policies are revocable, apply only with a valid document approval, and every receipt lists the policies it used.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M1b",
   "type": "object",
@@ -20,7 +20,7 @@
     "predicates": { "$ref": "#/$defs/predicates" },
     "requires": { "$ref": "#/$defs/requirements" },
     "expires": {
-      "description": "Date or date-time after which the policy stops applying, or null. Revoke earlier by signing a removal.",
+      "description": "Date or date-time after which the policy stops applying, or null. Revoke earlier by approving a removal (keel approve --doc).",
       "anyOf": [
         { "type": "string", "format": "date" },
         { "type": "string", "format": "date-time" },
@@ -78,8 +78,8 @@
       "description": "What a change on this policy must additionally carry.",
       "type": "object",
       "properties": {
-        "signed_request": {
-          "description": "The Board signs the verbatim request (keel new --policy).",
+        "approved_request": {
+          "description": "The Board approves the verbatim request (keel new --policy).",
           "type": "boolean"
         },
         "red_green_proof": {

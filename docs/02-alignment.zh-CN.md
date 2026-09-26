@@ -2,7 +2,7 @@
 
 > 英文原文（规范版本）：[02-alignment.md](02-alignment.md)。本文是其简体中文镜像，两者不一致时以英文版为准。
 
-本文档负责让每个席位（seat）的工作与董事会（Board）目标保持一致的机制：对齐链、简报（brief）编译器、ACK（复述确认）与提交通道、提交时重新编译、批准信封、修订案（amendment）、优先顺序与裁定，以及这些机制中哪些在每个梯级（rung）上都成立。谁担任哪个角色见 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)；强制执行这些机制的门禁（gate）在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中编目。
+本文档负责让每个席位（seat）的工作与董事会（Board）目标保持一致的机制：对齐链、简报（brief）编译器、ACK（复述确认）与提交通道、提交时重新编译、批准记录、修订案（amendment）、优先顺序与裁定，以及这些机制中哪些在每个梯级（rung）上都成立。谁担任哪个角色见 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)；强制执行这些机制的门禁（gate）在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中编目。
 
 ## 对齐链 L0–L11
 
@@ -26,24 +26,24 @@ flowchart TB
 
 | 层级 | 产物 | 编号 | 负责人 | 强制方式 |
 | --- | --- | --- | --- | --- |
-| L0 章程 | `.keel/charter.md` | `charter_version`（semver）；不变量 `INV-nn` | 董事会（用 `--doc` 签名，由治理提交提交） | 只有签名后才生效。每个产物都标记 `charter_version`；框定门禁会标记 MAJOR 或 MINOR 版本的滞后。INV 检查在验证门禁中运行，低成本的检查也在提交时运行。范围内的 INV 随简报下发，并加入产品、架构和工程席位的 ACK 编号集 |
-| L1 目标 | `.keel/goals.yaml` | `G-nn`（由董事会顺序编号） | 董事会（签名） | 每个提案至少引用一个 active 状态的目标（框定门禁）。简报的缘由链从目标开始。预算按目标汇总。目标进度 = 在 head 处已验证的需求数 / 需求总数 |
+| L0 章程 | `.keel/charter.md` | `charter_version`（semver）；不变量 `INV-nn` | 董事会（用 `--doc` 批准，由治理提交提交） | 只有批准后才生效。每个产物都标记 `charter_version`；框定门禁会标记 MAJOR 或 MINOR 版本的滞后。INV 检查在验证门禁中运行，低成本的检查也在提交时运行。范围内的 INV 随简报下发，并加入产品、架构和工程席位的 ACK 编号集 |
+| L1 目标 | `.keel/goals.yaml` | `G-nn`（由董事会顺序编号） | 董事会（已批准） | 每个提案至少引用一个 active 状态的目标（框定门禁）。简报的缘由链从目标开始。预算按目标汇总。目标进度 = 在 head 处已验证的需求数 / 需求总数 |
 | L2 需求 | `.keel/specs/<area>/spec.yaml`（活规格） | `R-<area>-<5>`；场景 `R-…#S<n>`；`rev_hash` | product 起草增量；只有落地归档提交会写入 | 增量以编号为目标并携带基准 `rev_hash`；基准不匹配时归档会拒绝，并显示三方文本。需求文本被逐字引用进简报。RTM 检查验证覆盖和实现情况 |
 | L3 决策与义务 | `.keel/decisions/ADR-<5>-<slug>.md`（进行中时位于提案的 `decisions/` 下，落地时晋升） | `ADR-<5>`；义务 `ADR-<5>.O<n>`，级别为 must、must_not 或 should | architect 或 product 提出；通过契约批准（system）或 `--doc` 接受 | 义务以确定性方式解析，绝不由 LLM 抽取。当 `applies_to` 与 write_set 相交时下发，must/must_not 编号加入 ACK 编号集。检查在验证门禁中运行（低成本的在提交时运行）。锚点或正文漂移会使接受失效 |
 | L4 架构契约 | `.keel/arch/model.yaml`、`rules.yaml`、`baseline.json` | `el:<dotted.slug>`；`AR-<5>` | architect，通过在落地时应用的 `arch.delta` | 由可信来源边支撑的新违规会失败；“unknown”按未知策略阻塞；基线增长或规则放宽需要契约批准；架构元素简报被编译进简报（[07](07-architecture-intelligence.zh-CN.md)） |
-| L5 冻结意图 | `keel/<P>/main` 上的 `.keel/proposals/<P>-<slug>/intent.md` + `spec.delta.yaml`（+ `arch.delta.yaml`） | `P-<6>`；`<P>#ACC-nn`；`contract_hash` | product（架构增量：architect） | 契约签名绑定 `contract_hash`、`keel/<P>/main` 提交和链头。任何字节变化都会使其失效，并阻塞派发和落地。验收只能通过修订案更改 |
-| L6 计划与工单 | `plan.yaml`、`workorders/T<n>.yaml`、`routing.snapshot.yaml` | `<P>.T<n>` | planner（路由快照：Steward） | 计划门禁检查双向覆盖、接口、每个波次内互不相交的写集、位于 write_set 之外的冻结测试以及预算；在 feature 和 system 上，一个跨家族的验证缺口评审镜头检查 ACC → 命令表和测试任务。需要时，计划批准会签署计划、工单和路由快照 |
+| L5 冻结意图 | `keel/<P>/main` 上的 `.keel/proposals/<P>-<slug>/intent.md` + `spec.delta.yaml`（+ `arch.delta.yaml`） | `P-<6>`；`<P>#ACC-nn`；`contract_hash` | product（架构增量：architect） | 契约批准绑定 `contract_hash`、`keel/<P>/main` 提交和链头。任何字节变化都会使其失效，并阻塞派发和落地。验收只能通过修订案更改 |
+| L6 计划与工单 | `plan.yaml`、`workorders/T<n>.yaml`、`routing.snapshot.yaml` | `<P>.T<n>` | planner（路由快照：Steward） | 计划门禁检查双向覆盖、接口、每个波次内互不相交的写集、位于 write_set 之外的冻结测试以及预算；在 feature 和 system 上，一个跨家族的验证缺口评审镜头检查 ACC → 命令表和测试任务。需要时，计划批准会绑定计划、工单和路由快照 |
 | L7 简报 | `.git/keel/briefs/BR-<sha12>.{md,json}`，复制到运行的输入中 | 规范化正文的 `BR-<sha12>` | Steward（compiler） | 见下一节 |
 | L8 ACK、裁定、结果 | 以账本事件 `ack.recorded`、`ruling.made`、`question.asked`、`result.submitted` 接收的提交通道投递文件 | `RUN-<ulid>`；`RL-<sha12>`；`Q-<sha12>` | 被派发的席位；由 Steward 验证 | 见“ACK 与提交通道”和“优先顺序、决策边界与裁定” |
 | L9 轮次与提交 | `keel/<P>/t/<n>` 上由 Steward 完成的提交 | `<P>.T<n>.r<k>`；提交 id；启用时的 jj change id | Steward | 每个轮次提交都带提交尾注（trailer）；席位自行做出的提交被保存在 `refs/keel/snap` 下；追溯检查覆盖提案的范围（[04](04-trace-and-state.zh-CN.md)） |
 | L10 证据与评审结论 | `.git/keel/records/EV-*.json`（缓存）、`VD-*.json`、`TR-*.json`，在落地时投影 | `EV-`、`VD-`、`TR-<sha12>`；源状态绑定 | Steward 运行器（EV）；评审席位，由 Steward 验证（VD）；planner（TR） | 只有运行器的证据才算数；落地时在集成后的提交上重新执行完整的验收矩阵；过期的评审结论被忽略（[11](11-verification.zh-CN.md)） |
-| L11 批准与回执 | `.keel/signatures/<blob-sha256>.<kind>.json`；`.keel/archive/<yyyy>/<P>-<slug>/` 中的 `receipt.json` 和 `receipt.md` | `AP-`、`AM-`、`OV-<sha12>`；每个提案一份回执 | 董事会（AP、OV）；Steward（回执） | 落地需要一个覆盖回执草稿和链头的有效落地签名，或者一份签名的落地策略加上随后的回执确认（[03](03-lifecycle.zh-CN.md)） |
+| L11 批准与回执 | `.keel/approvals/<record-sha256>.<kind>.json`；`.keel/archive/<yyyy>/<P>-<slug>/` 中的 `receipt.json` 和 `receipt.md` | `AP-`、`AM-`、`OV-<sha12>`；每个提案一份回执 | 董事会（AP、OV）；Steward（回执） | 落地需要一个覆盖回执草稿的有效落地批准，或者一份已批准的落地策略加上随后的回执确认（[03](03-lifecycle.zh-CN.md)） |
 
-章程（L0）包含：使命（至多 200 个字符）、作为 must/must_not 义务并带 `applies_to` glob 和可选检查命令的不变量、公司级决策边界、优先顺序、保留操作编号、各自引用一个事故编号的陷阱，以及根签名者指纹，总体积控制在 6 KiB 预算以内。冻结块（L5）位于 `keel:frozen` 标记之间，包含：问题；结果和信号；非目标；决策边界（可自行决定、必须提问）；ACC 项 {id、陈述、覆盖的 R 或场景、证据模式 test、command、review、manual 或 unobservable}；Always/Never；范围 {允许的 glob、受保护的 glob}；必须为空的未决问题；以及 system 轨道上的失败模型。
+章程（L0）包含：使命（至多 200 个字符）、作为 must/must_not 义务并带 `applies_to` glob 和可选检查命令的不变量、公司级决策边界、优先顺序、保留操作编号、各自引用一个事故编号的陷阱，总体积控制在 6 KiB 预算以内。冻结块（L5）位于 `keel:frozen` 标记之间，包含：问题；结果和信号；非目标；决策边界（可自行决定、必须提问）；ACC 项 {id、陈述、覆盖的 R 或场景、证据模式 test、command、review、manual 或 unobservable}；Always/Never；范围 {允许的 glob、受保护的 glob}；必须为空的未决问题；以及 system 轨道上的失败模型。
 
 `contract_hash` 是规范化冻结块、`spec.delta.yaml` blob、`arch.delta.yaml` blob 以及每个被覆盖需求的 `rev_hash` 的 sha256。它在契约批准时冻结，在归档提交之后永不重新计算。
 
-回执（L11）涵盖集成后的提交和预期的主干顶端、任务 → 轮次 → 提交映射、证据和评审结论、ACC → 命令表、按代价排序的裁定、未运行的门禁、豁免、剩余风险、已应用的架构增量、RTM 摘要、声明的工程席位家族（构建路由和测试路由）与评审席位家族、一致性测评状态以及暴露面画像。已落地的提交 id 放在 `land.completed` 账本事件中，而不放在签名的回执里。
+回执（L11）涵盖集成后的提交和预期的主干顶端、任务 → 轮次 → 提交映射、证据和评审结论、ACC → 命令表、按代价排序的裁定、未运行的门禁、豁免、剩余风险、已应用的架构增量、RTM 摘要、声明的工程席位家族（构建路由和测试路由）与评审席位家族、一致性测评状态以及暴露面画像。已落地的提交 id 放在 `land.completed` 账本事件中，而不放在已批准的回执里。
 
 借鉴自：GitHub Spec Kit（带 semver 版本并标记在产物上的 constitution）、OpenSpec（按编号并带基准指纹的增量规格）、Kiro（EARS 需求，公开文档）、BMAD-METHOD（批准后冻结的意图）、edikt（确定性的义务解析；仅借鉴思想）、oh-my-claudecode（带剩余风险登记表的回执）。
 
@@ -136,68 +136,93 @@ flowchart TB
 
 借鉴自：GitHub Spec Kit（产物上的 constitution 版本）。
 
-## 签名批准（链头、拒绝 ssh-agent 中的密钥）
+## 董事会批准（显式确认、哈希绑定、失效）
 
-董事会的每个行为都是对一个信封的 ssh 签名。董事会签署的阶段和裁定列于 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)；本节定义信封及其验证。签名密钥卫生详见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)，该决策记录在 [ADR-0005](adr/ADR-0005-signed-board-approvals.zh-CN.md) 中。
+董事会的每个行为都是对屏幕上所展示的某个主题在某一个内容版本下的显式确认，由 `keel approve` 记录。需要批准的阶段、文档、请求和裁定列于 [01-org-model.zh-CN.md](01-org-model.zh-CN.md)；本节定义流程、记录以及 Steward 如何检查它。记录能证明什么、不能证明什么见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)，该决策记录在 [ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.zh-CN.md) 中。
 
-**信封。** `keel approve` 构建：
+**从董事会一侧看到的流程。**
+
+1. `keel approve <subject> ...` 展示主题及其具体变更：`org/checkpoints.yaml` 中的阅读清单、被绑定的产物，以及每个产物相对其上一次已批准版本的差异（首次为完整内容）。在这些内容出现在屏幕上之前，不会提出任何要求。
+2. 董事会通过输入确认词 `approve` 来确认（在 Git Bash mintty 下 Node 看不到 TTY，此时输入所显示的确认码）。单独按 Enter、`y`、泛泛的“继续”或其他任何输入都是拒绝，不记录任何东西。确认只适用于屏幕上的主题和内容版本。
+3. keel 计算并记录其余内容：每个被绑定产物的规范化内容哈希、声明的批准人（`.keel/local.yaml` 中的 `board.approver`、`--as <name>`，或在提示处输入的名字）以及本地时间。`--note "<text>"` 添加可选的备注。
+4. 在任何受保护的步骤（派发、落地、策略路径受理）之前，Steward 都会把当前内容与记录进行核对。
+5. 当已批准的内容发生了变化，该事项会重新出现为待批准，标记为已失效，并附上使其失效的变更；董事会查看变更并再次确认。
+
+董事会从不计算哈希、准备密钥、维护签名者列表、输入签名命令或操作硬件设备。
+
+**记录。** `keel approve` 写入 `.keel/approvals/<record-sha256>.<kind>.json`（`AP-<sha12>`）：
 
 ```json
 {
   "v": 1,
-  "payload": {
-    "kind": "stage",
-    "stage": "contract",
-    "rule": null,
-    "subject": "P-7F3K9Q",
-    "commit": "<40-hex commit of keel/P-7F3K9Q/main>",
-    "artifacts": [{ "path": ".keel/proposals/P-7F3K9Q-note-tags/intent.md", "sha256": "<64 hex>" }],
-    "contract_hash": "<64 hex>",
-    "request": null,
-    "land": null,
-    "quote": "Approved as framed; tags stay local to a note.",
-    "approver": {
-      "principal": "<signer principal from allowed_signers>",
-      "fingerprint": "SHA256:<43 base64 characters>",
-      "key_type": "sk-ssh-ed25519@openssh.com"
-    },
-    "ledger_chain_head": "<64 hex>",
-    "ts": "2026-09-25T10:00:00Z",
-    "nonce": "<random>"
-  },
-  "signature": { "namespace": "keel-approval", "format": "sshsig", "armored": "<SSH SIGNATURE block>" }
+  "kind": "stage",
+  "stage": "contract",
+  "rule": null,
+  "subject": "P-7F3K9Q",
+  "commit": "<40-hex commit of keel/P-7F3K9Q/main>",
+  "artifacts": [{ "path": ".keel/proposals/P-7F3K9Q-note-tags/intent.md", "sha256": "<64 hex>" }],
+  "contract_hash": "<64 hex>",
+  "request": null,
+  "land": null,
+  "note": "Approved as framed; tags stay local to a note.",
+  "approver": { "name": "<declared approver name>" },
+  "ledger_chain_head": "<64 hex>",
+  "approved_at": "2026-09-26T10:00:00Z"
 }
 ```
 
-签名覆盖 `payload` 的规范化 JSON。文档、策略、请求或裁定设置 `kind`（`doc`、`policy`、`request`、`rule`；`tofu` 记录首个签名者）并令 `stage: null`，裁定还会设置 `rule`。权威的结构以 `schemas/approval.schema.json` 为准；示例信封见 `examples/acme-notes/.keel/signatures/example.contract.json`。
+文档、策略、请求或裁定设置 `kind`（`doc`、`policy`、`request`、`rule`）并令 `stage: null`，裁定还会设置 `rule`。权威的结构以 `schemas/approval.schema.json` 为准；示例见 `examples/acme-notes/.keel/approvals/example.contract.json`。
 
-**签名。** `keel approve` 准确打印要阅读的内容，要求交互式确认（一个 TTY，或在 Git Bash mintty 下输入确认码），并在 `KEEL_RUN` 或 `KEEL_RUN_ID` 下拒绝执行。它使用 `ssh-keygen -Y sign -n keel-approval` 签名，这会要求输入密钥口令或进行硬件触碰；所用密钥是 `KEEL_BOARD_KEY` 指定的那一把（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。分离的信封一经签名，Steward 就把它提交到 `.keel/signatures/<blob-sha256>.<kind>.json`，使派发和落地能从 git 中验证它：文档、策略和回执信封通过主干上的治理提交；某个提案的契约、计划和请求信封以及裁定，通过 `keel/<P>/main` 上的治理式提交，并随归档提交进入主干；落地信封则直接放在归档提交中。信封自我认证；账本（ledger）引用它们，因此它们在每个克隆上都能验证。
+哈希覆盖的内容：恰好是 `artifacts` 中列出的那些产物，按 `src/core/normalize.ts` 的规范化规则（与简报及其他所有内容 id 使用的规则相同）哈希。按种类：
 
-**链锚定。** 每个信封都包含账本链头。因此，对已签名链头之前任何账本事件的编辑都是可检测的，签名也无法被重放到另一段历史上（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)）。
+| 种类 | 被绑定的产物 |
+| --- | --- |
+| contract | `intent.md` 的冻结块和 `spec.delta.yaml`（system 轨道上还有 `arch.delta.yaml`），汇总为 `contract_hash`；`keel/<P>/main` 提交 |
+| plan | `plan.yaml`、每个工单、`routing.snapshot.yaml` |
+| land | 回执草稿（`land.receipt_draft`），写明集成提交和预期的主干顶端 |
+| receipt | 已归档的 `receipt.md` |
+| doc、policy | 该文档在主干提交处的规范化 blob |
+| request | 逐字的请求文本（`request`）；`artifacts` 为空 |
+| rule | 被裁定的事项（一个问题、发现项、预算或轨道记录） |
 
-**验证。** Steward 使用 `ssh-keygen -Y verify -n keel-approval`，以最近一次董事会签名的主干修订中的 `allowed_signers` blob 为准进行验证，绝不以工作树中的副本为准。根签名者的指纹被固定在签名的章程中；`keel init` 记录首次使用时的信任。当任何被绑定产物的当前哈希与签名时的哈希不同、签名者不在经验证的 `allowed_signers` 中，或者某个修订案已将其取代时，批准无效。
+记录从不把自己列入其中，因此记录的哈希与记录内部的哈希不可能相互依赖。对任何所列产物的变更都会使批准失效。对其他任何文件的变更、其他提案的活动、新的账本事件，或不触及所列产物的 Steward 提交，都不影响其有效性。
 
-**拒绝 ssh-agent 中的密钥（失败即关闭）。** 只要任何受允许签名者的公钥出现在 `ssh-add -L` 中（通过 `SSH_AUTH_SOCK` 或 Windows 命名管道 `\\.\pipe\openssh-ssh-agent` 访问），`keel approve`、`keel run`（派发）和 `keel land` 就以退出码 6 退出，除非该密钥是 FIDO2 `-sk` 密钥。在 Windows 上推荐使用 `-sk` 密钥；Windows OpenSSH 和 Git for Windows 所带 `ssh-keygen` 构建对 `-sk` 的支持为待探测验证，`keel doctor --section signing` 会指明经验证的 `ssh-keygen` 路径。负对照：加载进 ssh-agent 的口令密钥必须使 `approve` 和 `land` 拒绝执行。
+**记录的提交。** Steward 在记录写出后立即提交它，使派发和落地能从 git 中检查它：文档、策略和回执记录通过主干上的治理提交；某个提案的契约、计划和请求记录以及裁定，通过 `keel/<P>/main` 上的治理式提交，并随归档提交进入主干；落地记录则直接放在归档提交中。随后，同一个 `keel approve` 进程在账本写者锁下追加 `approval.recorded`。`keel approve` 像其他每个会改变状态的动词一样等待监督者锁，因此席位运行期间不会记录任何批准（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)）。
+
+**保护确认本身。** 在董事会确认之后、写入任何内容之前，`keel approve` 会重新读取并重新哈希被绑定的产物。如果任何哈希与所展示的不同，它会以 `changed-during-confirmation` 拒绝，展示新的差异并重新开始。因此，即使某个文件在显示与击键之间被改动，确认也绝不会绑定到董事会没有看到的内容上。
+
+**门禁处的检查。** 只有在以下条件全部成立时，Steward 才接受一个批准；不成立的条件按名称报告，追踪漂移类别为 `missing-approval`：
+
+- 记录存在于 git 中的预期位置（主干、`keel/<P>/main` 或归档提交），并通过 schema 校验；
+- 其 `approval.recorded` 事件位于已验证的账本链上；
+- 种类、阶段和主题与门禁所要求的相符；
+- 每个被绑定产物的当前规范化哈希都等于记录中的哈希（否则为 `artifact-changed`）；
+- 没有修订案取代它，且它所依赖的豁免或策略尚未过期；
+- 其 `ledger_chain_head` 位于已验证的链上（否则为 `chain-head-not-on-chain`，`keel audit` 也会将其报告为链断裂）。
+
+每个条件都根据记录和仓库来检查；批准人姓名和时间是被记录的事实，而不是条件。不是由 `keel approve` 写出的记录、席位丢到 `.keel/approvals/` 下的文件、席位声称“已批准”的最终消息或投递文件、行为者自称是董事会的账本行，以及仓库中的其他任何 JSON，都只是数据。无论它们如何描述自己，都不是批准（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
+
+**链头。** 每条记录都携带记录时的账本链头。`keel audit` 把它用作一致性检查：对某个已记录链头之前的事件的编辑，会使链头不再与记录所持有的链头相符。这能检测意外和对文件的普通篡改；它无法抵御一个把记录、账本和锚点一起改写的进程，而这超出了所有者要求 keel 防御的范围（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
 
 ### 请求与席位不可调用的动词
 
-`keel new --policy <name>` 让董事会把逐字请求作为请求信封签署，一次介入。策略路径的派发和落地会在 `proposal.created` 事件上验证该签名。每个提案都记录其来源——董事会签名的请求，或经契约批准——回执会显示它。
+`keel new --policy <name>` 向董事会展示逐字的请求，并把其批准记录为一条请求记录，一次确认。策略路径的派发和落地会在 `proposal.created` 事件上检查该记录。每个提案都记录其来源——`board-requested` 或 `contract-approved`——回执会显示它。
 
 作为第一道防线，每个会改变状态的动词（`new`、`run`、`land`、`sync`、`audit`、`approve`）在 `KEEL_RUN` 或 `KEEL_RUN_ID` 下都会拒绝执行，当某个祖先进程是已登记的 keel 运行时也会拒绝（Windows 上的祖先进程遍历为待探测验证）。只有 `keel run` 会认领工作。退出码见 [12-cli-api-mcp.zh-CN.md](12-cli-api-mcp.zh-CN.md)。
 
-借鉴自：old-coder（可引述的同意）、superpowers（批准只绑定所呈现的产物）、OpenSSH（`ssh-keygen -Y`、FIDO2 `-sk`）。
+借鉴自：old-coder（绑定到某个版本的同意）、superpowers（批准只绑定所呈现的产物）。
 
 ## 修订案账本
 
 契约批准之后，冻结块和 ACC 项只能通过修订案更改。当 Steward 在 `keel/<P>/main` 上看到此类更改时，它会从 git 中派生一条 `AM-<sha12>` 记录：
 
-- 原文，逐字取自签名的 blob；
+- 原文，逐字取自已批准的 blob；
 - 替换文本；
 - 变化的编号；
 - 原因；
 - 授权依据（导致该更改的提问、裁定或董事会请求）。
 
-修订案会使契约批准失效，如果存在计划批准，也会使其失效；董事会需重新签名。完成声明（结果、证据、回执）会引用它们所满足的 ACC 修订版本，因此被削弱的标准绝不会被悄悄满足。来自意图对齐评审镜头的 `intent_gap` 会让提案回到框定阶段，并以同样的重新签名结束（[03-lifecycle.zh-CN.md](03-lifecycle.zh-CN.md)）。
+修订案会使契约批准失效，如果存在计划批准，也会使其失效；董事会查看变更并重新批准。完成声明（结果、证据、回执）会引用它们所满足的 ACC 修订版本，因此被削弱的标准绝不会被悄悄满足。来自意图对齐评审镜头的 `intent_gap` 会让提案回到框定阶段，并以同样的重新批准结束（[03-lifecycle.zh-CN.md](03-lifecycle.zh-CN.md)）。
 
 借鉴自：oh-my-claudecode（标准的修订与取代账本）。
 
@@ -237,7 +262,7 @@ flowchart TB
 - 编译并哈希的简报及其在提交时的重新编译；
 - ACK 编号集差异比对；
 - 检测在匹配 ACK 之前的编辑：把 ACK 摄取时同步拍摄的快照与派生前的基线比较（[05-vcs.zh-CN.md](05-vcs.zh-CN.md)）。这项检查在每个梯级上都相同，但它能看到的内容并不相同：在 ACK 之前做出又撤销的编辑是看不见的，而防止只存在于钩子能加载之处（[09-runtimes.zh-CN.md](09-runtimes.zh-CN.md) 第 6 节）；
-- 对每个批准、请求和裁定的签名验证；
+- 对每个批准、请求和裁定的批准检查（记录、账本事件、主题、内容哈希）；
 - 范围检查、冻结路径与受保护路径检查以及轨道棘轮；
 - 通过引用快照和 `ls-remote` 检测保留操作；
 - 落地时重新执行的证据和追溯检查；

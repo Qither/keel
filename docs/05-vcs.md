@@ -238,7 +238,7 @@ worktree under `_verify/`. Evidence survives a restack only when its source stat
 
 ## Three land cases
 
-Land happens after the land gate passes and the land approval (or, on a policy land, the signed land policy
+Land happens after the land gate passes and the land approval (or, on a policy land, the approved land policy
 and request) is verified ([11-verification.md](11-verification.md)). The archive commit is the new trunk tip.
 
 1. Ancestry: `git merge-base --is-ancestor <trunk> <archive>`. If trunk is not an ancestor, trunk moved:
@@ -297,13 +297,13 @@ remotes   git ls-remote <remote>                   each configured remote, read-
 - The ref, HEAD and reflog parts are diffed at ingest and at land. A change is explained only when the
   Steward recorded it as a `vcs.op` ledger event, when it is a seat commit fast-forwarding the seat's own
   task branch (preserved as above), or when it is a move of the ledger anchor `refs/keel/ledger/head` that
-  matches the appends the supervising Steward process made itself or a Board-signed approval appended in the
-  window ([04-trace-and-state.md](04-trace-and-state.md)). Any other change sets `blocked(reserved_op)` and
+  matches the appends the supervising Steward process made itself
+  ([04-trace-and-state.md](04-trace-and-state.md)). Any other change sets `blocked(reserved_op)` and
   becomes a Board item.
 - `git ls-remote` runs before and after each run. A remote ref that changed is `blocked(reserved_op)`. If a
   remote cannot be reached, the check reports `unknown`, never `pass`.
 - Detection cannot tell who moved a ref. A ref the Board moves by hand during a run is flagged like any
-  other; the Board clears it with a signed override (`keel approve <RUN> --rule override`). With parallel
+  other; the Board clears it with an approved override (`keel approve <RUN> --rule override`). With parallel
   runs, an unexplained change is attributed to every run whose window covers it.
 - With JjBackend, the op log is an extra detection source.
 
@@ -390,7 +390,7 @@ that reading never snapshots a working copy.
 | Land | ff-only or CAS `update-ref` | Bookmark set after the same checks |
 
 M7 exit: the M1-M4 suites pass on both backends, and disabling jj mid-project loses no trace, evidence or
-approval, because all three live in git trailers, the ledger and committed envelopes.
+approval, because all three live in git trailers, the ledger and committed approval records.
 
 ## Windows notes
 

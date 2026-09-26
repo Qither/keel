@@ -74,7 +74,7 @@ export interface RoundTrailers {
 
 /**
  * The trailers of a governance commit (`keel approve --doc`) or an archive commit (the archived receipt.md
- * and the land approval, or on a policy land the signed request).
+ * and the land approval, or on a policy land the approved request).
  */
 export interface GovernanceTrailers {
   "Keel-Doc": RepoPath;

@@ -3,7 +3,8 @@
 keel is built in nine milestones, M0 to M8, with M1 split into M1a and M1b. Each milestone has a fixed
 scope and exit criteria that are tests, not opinions. A milestone is done when every exit criterion passes
 in CI on windows-latest and ubuntu-latest (Node 22.13 and 24), or, for criteria that need real routes, when
-the Board has run the opt-in check and recorded the result.
+the Board has run the opt-in check and recorded the result. From M1a on, a milestone also needs the refresh
+review of P4 ([00-mandate.md](00-mandate.md) section 4) run and recorded in `docs/reference-projects.yaml`.
 
 This document owns the milestone plan, the risks and the measures. Where a criterion names a mechanism, the
 mechanism's home document is listed in the single-home table of [README.md](README.md).
@@ -13,7 +14,7 @@ mechanism's home document is listed in the single-home table of [README.md](READ
 ```mermaid
 flowchart LR
   M0["M0 design + skeleton"] --> M1a["M1a deterministic core"]
-  M1a --> M1b["M1b signing, policies, trace"]
+  M1a --> M1b["M1b approvals, policies, trace"]
   M1b --> M2["M2 dispatch on two runtimes"]
   M2 --> M3["M3 verify, review, land"]
   M3 --> M4["M4 architecture intelligence"]
@@ -33,8 +34,13 @@ Status: in progress in this repository.
 
 Scope:
 
-- the design documents in `docs/` (English canonical, Simplified Chinese mirrors) and the eight design
-  ADRs in `docs/adr/`;
+- the design documents in `docs/` (English canonical, Simplified Chinese mirrors) and the nine design
+  ADRs in `docs/adr/` (ADR-0001 to ADR-0009);
+- the owner's mandate (`docs/00-mandate.md`), which records the owner's statement verbatim and owns the
+  refresh discipline (P4);
+- the reference registry (`docs/reference-projects.yaml`, validated against
+  `schemas/reference-registry.schema.json` by the `examples` check via `schemas/examples.map.json` and
+  cross-referenced with 00-mandate and 16 by the `references` check of `scripts/validate.mjs`);
 - full JSON Schemas and type-only TypeScript for the M1–M3 artifacts, with M4 and later artifacts as
   one-line deferred stubs;
 - seat contracts and the canonical tables (`org/`, `runtimes/hook-events.yaml`);
@@ -46,13 +52,17 @@ Scope:
   declared tooling exception (D1).
 
 No product logic and no `bin`. The advisory shims and the commit-msg hook are deferred to M2, and the
-dashboard shell and CSS to M5.
+TanStack dashboard application, its bundles and CSS tokens to M5.
 
 Exit criteria:
 
 - The owner has answered the decisions that block M0 (licence, documentation language, approval mechanism,
-  VCS strategy, provenance, stack) and confirmed the adopted-by-recommendation list. The decisions still
-  open in [17-open-decisions.md](17-open-decisions.md) do not block M0.
+  VCS strategy, provenance, stack) and confirmed the adopted-by-recommendation list; the owner's statement
+  that settles them is recorded in [00-mandate.md](00-mandate.md). The decisions still open in
+  [17-open-decisions.md](17-open-decisions.md) do not block M0.
+- The owner's statement is recorded verbatim in [00-mandate.md](00-mandate.md), every R, D and P row of
+  [00-vision.md](00-vision.md) maps to it, and the reference registry validates against its schema (`examples`
+  check) and its owner-named projects are cross-referenced (the `references` check passes).
 - `npm run typecheck` passes on windows-latest and ubuntu-latest.
 - `node scripts/validate.mjs` meta-validates every schema, validates every YAML and JSON example listed in
   `schemas/examples.map.json` (JSONL from M1), and passes the strict-subset lint.
@@ -63,7 +73,7 @@ Exit criteria:
   clean.
 - The ELv2 shape audit is recorded in [16-sources-credits.md](16-sources-credits.md).
 
-### M1a Deterministic core (no LLM, no signing)
+### M1a Deterministic core (no LLM, no approvals)
 
 Scope: ids, normalization and hashing, the hash-chained single-writer ledger, parsers, the brief compiler
 with a golden hash and per-seat ACK sets, `keel init`, `keel new`, `keel brief`, `keel status`, and the
@@ -76,18 +86,28 @@ Exit criteria:
 - A chain edit is detected.
 - Nested ref names are rejected by the doctor check.
 
-### M1b Signing, policies and trace
+### M1b Approvals, policies and trace
 
-Scope: signed approvals (`ssh-keygen -Y`, committed envelopes, `allowed_signers` at the last signed trunk
-revision, the fail-closed agent check, the mintty confirmation flow), request envelopes, `--rule` modes,
-amendments, standing policies, governance commits, the trace check with its epoch (no sqlite yet), and the
-refusal of mutating verbs under a keel run.
+Scope: explicit-confirmation approvals ([ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.md): the
+show-confirm-recheck-record flow, committed approval records with their `approval.recorded` events, the
+re-hash at every gate, the mintty confirmation flow, `keel doctor --section approvals`), request records,
+`--rule` modes, amendments, standing policies, governance commits, the trace check with its epoch (no
+sqlite yet), and the refusal of mutating verbs under a keel run.
 
-Exit criteria:
+Exit criteria (each with a negative control in `test/README.md`):
 
-- A one-byte edit to a frozen block invalidates the contract approval.
-- Unsigned and wrong-signer approvals are rejected.
-- An agent-loaded passphrase key makes `keel approve` refuse.
+- A protected step (dispatch, land, policy-path intake) does not proceed while its subject has no valid
+  approval.
+- An approval record binds the subject, the content hash of every bound artifact, the declared approver
+  and the approval time, and its ledger event is on the chain.
+- A one-byte edit to a frozen block invalidates the contract approval; an edited receipt draft invalidates
+  the land approval.
+- A bound artifact rewritten between the display and the confirmation keystroke is not approved: `keel
+  approve` refuses and records nothing.
+- Unrelated file changes and unrelated ledger appends after a document approval leave it valid.
+- A seat's completion claim, a drop that says "approved" and a JSON file dropped under `.keel/approvals/`
+  without a ledger event are not accepted as approvals.
+- `keel init` and every daily approval complete with no SSH key, signer list, agent or hardware set up.
 - `keel approve` and `keel new` refuse under `KEEL_RUN`.
 - `keel trace` resolves `file:line` to a goal on the example.
 - History before the epoch does not fail the trace check.
@@ -127,7 +147,7 @@ land cases (ff-only, CAS, refuse); the liveness audit.
 
 Exit criteria:
 
-- A feature proposal lands with a cross-family reviewer and signed contract and land approvals.
+- A feature proposal lands with a cross-family reviewer and explicitly confirmed contract and land approvals.
 - A planner cannot dismiss a critical finding.
 - Builder-only tests do not satisfy an ACC without the verification-gap lens.
 - A track raised by the path fallback blocks.
@@ -155,15 +175,23 @@ Exit criteria:
 
 ### M5 Read-only dashboard
 
-Scope: the DashboardModel, the CSS and HTML shell, the eight views including search and the change feed,
-and the optional loopback `serve`.
+Scope: the DashboardModel; the TanStack (React) application with its render bundle and client bundle, both
+compiled at package build time ([ADR-0009](adr/ADR-0009-tanstack-frontend.md)); the CSS tokens; the eight
+views including search and the change feed; and the optional loopback `serve`.
 
 Exit criteria:
 
-- The dashboard renders without JavaScript.
-- It shows the same states and denominators as the `keel check --json` and `keel trace --json` golden tests.
+- The pre-rendered page shows every view without JavaScript: all eight views are in the tree and long lists
+  are pre-rendered in full; hydration changes no markup (golden test, run at `#/` and at least one deep link
+  such as `#/trace`).
+- It shows the same states and denominators as the `keel check --json` and `keel trace --json` golden tests,
+  with and without a table filter applied.
 - It has no write endpoints.
 - It is under 2 MB for a 5k-file fixture.
+- Its inline JavaScript is under 600 KB minified.
+- It makes zero external requests.
+- The same model and keel version give a byte-identical page.
+- `react`, `react-dom` and `@tanstack/*` appear only in `devDependencies`.
 
 ### M6 All runtimes, direct lane and behaviour conformance
 
@@ -216,16 +244,18 @@ settled.
 | RK-02 | The Codex env-only custom endpoint route (`OPENAI_BASE_URL` through the built-in provider) is not honoured | Codex cannot host code-executing seats on custom endpoints | Engineer role falls to claude-code, qwen-code or opencode, but only on a route whose env-scrub probe has passed ([10-providers.md](10-providers.md) section 4); until one passes, no route qualifies for the engineer and dispatch refuses it with `blocked(runtime_unavailable)`. Codex keeps tool-less and blocked-file-exposure seats | M2 probe |
 | RK-03 | The Gemini CLI per-run `--policy` probe fails | Gemini CLI holds reviewer seats only | Gemini-family models stay reachable through opencode or the direct lane on openai-chat | M6 |
 | RK-04 | Kimi Code never reaches a verified non-bypass write mode | Kimi Code stays at rung D | Kimi-family models run through opencode; the ACP driver is the candidate enforcement path | M6 |
-| RK-05 | `-sk` keys do not work with the Windows or Git for Windows `ssh-keygen` | FIDO2 keys unavailable on Windows | Passphrase keys kept out of any agent; doctor names the verified `ssh-keygen` path | M1b probe |
+| RK-05 | A Board member confirms without reading, or an approval is treated as more than a declared confirmation | A change lands that no human judged; a record is cited as proof of identity | `keel approve` shows the change before it asks; the reading list is printed verbatim; documents state that the approver is declared and the time is local ([14-trust-security.md](14-trust-security.md)) | M1b |
 | RK-06 | Most native Windows routes report `tool_file_exposure: exposed` | Too few routes qualify for code-executing seats | Env-auth routes with a verified scrub; evaluate the isolated seat OS account | M2, M6 |
 | RK-07 | Models from weaker or unfamiliar families misread briefs | ACK mismatches, blocked tasks, wasted budget | ACK id-set diff with one bounded retry, behaviour conformance with a no-guidance control, tier overlays, rung D fallback | M2, M6 |
 | RK-08 | codegraph edits agent configs, writes in-tree or sends telemetry despite the constraints | Seat worktrees polluted; P1 or privacy concerns | Constraints verified by probe; scip import and the heuristic backend as alternatives; doctor reports inert architecture checks | M4 |
 | RK-09 | jj workspace colocation stays unreleased or jj semantics shift before 1.0 | No jj agent workspaces | jj stays optional; agent workspaces stay git worktrees; the hazard suite gates the backend | M7 |
-| RK-10 | Ceremony feels too heavy for a single owner | keel is bypassed | Track right-sizing (typically two Board touches per feature), standing policies for patches, the owner guide | M3 |
+| RK-10 | Ceremony feels too heavy for a single owner | keel is bypassed | Track right-sizing (typically two Board confirmations per feature), standing policies for patches, the owner guide | M3 |
 | RK-11 | Brief hashes differ across OS line endings or Unicode forms | ACKs mismatch spuriously; evidence reuse fails | LF/BOM/NFC normalization with a golden hash test on a Windows CRLF checkout | M1a |
 | RK-12 | Surface sprawl (verbs, modes, tables) creeps back | Drift between docs, shims and code | Surface budgets and generated tables checked in CI | Every milestone |
 | RK-13 | The package and CLI name collide with dcsg/keel | Confusion on publish | Open decision; revisit before the first publish | Before first publish |
 | RK-14 | Readers take detection for prevention | False assurance | The exposure profile in every receipt; [14-trust-security.md](14-trust-security.md) states the limits | M2 |
+| RK-15 | TanStack or React major versions change (framework churn) | The dashboard build breaks or needs migration | Pinned lockfile; headless libraries over native markup; the model is framework-independent, so a migration is confined to `src/dashboard/` | M5 and every refresh review |
+| RK-16 | Refresh reviews are skipped | keel drifts from its references and from P4 | The review is an exit criterion from M1a; the registry records dates and HEADs; the "Refresh review currency" measure below | Every milestone |
 
 ## Measures
 
@@ -234,7 +264,7 @@ its denominator.
 
 | Measure | Target or budget | Computed from | From |
 | --- | --- | --- | --- |
-| Board touches per proposal | Typically 2 on feature (contract, land), 3 on system (contract, plan, land) | Approval events per proposal | M1b |
+| Board confirmations per proposal | Typically 2 on feature (contract, land), 3 on system (contract, plan, land) | Approval events per proposal | M1b |
 | Surface size | 16 top-level verbs, at most 40 verb modes, 5 seats, 5 skills, 3 default MCP tools, 5 phase gates | Manifests; CI fails on overruns | M0 |
 | Handbook size | Managed AGENTS.md block ≤ 8 KiB; instruction chain < 32 KiB; charter ≤ 6 KiB | `keel sync --check` | M1a |
 | Brief determinism | 100% identical golden hashes across Windows CRLF and Linux | Golden test | M1a |
@@ -251,4 +281,6 @@ its denominator.
 | Hook coverage | Hook outcomes journaled per runtime, fired / expected | Hook journal | M2 |
 | Liveness orphans | 0 | `keel audit` | M3 |
 | Index freshness | `index_commit` distance from head | Index status | M4 |
+| Refresh review currency | Every project entry with a local clone has a review whose scope names the milestone being exited (for example "M1a exit review"), and `scouting.last_run` is dated at or after the previous milestone exit | `docs/reference-projects.yaml` | M1a |
 | Dashboard size | Under 2 MB for a 5k-file repository | Build output | M5 |
+| Dashboard JavaScript | Under 600 KB minified, inline | Build output | M5 |

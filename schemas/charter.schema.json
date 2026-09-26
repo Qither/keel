@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/charter.schema.json",
   "title": "keel charter",
-  "description": "The frontmatter of .keel/charter.md (L0, Board-signed, budget 6 KiB for the whole file). The frontmatter holds every machine-read part: mission, invariants, decision boundaries, precedence, reserved-action additions, pitfalls and the root signer. The Markdown body explains them for humans and must contain the level-2 sections in x-keel-sections, in order; further sections may follow. Changes take effect only once signed; every artifact stamps charter_version, and the frame gate flags a MAJOR or MINOR lag.",
+  "description": "The frontmatter of .keel/charter.md (L0, Board-approved, budget 6 KiB for the whole file). The frontmatter holds every machine-read part: mission, invariants, decision boundaries, precedence, reserved-action additions and pitfalls. The Markdown body explains them for humans and must contain the level-2 sections in x-keel-sections, in order; further sections may follow. Changes take effect only once approved with keel approve --doc and committed by a governance commit; every artifact stamps charter_version, and the frame gate flags a MAJOR or MINOR lag.",
   "$comment": "x-keel-sections is an annotation keyword registered by scripts/validate.mjs, which checks mapped Markdown examples against it.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M1a",
@@ -15,10 +15,6 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 200
-    },
-    "root_signer": {
-      "description": "Fingerprint of the root Board signer. allowed_signers changes chain back to it, and keel init records trust on first use.",
-      "$ref": "common.schema.json#/$defs/sshFingerprint"
     },
     "invariants": {
       "type": "array",
@@ -47,7 +43,6 @@
   "required": [
     "charter_version",
     "mission",
-    "root_signer",
     "invariants",
     "decision_boundaries",
     "precedence",

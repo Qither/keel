@@ -166,7 +166,7 @@ for each submitted tip, in wave order:
 
 ## 三种落地情况
 
-落地发生在落地门禁通过、并且落地审批（或在按策略落地时，已签名的落地策略和请求）验证通过之后（[11-verification.zh-CN.md](11-verification.zh-CN.md)）。归档提交成为新的主干末端。
+落地发生在落地门禁通过、并且落地审批（或在按策略落地时，已批准的落地策略和请求）验证通过之后（[11-verification.zh-CN.md](11-verification.zh-CN.md)）。归档提交成为新的主干末端。
 
 1. 祖先关系：`git merge-base --is-ancestor <trunk> <archive>`。如果主干不是祖先，说明主干已移动：以退出码 5 退出，restack 后再次落地。
 2. `git worktree list --porcelain` 显示哪个工作树（如果有）检出了主干。
@@ -213,9 +213,9 @@ reflogs   git reflog show -n <k> <ref>             newest entries of each HEAD a
 remotes   git ls-remote <remote>                   each configured remote, read-only
 ```
 
-- 引用、HEAD 和 reflog 部分在摄入（ingest）时和落地时做 diff。只有当 Steward 把某项变更记录为 `vcs.op` 账本事件，或者该变更是席位提交对其自身任务分支的快进（如上所述被保留），或者它是账本锚点 `refs/keel/ledger/head` 的移动且与负责监督的 Steward 进程自己所做的追加或该时间窗口内追加的董事会签名审批相符时（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)），这项变更才算得到解释。任何其他变更都会设置 `blocked(reserved_op)` 并成为董事会事项。
+- 引用、HEAD 和 reflog 部分在摄入（ingest）时和落地时做 diff。只有当 Steward 把某项变更记录为 `vcs.op` 账本事件，或者该变更是席位提交对其自身任务分支的快进（如上所述被保留），或者它是账本锚点 `refs/keel/ledger/head` 的移动且与负责监督的 Steward 进程自己所做的追加相符时（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)），这项变更才算得到解释。任何其他变更都会设置 `blocked(reserved_op)` 并成为董事会事项。
 - `git ls-remote` 在每次运行前后执行。远程引用发生变化即为 `blocked(reserved_op)`。如果某个远程无法访问，检查报告 `unknown`，从不报告 `pass`。
-- 检测无法分辨是谁移动了引用。董事会在运行期间手动移动的引用会像其他引用一样被标记；董事会用签名豁免（override）（`keel approve <RUN> --rule override`）清除它。在并行运行时，一项未解释的变更会归因于时间窗口覆盖它的每一次运行。
+- 检测无法分辨是谁移动了引用。董事会在运行期间手动移动的引用会像其他引用一样被标记；董事会用已批准的豁免（override）（`keel approve <RUN> --rule override`）清除它。在并行运行时，一项未解释的变更会归因于时间窗口覆盖它的每一次运行。
 - 使用 JjBackend 时，操作日志是额外的检测来源。
 
 正是这一点让"每项保证在纯 git 上都成立"为真：检测不需要钩子、不需要垫片（shim），也不需要 jj。
@@ -276,7 +276,7 @@ JjBackend 需主动启用（M7），只做增加，从不替代。这些想法�
 | 逐修订检查 | 分离工作树 | `jj run` |
 | 落地 | ff-only 或 CAS `update-ref` | 经过相同检查后设置书签 |
 
-M7 退出标准：M1-M4 测试套件在两个后端上都通过，并且在项目中途禁用 jj 不会丢失任何追踪、证据或审批，因为这三者都存在于 git 提交尾注、账本和已提交的信封中。
+M7 退出标准：M1-M4 测试套件在两个后端上都通过，并且在项目中途禁用 jj 不会丢失任何追踪、证据或审批，因为这三者都存在于 git 提交尾注、账本和已提交的批准记录中。
 
 ## Windows 说明
 

@@ -72,7 +72,8 @@ export interface ProfileEnvMapping {
 
 /**
  * The child environment as an allowlist, never a copy of the parent minus some names. Never passed:
- * other profiles' variables, the ssh agent socket, Board variables and git credential helpers.
+ * other profiles' variables, the ssh agent socket (git transport credentials stay with the user) and git
+ * credential helpers.
  */
 export interface EnvAllowlist {
   /** Base OS variables the runtime needs to start; an env-policy constant from M2. */

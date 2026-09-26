@@ -15,7 +15,7 @@ For every landed line, keel is designed to answer:
 - from which byte-identical brief;
 - proven by which evidence that keel re-executed itself;
 - governed by which architecture element and rules;
-- signed by which human.
+- approved by which human, after viewing which content.
 
 That answer has to hold on any of the supported runtimes (Claude Code, Codex, Gemini CLI, Qwen Code,
 Kimi Code, opencode, plus GLM-family and Gemini-family models reached through a host runtime or keel's
@@ -36,7 +36,9 @@ nothing that runs as a product:
 
 The single declared tooling exception is `scripts/validate.mjs`, which checks the skeleton itself. There
 is no `keel` executable yet; the commands shown in the docs are the designed interface. The roadmap from
-M1a to M8, with exit criteria, is in [docs/15-roadmap.md](docs/15-roadmap.md).
+M1a to M8, with exit criteria, is in [docs/15-roadmap.md](docs/15-roadmap.md). The owner's statement that
+every document derives from, with the ids R1–R5, D1–D7 and P1–P4, is
+[docs/00-mandate.md](docs/00-mandate.md).
 
 ## What keel does, in one screen
 
@@ -44,9 +46,10 @@ M1a to M8, with exit criteria, is in [docs/15-roadmap.md](docs/15-roadmap.md).
   proposal compile into one hashed brief per seat and subject. See [docs/02-alignment.md](docs/02-alignment.md).
 - **Checked understanding.** Every seat acknowledges (ACK) its brief before its first edit; keel diffs the
   ACK's id set against the brief, and the seat echoes the brief hash again at submit.
-- **Signed authority.** Board approvals are `ssh-keygen -Y` signatures bound to artifact hashes and to
-  the ledger chain head. keel refuses to sign or accept an approval while a Board key is loadable from an
-  ssh-agent, unless it is a FIDO2 `-sk` key (every signature then needs a touch).
+- **Explicitly confirmed authority.** A Board approval is a confirmation the Board gives after viewing the
+  specific change; keel records it with the artifact hashes, the declared approver and the time, and any
+  change to the approved content invalidates it. Seat output can never produce an approval, and no key,
+  signer list or hardware is involved. See [docs/02-alignment.md](docs/02-alignment.md).
 - **Re-executed evidence.** The Steward re-runs the full acceptance matrix on the integrated commit at land.
   Evidence files are a cache, and `not_run` is never `pass`. See
   [docs/11-verification.md](docs/11-verification.md).
@@ -69,7 +72,7 @@ What keel is not (an agent runtime, an LLM router, a sandbox, a hosted service, 
 
 | Path | Contents |
 | --- | --- |
-| `docs/` | Design documents: start at [docs/README.md](docs/README.md) for the reading order and the single-home table |
+| `docs/` | Design documents: the root is [docs/00-mandate.md](docs/00-mandate.md); start at [docs/README.md](docs/README.md) for the reading order and the single-home table; `docs/reference-projects.yaml` is the reference registry (P4) |
 | `docs/adr/` | keel's own architecture decision records (ADR-0001 onwards) |
 | `schemas/` | JSON Schemas (draft 2020-12); `common.schema.json` is the only home of id patterns and shared enums |
 | `src/` | Type-only TypeScript mirroring the schemas and interfaces; no runtime code in M0 |
@@ -81,7 +84,7 @@ What keel is not (an agent runtime, an LLM router, a sandbox, a hosted service, 
 | `templates/` | Project, proposal, runtime and prompt templates, including the review lenses |
 | `examples/` | The golden example project `acme-notes`, a names-only provider env example, a static dashboard mock |
 | `test/` | Test plan and fixtures (loopback fake providers, env stripping) |
-| `scripts/validate.mjs` | The declared M0 tooling exception: schema, example, strict-subset, bilingual-doc, audit and manifest checks |
+| `scripts/validate.mjs` | The declared M0 tooling exception: schema, example, strict-subset, bilingual-doc, audit, manifest and reference-registry checks |
 | `AGENTS.md`, `CLAUDE.md` | Guidance for agents that develop keel itself |
 
 The complete, checked file list is the manifest in
@@ -95,7 +98,7 @@ Requires Node >= 22.13.
 npm ci
 npm run check                                  # typecheck + validate, as CI runs it
 node scripts/validate.mjs --only audit         # one check
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
 ```
 
 CI runs the same commands on windows-latest and ubuntu-latest with Node 22.13 and 24.

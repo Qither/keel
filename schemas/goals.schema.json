@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/goals.schema.json",
   "title": "keel goals",
-  "description": "The Board-signed .keel/goals.yaml (L1). Every proposal cites at least one active goal (frame gate), the brief's why-chain starts at the goal, budgets roll up per goal, and goal progress is the requirements verified at head over the total.",
+  "description": "The Board-approved .keel/goals.yaml (L1). Every proposal cites at least one active goal (frame gate), the brief's why-chain starts at the goal, budgets roll up per goal, and goal progress is the requirements verified at head over the total.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M1a",
   "type": "object",

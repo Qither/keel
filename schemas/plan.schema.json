@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/plan.schema.json",
   "title": "keel plan",
-  "description": "The .keel/proposals/<P>-<slug>/plan.yaml written by the planner (L6). It lists tasks; each task's details live in its own work order, the single home for covers, after, write sets and acceptance. The Steward computes waves from the work orders and the plan gate returns PASS, CONCERNS or FAIL. Plan approval signs this file, the work orders and routing.snapshot.yaml. The campaign kind is a deferred stub (M8).",
+  "description": "The .keel/proposals/<P>-<slug>/plan.yaml written by the planner (L6). It lists tasks; each task's details live in its own work order, the single home for covers, after, write sets and acceptance. The Steward computes waves from the work orders and the plan gate returns PASS, CONCERNS or FAIL. Plan approval binds this file, the work orders and routing.snapshot.yaml. The campaign kind is a deferred stub (M8).",
   "x-keel-status": "stable",
   "x-keel-milestone": "M2",
   "anyOf": [{ "$ref": "#/$defs/standard" }, { "$ref": "#/$defs/campaign" }],

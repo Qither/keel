@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/routing.schema.json",
   "title": "keel routing",
-  "description": "The Board-signed .keel/routing.yaml: seat to runtime, profile alias and tier bindings with Board-declared families. It holds NAMES only: environment variable names, aliases, protocol, declared family and auth mode. No field can hold an endpoint, a key or a model name; the user sets those values in their own environment. Dispatch refuses without a valid signature.",
+  "description": "The Board-approved .keel/routing.yaml: seat to runtime, profile alias and tier bindings with Board-declared families. It holds NAMES only: environment variable names, aliases, protocol, declared family and auth mode. No field can hold an endpoint, a key or a model name; the user sets those values in their own environment. Dispatch refuses without a valid document approval.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M2",
   "type": "object",
@@ -31,7 +31,7 @@
       "properties": {
         "protocol": { "$ref": "common.schema.json#/$defs/protocol" },
         "family": {
-          "description": "Declared family: a Board-signed declaration, shown as declared and never as verified.",
+          "description": "Declared family: a Board-approved declaration, shown as declared and never as verified.",
           "$ref": "common.schema.json#/$defs/family"
         },
         "auth": { "$ref": "common.schema.json#/$defs/authMode" },

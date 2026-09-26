@@ -49,6 +49,9 @@ keel also needs YAML parsing and JSON Schema validation, and must hash text iden
 ## Consequences
 
 - The dependency surface is two packages plus their companions, and nothing needs a compiler on install.
+- The dashboard's frontend libraries (React and TanStack) are compiled into bundles at package build and are
+  not runtime dependencies ([ADR-0009](ADR-0009-tanstack-frontend.md)); the dependency surface above is
+  unchanged.
 - Windows is a first-class CI target, so Windows-only failures surface on every change.
 - The spawn contract adds per-runtime descriptor fields (Windows resolution, prompt channel, exit-code map)
   that must be probed and kept current ([09-runtimes.md](../09-runtimes.md)).

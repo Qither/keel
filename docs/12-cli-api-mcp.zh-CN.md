@@ -4,16 +4,16 @@
 
 本文档是 keel 命令接口的归属文档（home）：16 个动词及其计数的模式、JSON 信封（envelope）、退出码、面向智能体的 `keel api`、带 `keel_submit` 写入范围的 MCP 服务器，以及 `keel hook` 入口。在 M0 中这里的一切都不可执行；在 M1 之前 `package.json` 没有 `bin`。该接口在类型层面的镜像是 `src/cli/commands.ts`（动词、模式和退出码）和 `src/api/contract.ts`（api 操作、提交通道、信封）；`src/mcp/tools.ts` 为 MCP 工具定义类型。本文档与这些文件必须列出相同的动词、模式和代码。
 
-相关归属文档：各门禁（gate）检查什么见 [11-verification.zh-CN.md](11-verification.zh-CN.md)；签名与批准的语义见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)；各运行时（runtime）的提交通道见 [09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)；所有者的日常命令见 [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md)。
+相关归属文档：各门禁（gate）检查什么见 [11-verification.zh-CN.md](11-verification.zh-CN.md)；批准的语义见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)；各运行时（runtime）的提交通道见 [09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)；所有者的日常命令见 [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md)。
 
 ## 1. 16 个动词与至多 40 个模式
 
 接口预算（KP-14）是 16 个顶层动词和至多 40 个动词模式；这一教训来自 oh-my-claudecode、oh-my-codex、BMAD-METHOD 和 superpowers 的接口膨胀。概要：
 
 ```text
-keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--signer <public key file>] [--yes]
+keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--yes]
 keel sync [--check] [--runtime <id>]
-keel doctor [--section runtimes|providers|vcs|signing|exposure|arch] [--conformance] [--selftest] [--json]
+keel doctor [--section runtimes|providers|vcs|approvals|exposure|arch] [--conformance] [--selftest] [--json]
 keel new "<title>" [--goal G-nn] [--track spike|patch|feature|system] [--policy <name>]
 keel approve <subject> --stage contract|plan|land|receipt
 keel approve --doc <path>
@@ -21,7 +21,7 @@ keel approve --policy <name>
 keel approve <subject> --request
 keel approve <subject> --rule answer|budget|track|override|dismiss|degraded|unverified|abandon
              [--until <date|land|commit-touching:path>] [--limit <usd|runs|wall_minutes>=<n>]
-             [--to spike|patch|feature|system] [--quote "<text>"]
+             [--to spike|patch|feature|system] [--note "<text>"] [--as <approver>]
 keel run <P|P.Tn> [--seat <seat>] [--wave] [--runtime <id>] [--resume] [--dry-run]
 keel run --hold on|off <P>
 keel check [<P>] [--gate frame|plan|submit|verify|land|all] [--check <id>] [--at <commit>] [--json]
@@ -38,7 +38,7 @@ keel api mcp [--http]
 keel hook <canonical event> --runtime <id>
 ```
 
-计数规则。一个模式是一个子命令词，或一个选择不同操作的标志（不同的副作用、不同的签名对象种类，或某个操作的仅检查变体）。不计数的有：枚举参数值（`--stage`、`--rule`、`--section`、`--gate` 的取值）、输出视图（`--json`、`--format`、`--next`、`--matrix`）、过滤器（`--check <id>`、`--at`、`--seat`、`--runtime`）以及调节项（`--wave`、`--resume`、`--until`、`--limit`、`--to`、`--quote`、`--out`、`--port`、`--http`、`--goal`、`--track`、`--vcs`、`--runtimes`、`--signer`、`--yes`）。`keel new --policy <name>` 是受理加上 `approve --request` 签名流程，因此签名只在 `approve` 下计数一次。
+计数规则。一个模式是一个子命令词，或一个选择不同操作的标志（不同的副作用、不同的批准对象种类，或某个操作的仅检查变体）。不计数的有：枚举参数值（`--stage`、`--rule`、`--section`、`--gate` 的取值）、输出视图（`--json`、`--format`、`--next`、`--matrix`）、过滤器（`--check <id>`、`--at`、`--seat`、`--runtime`）以及调节项（`--wave`、`--resume`、`--until`、`--limit`、`--to`、`--note`、`--as`、`--out`、`--port`、`--http`、`--goal`、`--track`、`--vcs`、`--runtimes`、`--yes`）。`keel new --policy <name>` 是受理加上 `approve --request` 确认流程，因此批准只在 `approve` 下计数一次。
 
 | 动词 | 计数的模式 | 数量 | 在 `KEEL_RUN` 下 | 阶段 |
 | --- | --- | --- | --- | --- |
@@ -64,20 +64,20 @@ keel hook <canonical event> --runtime <id>
 
 各动词的作用：
 
-- **init** 搭建 `.keel/`、控制平面 `.git/keel/` 和工作区根目录，设置 `trace.since`（追溯纪元），并在征得同意后根据 `--signer <public key file>` 登记第一位董事会（Board）签名者（首次使用即信任，并在 `.keel/signatures/` 中记录一段引用的同意声明；密钥的指定方式见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)），然后运行 `sync`。幂等。
+- **init** 搭建 `.keel/`、控制平面 `.git/keel/` 和工作区根目录，设置 `trace.since`（追溯纪元），并运行 `sync`。它不需要任何密钥、签名者或硬件；董事会（Board）事后用 `keel approve --doc` 批准搭建出的文档。幂等。
 - **sync** 生成 keel 自有的接入面，并为共享设置打印片段（[09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)）。`--check` 不写任何东西，在出现漂移（drift）或手册预算超限时失败。
-- **doctor** 运行能力探测并打印验证状态：SET/UNSET 的环境变量名和 PRESENT/ABSENT 的模型提供方（provider）路径（仅 stat）、兼容性、认证模式、暴露面画像（exposure profile）（工具环境变量、工具文件、控制平面、垫片覆盖）、信任状态、签名卫生（加载在 agent 中的密钥、已验证的 `ssh-keygen` 路径、`-sk`）、git 版本下限、ref 冲突和 jj 隐患检查，以及惰性的架构检查。`--conformance` 在用户主动选择时于真实路由上运行行为场景；`--selftest` 在临时仓库中演练每个动词。
-- **new** 铸造一个提案（proposal）id，检查锚点，划分轨道（track），并创建 `keel/<P>/main` 和计划工作树（worktree）。使用 `--policy` 时，董事会在同一交互流程中对逐字的请求签名。
-- **approve** 是唯一的董事会签名路径。它构建一个与哈希绑定、锚定到链上的信封，以交互方式确认（TTY，或在 Git Bash mintty 下输入确认码），准确展示需要阅读的内容，然后把信封提交到 `.keel/signatures/` 下。`--stage` 签署一个检查点（checkpoint），`--doc` 签署一份治理文档，`--policy` 签署一项常设策略（standing policy），`--request` 签署一个逐字的变更请求，`--rule` 签署一项裁定（ruling）（`--until` 设置豁免的到期时间，`--limit` 设置预算裁定的新上限，`--to` 设置轨道裁定所定的轨道；这两个值都签入信封的 `rule` 对象中）。只要有任何允许的签名者密钥被 agent 列出且不是 `-sk`，它就以退出码 6 退出。
-- **run** 是确定性的派发器：解析已签名的路由、兼容性、暴露规则和一致性测评状态（conformance status）；认领（claim）；创建稀疏工作树；对 ref 做快照；编译简报（brief）；以每次运行的配置无头派生；摄取提交通道；创建 Steward 提交。`--dry-run` 在认领和派生之前停止，并打印解析出的路由和 argv 模板。`--hold on|off <P>` 暂停或释放一个提案。
+- **doctor** 运行能力探测并打印验证状态：SET/UNSET 的环境变量名和 PRESENT/ABSENT 的模型提供方（provider）路径（仅 stat）、兼容性、认证模式、暴露面画像（exposure profile）（工具环境变量、工具文件、控制平面、垫片覆盖）、批准状态（没有账本事件的记录、所绑定内容已变更的批准、即将到期的文档与策略）、git 版本下限、ref 冲突和 jj 隐患检查，以及惰性的架构检查。`--conformance` 在用户主动选择时于真实路由上运行行为场景；`--selftest` 在临时仓库中演练每个动词。
+- **new** 铸造一个提案（proposal）id，检查锚点，划分轨道（track），并创建 `keel/<P>/main` 和计划工作树（worktree）。使用 `--policy` 时，董事会在同一交互流程中查看并批准逐字的请求。
+- **approve** 是唯一的董事会批准路径。它准确展示需要阅读的内容和变更本身，接受显式确认（在 TTY 上输入确认词，或在 Git Bash mintty 下输入所显示的确认码），重新计算所绑定产物的哈希，并把记录连同其 `approval.recorded` 事件写入 `.keel/approvals/` 下（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。`--stage` 批准一个检查点（checkpoint），`--doc` 批准一份治理文档，`--policy` 批准一项常设策略（standing policy），`--request` 批准一个逐字的变更请求，`--rule` 批准一项裁定（ruling）（`--until` 设置豁免的到期时间，`--limit` 设置预算裁定的新上限，`--to` 设置轨道裁定所定的轨道；这两个值都记入记录的 `rule` 对象中）。`--note` 添加备注；在未配置 `board.approver` 时，`--as` 指定本次确认的批准人。它在 keel 运行内拒绝执行，在席位运行期间等待监督者锁，并在所绑定产物于显示期间发生变化时以 `changed-during-confirmation` 拒绝。
+- **run** 是确定性的派发器：解析已批准的路由、兼容性、暴露规则和一致性测评状态（conformance status）；认领（claim）；创建稀疏工作树；对 ref 做快照；编译简报（brief）；以每次运行的配置无头派生；摄取提交通道；创建 Steward 提交。`--dry-run` 在认领和派生之前停止，并打印解析出的路由和 argv 模板。`--hold on|off <P>` 暂停或释放一个提案。
 - **check** 运行阶段门禁；见 [11-verification.zh-CN.md](11-verification.zh-CN.md)。
-- **land** 执行集成、预览、在集成提交上重新执行验收，并写出回执草稿。若该草稿尚无落地批准（也没有已签名的落地策略），它就在此停止并以退出码 3 结束。在 `keel approve <P> --stage land` 之后，再次运行 `keel land` 会验证签名、写入归档提交（其中投影已签名的回执），并推进主干（ff-only 或 CAS）。`--preview` 在预览之后停止。放弃通过 `keel approve <P> --rule abandon` 完成。
+- **land** 执行集成、预览、在集成提交上重新执行验收，并写出回执草稿。若该草稿尚无落地批准（也没有已批准的落地策略），它就在此停止并以退出码 3 结束。在 `keel approve <P> --stage land` 之后，再次运行 `keel land` 会检查草稿的哈希仍与记录所绑定的一致、写入归档提交（其中投影已批准的回执），并推进主干（ff-only 或 CAS）。`--preview` 在预览之后停止。放弃通过 `keel approve <P> --rule abandon` 完成。
 - **status** 根据账本（ledger）计算状态；`--next` 列出合法的下一步动作。
 - **trace** 从某个文件行、符号、提交或 id 出发遍历追溯图；`--matrix` 打印 RTM（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)）。
 - **brief** 打印某个席位（seat）和对象的已编译简报，附带其哈希和 ACK（复述确认）id 集。它是拉取通道，也是梯级（rung）D 的粘贴来源。
 - **arch** 涵盖逐提交的索引、映射到架构元素（element）的搜索、影响面（impact）、漂移、类型化的架构操作以及导出（[07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)）。
 - **audit** 执行活性、租约、豁免（override）和链的巡检；`--rebuild` 用集合差比较 `trace.db` 与一次完整重建的结果；`--export-vcs` 导出 jj 操作日志和 evolog；`--backfill` 回填指标序列。
-- **dashboard** 构建只读的原生 HTML 看板（dashboard），或在回环地址上提供服务（[08-dashboard.zh-CN.md](08-dashboard.zh-CN.md)）。
+- **dashboard** 构建只读看板（dashboard），或在回环地址上提供服务（[08-dashboard.zh-CN.md](08-dashboard.zh-CN.md)）。
 - **api** 和 **hook** 是智能体和运行时的入口（第 4 至 6 节）。
 
 防席位误用的动词。表中每个标为拒绝的模式，在设置了 `KEEL_RUN` 或 `KEEL_RUN_ID` 时，或当某个祖先进程是已登记的 keel 运行时，都会拒绝（Windows 上的祖先进程遍历待探测验证（verify by probe））。蓝图点名了 `new`、`run`、`land`、`sync`、`audit` 和 `approve`；其余被拒绝的模式源自这样一条规则：只有 Steward 写声明平面、控制平面和 ref。
@@ -137,7 +137,7 @@ keel 自身的退出码，所有动词共用：
 | 3 | 需要人工 | 有待处理的董事会事项：批准、提问、裁定、停止类别、需要决策的 `blocked(...)` |
 | 4 | 认领冲突 | 认领 ref 上的 CAS 失败；从不自动重试 |
 | 5 | 已过期，或检出的主干有未提交改动 | 主干已移动（重新堆叠后重试），或检出了主干的工作树有未提交改动 |
-| 6 | 环境问题 | 签名密钥加载在 agent 中、git 缺失或过旧、`ssh-keygen` 未验证、在 `KEEL_RUN` 下被拒绝 |
+| 6 | 环境问题 | git 缺失或过旧、在 `KEEL_RUN` 下或存在 keel 运行祖先进程时被拒绝 |
 
 运行时退出码（例如 53 轮次上限、55 预算、42 输入错误、143 仅限 POSIX）是另一回事：描述符把它们映射为规范的运行结果（[09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)）。
 

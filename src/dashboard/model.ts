@@ -7,9 +7,11 @@
  * Minimal shape until M5. The model is computed from ledger events, the committed `.keel/` files and the
  * derived caches; nothing in it is stored state, and the only file written is the rendered page. It holds
  * names only (profile aliases, env var names with SET or UNSET, declared families), never a provider
- * value. The page is native HTML with hand-written CSS (P2), readable without JavaScript, with text labels
- * for every colour and visible denominators. Board actions appear only as copyable `keel approve ...`
- * commands; `keel dashboard serve` has no write endpoints. docs/08-dashboard.md is the home.
+ * value. The page is a TanStack (React) application, headless over native HTML with hand-written CSS tokens
+ * (revised P2, ADR-0009), pre-rendered so it reads without JavaScript and hydrated for interaction, with
+ * text labels for every colour and visible denominators. Board actions appear only as copyable
+ * `keel approve ...` commands; `keel dashboard serve` has no write endpoints. docs/08-dashboard.md is the
+ * home.
  */
 import type { ElementPage, SeriesPoint } from "../arch/analysis.js";
 import type { Freshness } from "../core/brief.js";
@@ -42,8 +44,7 @@ export type BoardQueueKind =
   | "unverified-lane"
   | "liveness-orphan"
   | "unacknowledged-receipt"
-  | "unsigned-document"
-  | "agent-loaded-key"
+  | "unapproved-document"
   | "reserved-op";
 
 /** One Board queue item, with what to read and the copyable command. */

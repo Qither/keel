@@ -2,18 +2,21 @@
 
 ## Status
 
-Accepted on 2026-09-25. The technology rule follows the owner's standing preference P2; read-only operation
-was adopted by recommendation. Reversible through a superseding ADR.
+Accepted on 2026-09-25. Read-only operation was adopted by recommendation and is reversible by rewriting
+this ADR. The technology of the dashboard (TanStack on React, headless over native markup, pre-rendered
+and bundled) is decided by [ADR-0009](ADR-0009-tanstack-frontend.md); this ADR owns the read-only rule,
+the serve boundary and the single approval path.
 
 ## Context
 
 The Board needs one place to see goals, proposals, the trace matrix, architecture, the org, evidence,
 runtime health and the change feed. Dashboards tend to grow action buttons, and an "approve" button would
-create a second approval path that bypasses the signed, key-hygiene-checked `keel approve`
-([ADR-0005](ADR-0005-signed-board-approvals.md)). A local web server with write endpoints would also be a
+create a second approval path that bypasses `keel approve`, where the Board views the change and confirms
+it explicitly ([ADR-0005](ADR-0005-explicit-confirmation-approvals.md)). A local web server with write endpoints would also be a
 target for any page the user's browser loads.
 
-P2 requires native HTML elements and hand-written CSS, with no frameworks.
+P2 requires TanStack libraries, headless over native HTML elements with hand-written CSS and no UI kit,
+CDN or web font ([ADR-0009](ADR-0009-tanstack-frontend.md)).
 
 ## Decision
 
@@ -33,8 +36,8 @@ P2 requires native HTML elements and hand-written CSS, with no frameworks.
 
 ## Consequences
 
-- Authority has exactly one path: the terminal and a Board key. The dashboard cannot be used to approve,
-  even by a page that reaches the loopback server.
+- Authority has exactly one path: an explicit confirmation at the Board's terminal. The dashboard cannot be
+  used to approve, even by a page that reaches the loopback server.
 - The serve mode needs no authentication because it exposes no writes; the Host and Origin checks guard
   against DNS rebinding reads.
 - The Board copies commands instead of clicking; that friction is intended.
@@ -44,9 +47,10 @@ P2 requires native HTML elements and hand-written CSS, with no frameworks.
 
 ## Alternatives considered
 
-- **A web app with approve and ruling buttons.** Rejected: a second approval path outside key hygiene and
-  interactive confirmation.
-- **A frontend framework or widget library.** Rejected by P2.
+- **A web app with approve and ruling buttons.** Rejected: a second approval path outside the show-and-confirm
+  flow of `keel approve` and its refusal rules.
+- **A UI kit, a CSS framework or a CDN.** Rejected by P2; the headless TanStack libraries that P2 requires
+  are decided in [ADR-0009](ADR-0009-tanstack-frontend.md).
 - **A hosted dashboard.** Rejected: keel is local-first and not a hosted service.
 - **CLI output only.** Rejected: the architecture view, trace matrix and Board queue need a visual overview;
   the CLI keeps `--json` for scripts.
@@ -55,5 +59,5 @@ P2 requires native HTML elements and hand-written CSS, with no frameworks.
 
 - axumquant/arch-viewer: a self-contained HTML/SVG view with click-through detail and a change feed.
 - codegraph: loopback Host and Origin checks.
-- The owner's standing preference P2.
+- The owner's standing preference P2 ([ADR-0009](ADR-0009-tanstack-frontend.md) decides the technology).
 - See [16-sources-credits.md](../16-sources-credits.md).

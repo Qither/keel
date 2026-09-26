@@ -1,17 +1,20 @@
 # keel vision, positioning and principles
 
-This document owns keel's positioning and non-goals, the mapping from the owner's requirements and
-decisions to the design, the principles KP-01 to KP-16, the glossary, and one end-to-end example. Every
-other concept has its home elsewhere; the single-home table in [README.md](README.md) says where.
+This document owns keel's positioning and non-goals, the mapping that shows how the design meets the
+owner's mandate, the principles KP-01 to KP-16, the glossary, and one end-to-end example. The requirement
+statements themselves and their provenance live in [00-mandate.md](00-mandate.md), which is authoritative;
+this document only shows how the design meets them. Every other concept has its home elsewhere; the
+single-home table in [README.md](README.md) says where.
 
 ## One-line positioning and non-goals
 
-**keel is a git-native, traceable company of multi-vendor AI employees with compiled intent, signed
-approvals, re-executed evidence and architecture intelligence.**
+**keel is a git-native, traceable company of multi-vendor AI employees with compiled intent, explicitly
+confirmed approvals, re-executed evidence and architecture intelligence.**
 
 keel is a local-first TypeScript/Node CLI. It ships an MCP server with two read tools and one outbox-only
-write tool, and a static native-HTML dashboard. It runs a small, contract-bound company of coding agents
-from different vendors: Claude Code, Codex, Gemini CLI, Qwen Code, Kimi Code and opencode. GLM-family and
+write tool, and a read-only dashboard built with TanStack and pre-rendered to one self-contained page
+([08-dashboard.md](08-dashboard.md)). It runs a small, contract-bound company of coding agents from
+different vendors: Claude Code, Codex, Gemini CLI, Qwen Code, Kimi Code and opencode. GLM-family and
 Gemini-family models are reached through host runtimes or through keel's direct lane.
 
 The company has three parts ([01-org-model.md](01-org-model.md)):
@@ -30,9 +33,9 @@ Goal consistency is enforced mechanically, not by persuasion:
    one hashed brief per seat and subject ([02-alignment.md](02-alignment.md)).
 2. Every seat ACKs, and keel diffs the ACK's id sets against the brief.
 3. At submit, keel recompiles the brief and the seat echoes it again.
-4. Approvals are Board ssh signatures bound to artifact hashes and to the ledger chain head, including the
-   request that starts a standing-policy change. keel refuses to make or accept an approval while a Board
-   key is loadable from an ssh-agent, unless it is a FIDO2 `-sk` key.
+4. Approvals are explicit Board confirmations of a shown change, recorded with the artifact hashes, the
+   approver and the time, including the request that starts a standing-policy change. Any change to
+   approved content invalidates the approval, and seat output can never produce one.
 5. Tests are fixed independently of the code. Policy lands also need proof that a test failed before the
    change and passes after it (red-before/green-after).
 6. The Steward's runner re-executes evidence on the integrated commit at land.
@@ -46,8 +49,8 @@ with a derived code graph rented from codegraph or SCIP through keel's IndexProv
 keel provides search, impact, drift, ownership, a change feed and the upward-only track ratchet
 ([07-architecture-intelligence.md](07-architecture-intelligence.md)).
 
-git alone is sufficient: trailers, create-only CAS refs, worktrees, merge-tree, ref snapshots and ssh
-signatures. jj is an opt-in accelerator ([05-vcs.md](05-vcs.md)). keel runs natively on Windows with no
+git alone is sufficient: trailers, create-only CAS refs, worktrees, merge-tree, ref snapshots and
+committed approval records. jj is an opt-in accelerator ([05-vcs.md](05-vcs.md)). keel runs natively on Windows with no
 tmux, WSL, Docker, bash or python.
 
 ### The pitch
@@ -59,9 +62,10 @@ For every landed line keel can answer:
 - from which byte-identical brief;
 - proven by which re-executed evidence;
 - governed by which architecture element and rules;
-- signed by which human.
+- approved by which human, as declared, after viewing which content.
 
-This holds on any of the six LLM stacks, on plain git, on Windows.
+This holds on every supported runtime (the six host runtimes and the direct lane), on plain git, on
+Windows.
 
 ### Non-goals
 
@@ -72,7 +76,7 @@ keel is not:
 - persona role-play ([01-org-model.md](01-org-model.md) explains why);
 - a code-graph engine: it rents one through the IndexProvider port;
 - a hosted service;
-- an OS security sandbox. keel is a cooperative process with signed human authority, re-execution and
+- an OS security sandbox. keel is a cooperative process with explicitly confirmed human authority, re-execution and
   after-the-fact detection, and `keel doctor` reports, per runtime and OS, what it prevents and what it
   only detects ([14-trust-security.md](14-trust-security.md));
 - a user of the OpenSpec CLI;
@@ -84,28 +88,30 @@ knows only environment variable names, protocol ids, aliases and a names-only pr
 dereferences environment values only in memory, at spawn time and at direct-lane call time
 ([10-providers.md](10-providers.md)).
 
-## Requirement mapping R1–R5 / D1–D7 / P1–P3
+## Requirement mapping R1–R5 / D1–D7 / P1–P4
 
-R1 to R5 are the owner's requirements, D1 to D7 the fixed decisions, and P1 to P3 the owner's standing
-preferences. Each row names where the design meets it.
+R1 to R5 are the owner's requirements, D1 to D7 the fixed decisions, and P1 to P4 the owner's standing
+preferences; their statements and provenance live in [00-mandate.md](00-mandate.md). Each row names how
+and where the design meets one of them.
 
 | Id | Requirement or decision | How keel meets it | Home |
 | --- | --- | --- | --- |
-| R1 | Borrow the best ideas from OpenSpec, codegraph, edikt, keel-other (dcsg/keel), oh-my-claudecode, oh-my-codex, old-coder, OpenHands, BMAD-METHOD, superpowers and other well-designed workflows | Every construct maps to a credited source; ELv2 sources (edikt, dcsg/keel) contribute ideas only; each principle below lists its sources | [16](16-sources-credits.md) |
-| R2 | Architecture visualization in the spirit of Sourcegraph (code intelligence, search, code graph) and arch-viewer | Declared C4-style model joined with a derived graph through IndexProvider; `keel arch find`, impact, drift with invariant proof, element pages, change feed, deterministic SVG view | [07](07-architecture-intelligence.md), [08](08-dashboard.md) |
-| R3 | Easy to use across Claude, Codex, Gemini, Qwen, Kimi and GLM | One canonical source (skills, seat contracts, descriptors), keel-owned generated surfaces, per-run config, degradation rungs A to D; GLM and Gemini-family models as declared families on host runtimes or the direct lane | [09](09-runtimes.md), [10](10-providers.md) |
-| R4 | Consider jj for parallel versions and traceability | Opt-in JjBackend behind the Vcs interface: change ids, op log and evolog, megamerge preview, `jj run`; the M7 exit requires that disabling jj loses nothing | [05](05-vcs.md), [ADR-0001](adr/ADR-0001-git-primary-jj-optional.md) |
-| R5 | A company of AI employees in roles, with guaranteed consistency with the work goals | Board, Steward and five contract-bound seats; alignment chain L0 to L11; ACK diff; signed approvals; test independence; land re-execution; cross-family review with findings authority; trace gate | [01](01-org-model.md), [02](02-alignment.md), [03](03-lifecycle.md), [11](11-verification.md) |
+| R1 | Borrow the best ideas from OpenSpec, codegraph, edikt, keel-other (dcsg/keel), oh-my-claudecode, oh-my-codex, old-coder, rtk, OpenHands, BMAD-METHOD, superpowers and other well-designed workflows; Kiro through its public documentation only | Every construct maps to a credited source; ELv2 sources (edikt, dcsg/keel) contribute ideas only; Kiro is credited from its public documentation alone; each principle below lists its sources | [00-mandate](00-mandate.md), [16](16-sources-credits.md) |
+| R2 | Architecture visualization fusing approaches of the kind Sourcegraph and arch-viewer take | Declared C4-style model joined with a derived graph through IndexProvider; from the Sourcegraph side, per-commit indexes, search, definitions and references (`keel arch find`), impact and drift with invariant proof; from the arch-viewer side, a self-contained architecture view with element pages, click-through detail and a change feed, laid out as a deterministic SVG | [07](07-architecture-intelligence.md), [08](08-dashboard.md) |
+| R3 | Usable across Claude, Codex, Gemini, Qwen, Kimi, GLM and OpenCode | One canonical source (skills, seat contracts, descriptors), keel-owned generated surfaces, per-run config, degradation rungs A to D; opencode is a host runtime and the default GLM host; GLM and Gemini-family models as declared families on host runtimes or the direct lane | [09](09-runtimes.md), [10](10-providers.md) |
+| R4 | git primary and sufficient on its own; jj only an optional enhancement for parallel versions and traceability | Every guarantee is specified in git primitives; opt-in JjBackend behind the Vcs interface: change ids, op log and evolog, megamerge preview, `jj run`; the M7 exit requires that disabling jj loses nothing | [05](05-vcs.md), [ADR-0001](adr/ADR-0001-git-primary-jj-optional.md) |
+| R5 | A company of AI employees in roles, with guaranteed consistency with the work goals | Board, Steward and five contract-bound seats; alignment chain L0 to L11; ACK diff; explicitly confirmed approvals; test independence; land re-execution; cross-family review with findings authority; trace gate | [01](01-org-model.md), [02](02-alignment.md), [03](03-lifecycle.md), [11](11-verification.md) |
 | D1 | M0 delivers a design document set plus a repository skeleton only | Docs, schemas, templates, YAML tables, type-only TypeScript, examples and fixtures; no product logic and no `bin`; `scripts/validate.mjs` is the single declared tooling exception | [13](13-artifacts-schemas.md), [15](15-roadmap.md) |
 | D2 | A fresh, independent design | Every construct maps to a permitted, credited source; the D2 provenance audit (the D2 term list in `scripts/validate.mjs`) and the ELv2 shape audit are recorded | [16](16-sources-credits.md) |
 | D3 | TypeScript/Node >= 22.13 with Markdown, YAML and JSON Schema artifacts; native on Windows without tmux, WSL, Docker, bash or python in the core | Node built-ins plus `yaml` and `ajv`; Windows spawn contract; `taskkill` cancellation; CI on windows-latest and ubuntu | [ADR-0002](adr/ADR-0002-node-windows-native.md), [06](06-parallelism.md), [09](09-runtimes.md) |
 | D4 | git is primary and fully sufficient; jj is optional behind the Vcs interface | Every guarantee, including reserved-operation detection, is specified in git primitives | [05](05-vcs.md), [ADR-0001](adr/ADR-0001-git-primary-jj-optional.md) |
 | D5 | Human-facing docs are bilingual | English canonical `<name>.md`, Simplified Chinese mirror `<name>.zh-CN.md` with identical heading levels, checked by `validate --only i18n`; identifiers English only | [README](README.md) |
-| D6 | Board approvals are ssh signatures bound to artifact hashes and the ledger chain head | `ssh-keygen -Y sign/verify`, committed detached envelopes, verification against `allowed_signers` at the last Board-signed trunk revision, fail-closed agent check | [02](02-alignment.md), [14](14-trust-security.md), [ADR-0005](adr/ADR-0005-signed-board-approvals.md) |
+| D6 | Human approval is explicit confirmation of a shown change, recorded with the subject, the artifact hashes, the approver and the time; any change to approved content invalidates it; seat output cannot approve; no SSH, key or hardware identity | `keel approve` shows the change and takes the confirmation word, writes the committed approval record and its ledger event, re-hashes after the confirmation and at every gate, refuses inside runs; a declared approver and a local clock, stated as such | [02](02-alignment.md), [14](14-trust-security.md), [ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.md) |
 | D7 | MIT licence, "Copyright (c) 2026 Qither" | `LICENSE`; package `@qither/keel` | [17](17-open-decisions.md) |
 | P1 | Provider endpoints, keys and model names belong to the user | Names-only `routing.yaml`; values dereferenced in memory in exactly two modules; exposure rule with no Board-ack path; doctor prints SET/UNSET and PRESENT/ABSENT only; loopback fakes with fake keys; protocols `anthropic-messages`, `openai-chat`, `openai-responses`, `google` | [10](10-providers.md), [14](14-trust-security.md), [ADR-0006](adr/ADR-0006-provider-values-by-reference.md) |
-| P2 | Dashboard in native HTML elements and hand-written CSS, no frameworks | One self-contained HTML file, readable without JavaScript, at most about 300 lines of vanilla JS, read-only | [08](08-dashboard.md), [ADR-0008](adr/ADR-0008-read-only-dashboard.md) |
+| P2 | Every frontend display keel ships is built with TanStack; the libraries are headless, so the markup stays native HTML elements with hand-written CSS; no UI kit, CDN or web font | TanStack on the React adapter, pre-rendered to static HTML that is readable without JavaScript and then hydrated; libraries bundled at package build and never runtime dependencies; one self-contained read-only file with no external requests | [08](08-dashboard.md), [ADR-0008](adr/ADR-0008-read-only-dashboard.md), [ADR-0009](adr/ADR-0009-tanstack-frontend.md) |
 | P3 | Borrow ideas, not dependencies | No OpenSpec CLI dependency; codegraph, SCIP and jj are optional adapters; no text or code copied from ELv2 or non-OSS sources | [16](16-sources-credits.md) |
+| P4 | Refresh discipline: at every refactor review the reference projects are pulled to their latest version, their additions are analysed, and keel is re-checked and corrected against them as a first-time design; GitHub is searched for new well-designed workflows, the owner is prompted to pull candidates locally, and adopted ideas are merged | The procedure in [00-mandate.md](00-mandate.md) section 4; the reference registry `docs/reference-projects.yaml`, validated against `schemas/reference-registry.schema.json` by the `examples` check (mapped in `schemas/examples.map.json`) and cross-referenced with the mandate and the credits by the `references` check; a refresh review in every milestone exit from M1a | [00-mandate](00-mandate.md), [15](15-roadmap.md), [16](16-sources-credits.md) |
 
 ## Principles KP-01…KP-16 (with sources)
 
@@ -140,21 +146,23 @@ restate-and-confirm practice in agent company systems.
 
 **Home.** [02-alignment.md](02-alignment.md).
 
-### KP-03 Authority is signed
+### KP-03 Authority is an explicit confirmation of shown content
 
-A Board approval is an ssh-signed envelope that binds exact artifact hashes, a quoted consent and the
-ledger chain head. Any edit invalidates it. Seats cannot approve or relay approvals. keel refuses to make or
-accept an approval while any allowed signer's public key is listed by a reachable ssh-agent, unless it is a
-FIDO2 `-sk` key. Signature envelopes and the signer list are committed, so they verify on every clone.
+A Board approval is an explicit confirmation of a change the Board viewed, recorded with the exact artifact
+hashes, the declared approver and the time. Any edit to approved content invalidates it and brings the
+change back to the Board. Seats cannot approve, relay approvals or fabricate them: only `keel approve`,
+run by a human outside any keel run, writes a record and its ledger event. Records are committed, so every
+clone can read what was approved and at which version.
 
-**Why.** A TTY check works only while every process cooperates. On Windows, an agent-held key is usable by
-any process running as the same user. A signature that needs a passphrase per signature, or a hardware
-touch, makes authority authentic.
+**Why.** The owner asks keel to keep the human's decision right and the consistency between what was
+approved and what runs, not to defeat a malicious program under the same OS account. A confirmation bound
+to content hashes gives exactly that, without keys, signer lists or hardware. keel states the limit plainly
+instead of claiming an authenticity it cannot provide on native Windows.
 
-**Sources.** old-coder (quotable consent), superpowers (approval binds only the presented artifact),
-BMAD-METHOD (frozen after approval), OpenSSH `ssh-keygen -Y`.
+**Sources.** old-coder (consent bound to a version), superpowers (approval binds only the presented
+artifact), BMAD-METHOD (frozen after approval), the owner's mandate (D6).
 
-**Home.** [02-alignment.md](02-alignment.md); key hygiene in [14-trust-security.md](14-trust-security.md).
+**Home.** [02-alignment.md](02-alignment.md); limits in [14-trust-security.md](14-trust-security.md).
 
 ### KP-04 Control is code, production is LLM
 
@@ -212,15 +220,15 @@ that already pass certify no change.
 
 ### KP-08 Independence comes from a declared model family, and findings have authority
 
-- The Board-signed routing declares each alias's family, and receipts show it as "declared", never
+- The Board-approved routing declares each alias's family, and receipts show it as "declared", never
   "verified".
 - The reviewer's declared family differs from the engineer's.
 - An unavailable review lane means "not approved".
-- A critical finding closes only through a fix plus re-review by the same lane, or through a signed Board
+- A critical finding closes only through a fix plus re-review by the same lane, or through a Board
   ruling.
 
 **Why.** A correlated model repeats the same blind spots. Under P1 keel cannot inspect endpoints or model
-names, so the trust anchor is the Board's signed declaration, and keel says so.
+names, so the trust anchor is the Board's approved declaration, and keel says so.
 
 **Sources.** OpenSpec (cross-model review), oh-my-codex (dual lanes), BMAD-METHOD (intent auditor, evidence
 triage), old-coder (blind verifier).
@@ -324,8 +332,8 @@ jj are optional adapters. Every construct maps to a permitted source, and the M0
 
 Every runtime and OS pair has a doctor-reported exposure profile: `tool_env_exposure`,
 `tool_file_exposure`, `control_plane_exposure`, and reserved-operation prevention. Receipts carry the
-profile. Guarantees rest on signatures, re-execution, ref snapshots and hash chains, not on sandboxes that
-may be absent.
+profile. Guarantees rest on approval records checked against current content, re-execution, ref snapshots
+and hash chains, not on sandboxes that may be absent.
 
 **Why.** On native Windows most agent CLIs run with the user's full file rights. Claiming isolation that does
 not exist would turn a detection design into false assurance.
@@ -345,21 +353,21 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 
 | Term | zh-CN | Meaning | Home |
 | --- | --- | --- | --- |
-| Board | 董事会 | The human owners, identified by ssh signing keys in `.keel/board/allowed_signers`; the only source of authority | [01](01-org-model.md) |
+| Board | 董事会 | The human owners, who confirm shown changes at a terminal through `keel approve`; the only source of authority | [01](01-org-model.md) |
 | Steward | Steward | keel's deterministic core (compiler, dispatcher, runner, integrator, cartographer, auditor); never calls a model | [01](01-org-model.md) |
 | seat | 席位 | One of five contract-bound LLM roles: product, architect, planner, engineer, reviewer | [01](01-org-model.md) |
 | seat contract | 席位契约 | `org/seats/<seat>.yaml`: inputs, outputs, writable globs, allowed `keel api` ops, execution class, ACK id set, output schema, submit channel, default tier, independence rule, encoded assumption | [01](01-org-model.md) |
 | execution class | 执行等级 | `none`, `read-only` or `code-executing`; decides which exposure rule a route must pass | [01](01-org-model.md) |
 | tier | 档位 | Model capability of a route: frontier, standard or fast; never a ceremony level | [01](01-org-model.md) |
-| route | 路由 | The {runtime, profile alias, tier} resolved for a seat from signed routing at dispatch and frozen in the run record | [01](01-org-model.md) |
-| checkpoint | 检查点 | One of four Board signing stages: contract, plan, land, receipt | [01](01-org-model.md) |
-| Board ruling | 董事会裁定 | A signed `keel approve <subject> --rule <kind>`: answer, budget, track, override, dismiss, degraded, unverified or abandon | [01](01-org-model.md) |
+| route | 路由 | The {runtime, profile alias, tier} resolved for a seat from approved routing at dispatch and frozen in the run record | [01](01-org-model.md) |
+| checkpoint | 检查点 | One of four Board approval stages: contract, plan, land, receipt | [01](01-org-model.md) |
+| Board ruling | 董事会裁定 | An approved `keel approve <subject> --rule <kind>`: answer, budget, track, override, dismiss, degraded, unverified or abandon | [01](01-org-model.md) |
 | override | 豁免 | An expiring Board ruling (`--until`) that waives a specific check or trace failure; waivers are overrides | [01](01-org-model.md) |
 | ask | 提问 | `keel api ask` with the clause id in its input, routed by clause type to the clause owner; parks the task | [01](01-org-model.md) |
 | stop class | 停止类别 | One of four situations that always become an ask to the Board: `irreversible_or_destructive`, `security_sensitive`, `side_effect_outside_workspace`, `every_path_a_guess` | [01](01-org-model.md) |
 | remedy ladder | 补救阶梯 | The response to BLOCKED or NEEDS_CONTEXT: more context, one tier up, split the task, planner ruling or replan, Board | [01](01-org-model.md) |
 | single writer | 单写者 | Each artifact and field has exactly one writer | [01](01-org-model.md) |
-| artifact | 产物 | Anything a seat or the Steward writes that keel records or checks: proposal files, work orders, briefs, records, envelopes, receipts | [13](13-artifacts-schemas.md) |
+| artifact | 产物 | Anything a seat or the Steward writes that keel records or checks: proposal files, work orders, briefs, records, approval records, receipts | [13](13-artifacts-schemas.md) |
 | schema | schema | A JSON Schema under `schemas/`; the Chinese mirrors keep the word in English and never render it as 模式 | [13](13-artifacts-schemas.md) |
 | reserved action | 保留操作 | An action only the Board may authorize, such as pushing to a shared remote; listed in `org/reserved-actions.yaml` | [05](05-vcs.md) |
 
@@ -368,7 +376,7 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | Term | zh-CN | Meaning | Home |
 | --- | --- | --- | --- |
 | alignment chain | 对齐链 | The twelve levels L0 (charter) to L11 (approval, receipt) that link intent to landed code | [02](02-alignment.md) |
-| charter | 章程 | `.keel/charter.md`: mission, INV, decision boundaries, precedence order, reserved-action ids, pitfalls, root signer fingerprint; versioned by `charter_version` (semver) | [02](02-alignment.md) |
+| charter | 章程 | `.keel/charter.md`: mission, INV, decision boundaries, precedence order, reserved-action ids, pitfalls; versioned by `charter_version` (semver) | [02](02-alignment.md) |
 | INV | 不变量 | Charter invariant `INV-nn`: a must or must_not obligation with `applies_to` globs and an optional check command | [02](02-alignment.md) |
 | goal | 目标 | `G-nn` in `.keel/goals.yaml`: objective, success signal, non-goals, budget, status | [02](02-alignment.md) |
 | requirement | 需求 | `R-<area>-<5>` in a living spec: an EARS statement with scenarios, goal refs and `realized_in` elements | [02](02-alignment.md) |
@@ -387,7 +395,7 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | task | 任务 | `<P>.T<n>`: one work order, implemented by one engineer in its own worktree | [03](03-lifecycle.md) |
 | round | 轮次 | `<P>.T<n>.r<k>`: one submit round of a task, recorded as one Steward commit | [04](04-trace-and-state.md) |
 | write_set | 写集 | The paths and symbols a task may change | [02](02-alignment.md) |
-| amendment | 修订案 | `AM-<sha12>`: the record of a change to the frozen block or ACC after contract approval; the Board re-signs | [02](02-alignment.md) |
+| amendment | 修订案 | `AM-<sha12>`: the record of a change to the frozen block or ACC after contract approval; the Board views it and approves again | [02](02-alignment.md) |
 | ruling | 裁定 | `RL-<sha12>`: a seat's recorded decision inside its boundaries (clause, what, why, cost if wrong, reversible) | [02](02-alignment.md) |
 | receipt | 回执 | `receipt.json` and `receipt.md` in the archive: what landed, on what evidence, under which rulings and risks | [02](02-alignment.md) |
 
@@ -398,13 +406,13 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | track | 轨道 | The single ceremony axis: spike, patch, feature or system | [03](03-lifecycle.md) |
 | spike | spike（保留英文） | Read-only question answered by the product seat in `answer.md`; no land | [03](03-lifecycle.md) |
 | patch | patch（保留英文） | Small change (at most 5 files and about 100 LOC, one element); phase 2 skipped | [03](03-lifecycle.md) |
-| feature | feature（保留英文） | Change with product, planner, engineers and the quick lens set; typically two Board touches | [03](03-lifecycle.md) |
-| system | system（保留英文） | Change that adds the architect, a failure model and the thorough lens set; typically three Board touches | [03](03-lifecycle.md) |
+| feature | feature（保留英文） | Change with product, planner, engineers and the quick lens set; typically two Board confirmations | [03](03-lifecycle.md) |
+| system | system（保留英文） | Change that adds the architect, a failure model and the thorough lens set; typically three Board confirmations | [03](03-lifecycle.md) |
 | ratchet | 棘轮 | The track is recomputed at submit from the actual diff and impact and can only rise | [03](03-lifecycle.md) |
 | phase | 阶段 | One of 0 Intake, 1 Frame, 2 Plan, 3 Build, 4 Verify, 5 Land, 6 Close | [03](03-lifecycle.md) |
-| standing policy | 常设策略 | A Board-signed, revocable `.keel/policies/<name>.yaml` that lets a narrow class of patches proceed under fixed predicates | [03](03-lifecycle.md) |
-| policy path | 策略路径 | A patch contract made of a signed request plus a signed standing policy plus deterministically derived fields | [03](03-lifecycle.md) |
-| receipt acknowledgement | 回执确认 | A non-blocking Board signature after a policy land; while missing, it blocks the next change touching the same elements or paths | [03](03-lifecycle.md) |
+| standing policy | 常设策略 | A Board-approved, revocable `.keel/policies/<name>.yaml` that lets a narrow class of patches proceed under fixed predicates | [03](03-lifecycle.md) |
+| policy path | 策略路径 | A patch contract made of an approved request plus an approved standing policy plus deterministically derived fields | [03](03-lifecycle.md) |
+| receipt acknowledgement | 回执确认 | A non-blocking Board approval after a policy land; while missing, it blocks the next change touching the same elements or paths | [03](03-lifecycle.md) |
 | blocked | 阻塞 | A task state with a reason: `ack_mismatch`, `non_convergence`, `track_raised`, `budget`, `runtime_unavailable`, `reserved_op` | [03](03-lifecycle.md) |
 | unblock_owner | 解除负责人 | The party named on a parked or blocked task who must act before it can move | [03](03-lifecycle.md) |
 | liveness | 活性 | Every non-terminal task holds exactly one of: a claim, a queued dispatch, an unblock_owner with an open ask, a pending approval | [03](03-lifecycle.md) |
@@ -425,8 +433,8 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | outbox | 发件箱 | `<workspace_root>/_runs/<RUN>/outbox/`: O_EXCL JSON drops written through `keel api` | [02](02-alignment.md) |
 | stale_contract | 契约过期 | Recompilation at submit shows that an ACC, a must or must_not obligation, or an R changed; requires a re-ACK and re-review | [02](02-alignment.md) |
 | derived_from | 派生来源 | Hashes of upstream inputs recorded on plans, work orders, briefs, verdicts and evidence | [02](02-alignment.md) |
-| approval envelope | 批准信封 | `AP-<sha12>`: ssh-signed JSON binding stage or kind, subject, commit, artifact hashes, quote, approver, ledger chain head, timestamp and nonce | [02](02-alignment.md) |
-| request envelope | 请求信封 | The Board's signature over the verbatim request of `keel new --policy` | [02](02-alignment.md) |
+| approval record | 批准记录 | `AP-<sha12>`: the JSON record `keel approve` writes after an explicit confirmation, binding stage or kind, subject, commit, artifact hashes, an optional note, the declared approver, the ledger chain head and the local time | [02](02-alignment.md) |
+| request record | 请求记录 | The Board's approval of the verbatim request of `keel new --policy` | [02](02-alignment.md) |
 | rung | 梯级 | Degradation level of a runtime and mode: A (native schema output and blocking hooks), B (hooks plus outbox or MCP), C (no project hooks), D (manual) | [09](09-runtimes.md) |
 | hook | 钩子 | A runtime event callback that runs `keel hook`; it fails open, is journaled and never decides a gate | [09](09-runtimes.md) |
 | direct lane | 直连通道 | keel's own tool-less child process that calls a model API for read-only lenses (M6) | [09](09-runtimes.md) |
@@ -440,7 +448,7 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | Term | zh-CN | Meaning | Home |
 | --- | --- | --- | --- |
 | profile alias | 配置别名 | A lowercase name in `routing.yaml` that stands for one provider route; carries protocol, declared family, auth mode, env var names, revision | [10](10-providers.md) |
-| declared family | 声明的模型家族 | The model family the Board declares for an alias in signed routing: anthropic, openai, google, alibaba, moonshot, zhipu or other; shown as "declared", never "verified" | [10](10-providers.md) |
+| declared family | 声明的模型家族 | The model family the Board declares for an alias in approved routing: anthropic, openai, google, alibaba, moonshot, zhipu or other; shown as "declared", never "verified" | [10](10-providers.md) |
 | protocol | 协议 | `anthropic-messages`, `openai-chat`, `openai-responses` or `google` | [10](10-providers.md) |
 | provider path set | 模型提供方路径集 | A descriptor's names-only list of runtime homes, credential locations, user-global configs and `.env*`; tested by stat only | [10](10-providers.md) |
 | exposure rule | 暴露规则 | A code-executing seat is dispatched only when tool env exposure is scrubbed and tool file exposure is none or blocked | [10](10-providers.md) |
@@ -474,10 +482,10 @@ Every term and id prefix used in the design, with its Simplified Chinese renderi
 | --- | --- | --- | --- |
 | plane | 平面 | Declared (`.keel/`), VCS-embedded (commits, trailers, refs) or local control plane (`$(git rev-parse --git-common-dir)/keel`) | [04](04-trace-and-state.md) |
 | ledger | 账本 | `ledger/<yyyy-mm>.jsonl`: the canonical, hash-chained event log with one writer | [04](04-trace-and-state.md) |
-| chain head | 链头 | The hash of the latest ledger event; every Board envelope includes it | [04](04-trace-and-state.md) |
+| chain head | 链头 | The hash of the latest ledger event; every approval record includes it | [04](04-trace-and-state.md) |
 | ledger anchor | 账本锚点 | `refs/keel/ledger/head`: a Steward-owned ref to a blob holding the chain hash, CAS-updated after every append and checked before each one | [04](04-trace-and-state.md) |
 | trailer | 提交尾注 | `Keel-*` lines on Steward commits that link a commit to round, requirements, ACC, seat, run, runtime, brief, prompt and charter | [04](04-trace-and-state.md) |
-| governance commit | 治理提交 | A Steward commit of a Board-signed document, carrying `Keel-Doc` and `Keel-Approval` | [04](04-trace-and-state.md) |
+| governance commit | 治理提交 | A Steward commit of a Board-approved document, carrying `Keel-Doc` and `Keel-Approval` | [04](04-trace-and-state.md) |
 | archive commit | 归档提交 | The land commit that applies deltas to living specs and the arch model, promotes ADRs and writes projections | [04](04-trace-and-state.md) |
 | projection gate | 投影门禁 | Refuses URL-shaped or key-shaped tokens, other than documented placeholders, in archive projections | [04](04-trace-and-state.md) |
 | RTM | 需求追溯矩阵 | Requirements traceability matrix: R → ACC → task → round → commit → tests → evidence → verdict → element | [04](04-trace-and-state.md) |
@@ -535,13 +543,13 @@ flowchart LR
   C --> L["src/store/tags.ts line"]
   C --> EV["EV-3a9c0e1b2d4f re-executed at land"]
   C --> VD["VD-5b1d2e3f4a6c (declared google)"]
-  P --> AP["contract and land approvals (Board ssh signatures)"]
+  P --> AP["contract and land approvals (explicit Board confirmations)"]
 ```
 
 1. **Setup, once.** `keel init` scaffolds `.keel/` and the control plane and sets the trace epoch. The Board
-   signs the charter (`charter_version: 1.0.0`, with invariants such as `INV-01`), `goals.yaml`,
+   reads and approves the charter (`charter_version: 1.0.0`, with invariants such as `INV-01`), `goals.yaml`,
    `routing.yaml` and the tag-storage decision `ADR-7KQ2B` with `keel approve --doc <path>`; each lands on
-   trunk as a Steward governance commit. The signed routing declares the engineer route on claude-code
+   trunk as a Steward governance commit. The approved routing declares the engineer route on claude-code
    (declared family anthropic), the engineer's test route to a GLM alias on opencode (declared family
    zhipu) and the reviewer route on opencode (declared family google). It holds environment variable
    names only.
@@ -555,15 +563,15 @@ flowchart LR
    test) and `P-7F3K9Q#ACC-02` (covers `R-notes-4QX7B#S2`, mode test), plus `spec.delta.yaml`, which modifies
    `R-notes-4QX7B` against its base `rev_hash`. A spec lens from a different declared family reviews it and
    the frame gate passes.
-5. **Contract approval (Board touch 1).** `keel approve P-7F3K9Q --stage contract` shows the frozen block
-   and the spec-delta diff. The Board's signature binds the `contract_hash`, the commit of
-   `keel/P-7F3K9Q/main` and the ledger chain head.
-6. **Plan (phase 2).** The planner writes two work orders in two waves. `T1` is a test-first task on the signed
+5. **Contract approval (Board confirmation 1).** `keel approve P-7F3K9Q --stage contract` shows the frozen
+   block and the spec-delta diff, and the Board types the confirmation word. The record binds the
+   `contract_hash`, the commit of `keel/P-7F3K9Q/main`, the declared approver and the time.
+6. **Plan (phase 2).** The planner writes two work orders in two waves. `T1` is a test-first task on the approved
    test route (the GLM alias); it writes `tests/notes/tags.test.ts`. `T2` is the build task on claude-code;
    its `frozen_tests` include that test file, its write_set covers `src/store/**`, and its ACC → command
    table maps `ACC-01` to the command `npm test` and the matrix row tagged `[R-notes-4QX7B#S1]`. A cross-family
    verification-gap lens checks the table and the test-task definition. Each wave has width 1 and routing
-   follows the signed routing, so no plan approval is needed.
+   follows the approved routing, so no plan approval is needed.
 7. **Build (phase 3).** `keel run P-7F3K9Q` runs `T1`, then `T2`. `T1`'s round must leave its two cited
    test rows red (`verify.test-red`), and a verification-gap lens on the reviewer route reads the frozen test
    output and approves it before `T1` lands on `keel/P-7F3K9Q/main`. For `T2` the Steward acquires the claim
@@ -596,16 +604,16 @@ flowchart LR
    the round commit and records `EV-3a9c0e1b2d4f`, bound to source state. The `quick` lens set
    (`org/seats/reviewer.yaml`) runs on the reviewer route, declared family google, and returns
    `VD-5b1d2e3f4a6c` with recommendation approve. The verify gate passes.
-9. **Land (phase 5, Board touch 2).** The Steward integrates both tasks onto `keel/P-7F3K9Q/main`,
+9. **Land (phase 5, Board confirmation 2).** The Steward integrates both tasks onto `keel/P-7F3K9Q/main`,
    re-executes the full acceptance matrix on the integrated commit and writes the receipt draft. The Board
    reads `receipt.md` (the archived one is
    [`examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md`](../examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md))
-   and runs `keel approve P-7F3K9Q --stage land`. `keel land P-7F3K9Q` verifies the
-   signature, re-runs the land gate, writes the archive commit (spec delta applied, projections under
+   and runs `keel approve P-7F3K9Q --stage land`. `keel land P-7F3K9Q` checks that the draft still hashes
+   to what the record binds, re-runs the land gate, writes the archive commit (spec delta applied, projections under
    `.keel/archive/2026/P-7F3K9Q-note-tags/`) and advances trunk.
 10. **Close (phase 6).** Keel-provenance worktrees and refs are cleaned up; liveness is clean.
 
 Afterwards, any line can be walked back. `keel trace src/store/tags.ts:42` follows blame to the round commit,
 reads the trailers (`P-7F3K9Q.T2.r1` → `P-7F3K9Q#ACC-01` → `R-notes-4QX7B#S1` → `G-03`), then the ledger to
-`BR-9e4c1a7b2d05`, `EV-3a9c0e1b2d4f`, `VD-5b1d2e3f4a6c` and the two Board signatures, and path lift to the
+`BR-9e4c1a7b2d05`, `EV-3a9c0e1b2d4f`, `VD-5b1d2e3f4a6c` and the two Board approvals, and path lift to the
 element that owns `src/store/` (`el:notes.store`), its owner label, its obligations and its arch rules.

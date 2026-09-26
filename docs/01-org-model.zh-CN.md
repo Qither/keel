@@ -16,7 +16,7 @@
 
 ```mermaid
 flowchart TB
-  Board["董事会：持有 ssh 签名密钥的人类"]
+  Board["董事会：确认所显示变更的人类"]
   subgraph Steward["Steward：keel 核心，确定性，从不调用模型"]
     direction LR
     compiler --- dispatcher --- runner --- integrator --- cartographer --- auditor
@@ -26,7 +26,7 @@ flowchart TB
     product --- architect --- planner --- engineer --- reviewer
   end
   Repo[("git 仓库与账本")]
-  Board -- "keel approve：签名信封" --> Steward
+  Board -- "keel approve：批准记录" --> Steward
   Steward -- "简报、稀疏工作树、按运行的配置" --> Seats
   Seats -- "ACK、裁定、提问、结果：只是数据，从不是权力" --> Steward
   Steward -- "提交、门禁、落地、账本事件" --> Repo
@@ -53,39 +53,39 @@ flowchart TB
 - 独立性规则；
 - 该席位所编码的假设，以便能够凭证据让一个席位退役。
 
-派发时，Steward 根据董事会签名的 `.keel/routing.yaml` 为席位解析出一条路由 {runtime, profile alias, tier}。该路由连同其暴露面画像（exposure profile）和席位的一致性测评状态（conformance status）一起被冻结进运行记录。未通过该席位暴露规则的路由会以 `blocked(runtime_unavailable)` 被拒绝；不存在任何确认式的绕行路径（[10-providers.zh-CN.md](10-providers.zh-CN.md)）。
+派发时，Steward 根据董事会已批准的 `.keel/routing.yaml` 为席位解析出一条路由 {runtime, profile alias, tier}。该路由连同其暴露面画像（exposure profile）和席位的一致性测评状态（conformance status）一起被冻结进运行记录。未通过该席位暴露规则的路由会以 `blocked(runtime_unavailable)` 被拒绝；不存在任何确认式的绕行路径（[10-providers.zh-CN.md](10-providers.zh-CN.md)）。
 
 协调是确定性的：产物之间的消费/产出边、由工单（work order）的 `after` 边构成的任务 DAG，以及租约状态保存在账本（ledger）中的 CAS 认领（claim）锁（[06-parallelism.zh-CN.md](06-parallelism.zh-CN.md)）。没有任何 LLM 来路由工作。
 
 借鉴自：MetaGPT（角色作为产物种类的类型化订阅者）、BMAD-METHOD（工单 DAG）、Paperclip（冲突即终局的原子签出）。
 
-## 董事会权力与四个阶段签名
+## 董事会权力与四个阶段批准
 
-董事会由一位或多位人类组成，以 `.keel/board/allowed_signers` 中的 ssh 签名密钥标识。根签名者的指纹被固定在签名的章程（charter）中，`keel init` 以一段引述的同意声明记录首次使用时的信任（trust on first use）。对 `allowed_signers` 的更改必须由现有签名者签署。
+董事会由一位或多位人类组成，他们在交互式终端上运行 `keel approve`，查看所显示的变更并显式确认它。每次批准都连同主题、内容哈希、声明的批准人姓名和本地时间一起记录（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）；不存在签名者列表、密钥或账户系统，批准人姓名是声明的（而非经过验证的）身份（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
 
 只有董事会能做以下事情，且全部通过 `keel approve` 进行：
 
-- **签署文档**：章程、目标、路由（包括每个别名声明的模型家族）和 `allowed_signers` 使用 `keel approve --doc <path>`，常设策略使用 `keel approve --policy <name>`（信封类型 `policy`）。每份文档都以一个携带 `Keel-Doc` 和 `Keel-Approval` 的 Steward 治理提交进入主干（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)）。
-- **签署策略路径请求**：`keel new --policy <name>` 让董事会签署逐字请求，一次介入（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
-- **签署四个阶段检查点**（见下表）。
+- **批准文档**：章程、目标和路由（包括每个别名声明的模型家族）使用 `keel approve --doc <path>`，常设策略使用 `keel approve --policy <name>`（记录种类 `policy`）。每份文档都以一个携带 `Keel-Doc` 和 `Keel-Approval` 的 Steward 治理提交进入主干（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)）。
+- **批准策略路径请求**：`keel new --policy <name>` 向董事会显示逐字请求并记录其批准，一次确认（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
+- **批准四个阶段检查点**（见下表）。
 - **签发每一项董事会裁定**，使用 `keel approve <subject> --rule <kind>`（见下表）。
 - **授权保留操作**，例如推送到共享远程仓库（[05-vcs.zh-CN.md](05-vcs.zh-CN.md)）。
 - **设置每个模型提供方的端点、密钥和模型名称**，在其自己的环境中、keel 之外完成。
 
-董事会不得通过智能体或转发的消息进行批准，不得签署当前哈希与所呈现哈希不同的产物，不得使用加载在 ssh-agent 中的密钥签名（FIDO2 `-sk` 密钥除外），也不得把模型提供方（provider）的值暴露给 keel 或任何助手。没有席位评审董事会；auditor 模块会报告未签名、已过期和已过时的事项、未确认的回执，以及可从 ssh-agent 加载的签名者密钥。
+董事会不得通过智能体或转发的消息进行批准，不得批准当前哈希与所呈现哈希不同的产物（keel 拒绝记录这样的确认），也不得把模型提供方（provider）的值暴露给 keel 或任何助手。没有席位评审董事会；auditor 模块会报告未批准、已失效、已过期和已过时的事项，以及未确认的回执。
 
 ### 检查点阶段
 
 | 阶段 | 绑定 | 何时需要 | 是否阻塞 |
 | --- | --- | --- | --- |
 | contract | 冻结意图加 `spec.delta.yaml`（system 轨道上再加 `arch.delta.yaml`），作为 `contract_hash`；`keel/<P>/main` 提交；账本链头 | 无策略路径的 patch、feature、system | 是 |
-| plan | `plan.yaml`、工单、`routing.snapshot.yaml` 和预算 | system 上始终需要；feature 上仅当某个波次宽度大于 1 或路由偏离签名的路由配置时需要；patch 上从不需要 | 是 |
+| plan | `plan.yaml`、工单、`routing.snapshot.yaml` 和预算 | system 上始终需要；feature 上仅当某个波次宽度大于 1 或路由偏离已批准的路由时需要；patch 上从不需要 | 是 |
 | land | 回执草稿（其中指明集成后的提交和预期的主干顶端）以及链头 | feature 和 system；patch 上按落地策略决定 | feature 和 system 上是 |
 | receipt | 对在常设策略下落地的变更的回执进行确认 | 每次策略落地之后 | 否，但未确认的回执会阻塞下一个触及相同架构元素的变更；路径未映射时，则阻塞下一个触及相同路径 glob 的变更 |
 
-信封格式以及签名如何验证，见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)。董事会在每个阶段阅读什么，见 [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md)。
+记录格式以及 Steward 如何检查批准，见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)。董事会在每个阶段阅读什么，见 [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md)。
 
-`keel approve` 需要交互式确认：一个 TTY，或在 Git Bash mintty 下输入确认码。它在 `KEEL_RUN` 或 `KEEL_RUN_ID` 下拒绝执行；只要任何受允许签名者的密钥被 ssh-agent 列出且不是 `-sk` 密钥，它就以退出码 6 退出；并且需要密钥的口令或硬件触碰（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
+`keel approve` 先显示变更，然后要求一次显式确认：在 TTY 上输入确认词，或在 Git Bash mintty 下输入所显示的确认码。它在 `KEEL_RUN` 或 `KEEL_RUN_ID` 下以及在 keel 运行的祖先进程之下拒绝执行，在席位运行期间等待监督者锁，并且拒绝记录一次其主题在显示期间发生了变化的确认（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
 
 ### 董事会裁定
 
@@ -100,9 +100,9 @@ flowchart TB
 | `--rule unverified` | 按变更接受一个一致性测评状态为 unverified 的评判席位 | `RL-` |
 | `--rule abandon` | 放弃一个提案 | `RL-` |
 
-waiver 就是豁免（override）；没有单独的 waiver 记录。每项裁定都是一个签名信封和一个账本事件。
+waiver 就是豁免（override）；没有单独的 waiver 记录。每项裁定都是一份批准记录和一个账本事件。
 
-借鉴自：old-coder（可引述的同意）、superpowers（批准只绑定所呈现的产物）、edikt（会过期的豁免；仅借鉴思想）、OpenSSH（`ssh-keygen -Y`、`allowed_signers`、FIDO2 `-sk` 密钥）。
+借鉴自：old-coder（绑定到某个版本的同意）、superpowers（批准只绑定所呈现的产物）、edikt（会过期的豁免；仅借鉴思想）。
 
 ## Steward 模块（不是员工）
 
@@ -111,24 +111,24 @@ Steward 是 keel 自己的进程。它从不调用 LLM。直连通道（direct l
 | 模块 | 职责 |
 | --- | --- |
 | compiler | 铸造编号；规范化并哈希产物；计算 `contract_hash`；编译简报（brief）和 PG 哈希；在提交时和每道门禁处重新编译（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)） |
-| dispatcher | 解析签名的路由、兼容性、暴露规则和一致性测评状态；获取认领；创建稀疏工作树；每次拉起前为引用做快照；以按运行的配置无头拉起运行时；接收提交通道的投递文件 |
+| dispatcher | 解析已批准的路由、兼容性、暴露规则和一致性测评状态；获取认领；创建稀疏工作树；每次拉起前为引用做快照；以按运行的配置无头拉起运行时；接收提交通道的投递文件 |
 | runner | 在干净的稀疏分离检出中运行声明的命令；记录证据；生成红绿证明；在落地时重新执行完整的验收矩阵（[11-verification.zh-CN.md](11-verification.zh-CN.md)） |
 | integrator | 完成每一次提交，并附上提交尾注；对任务轮次做 restack；预览集成；写出归档提交；以 ff-only 或 CAS 方式更新主干（[05-vcs.zh-CN.md](05-vcs.zh-CN.md)） |
 | cartographer | 对轨道分类并在提交时重新计算；查询 IndexProvider；计算影响面和漂移；编译架构元素简报（[07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)） |
-| auditor | 维护哈希链式账本并验证链；检查活性；清扫租约和豁免；运行追溯检查；报告未签名、已过期或已过时的事项以及可从 ssh-agent 加载的签名者密钥（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)） |
+| auditor | 维护哈希链式账本并验证链；检查活性；清扫租约和豁免；运行追溯检查；报告未批准、已失效、已过期或已过时的事项（[04-trace-and-state.zh-CN.md](04-trace-and-state.zh-CN.md)） |
 
 Steward 可以：
 
 - 作为唯一写者，写入控制平面 `.git/keel/**`；
 - 创建和删除带 keel 出处标记的工作树，以及 `refs/keel/*` 下的引用；
-- 在 `keel/*` 分支上提交，并在经验证的落地批准或签名的落地策略之后，以 CAS 方式更新主干；
+- 在 `keel/*` 分支上提交，并在经验证的落地批准或已批准的落地策略之后，以 CAS 方式更新主干；
 - 在分离的验证检出中运行声明的命令；
 - 对已配置的远程仓库运行只读的 `git ls-remote`。
 
 Steward 不可以：
 
 - 在自己的进程中调用任何 LLM；
-- 进行批准，或接受未签名、无效或由 ssh-agent 中的密钥签名的批准；
+- 进行批准，或把任何不是由 `keel approve` 记录的东西（席位的声称、一个文件、一行账本）或其所绑定内容已经变化的东西当作批准接受；
 - 自动解决冲突（`-X ours` 或 `-X theirs`），或改写已落地的历史；
 - 打开模型提供方、凭据或共享设置文件，或者在 `src/providers/env-policy.ts` 和直连通道的请求构建器之外解引用环境变量的值。
 
@@ -161,7 +161,7 @@ Steward 不可以：
 **product（产品席位）**把一个目标和一个请求转化为提案的冻结意图：问题、结果、非目标、决策边界、带证据模式的 ACC 项、Always/Never、未决问题，以及 system 轨道上的失败模型。它编写 `spec.delta.yaml`（带场景、目标引用和 `realized_in` 的 EARS 需求），回答需求类提问，并运行 spike，spike 产出 `answer.md`。
 
 - 可以：编写 `.keel/proposals/<P>-<slug>/{intent.md, spec.delta.yaml}`（由 Steward 依据其结果写入规划工作树）；阅读代码、规格、架构元素页面和预测的影响面；`keel api ack|ask|rule|submit`。
-- 不可以：编辑源代码或测试；在契约批准之后编辑冻结块，除非通过董事会重新签署的修订案（amendment）；写入活规格；批准任何东西。
+- 不可以：编辑源代码或测试；在契约批准之后编辑冻结块，除非通过董事会再次批准的修订案（amendment）；写入活规格；批准任何东西。
 - 评审方：框定门禁、一个来自不同声明的模型家族的 spec 评审镜头，以及契约批准时的董事会。
 - 建议的运行时：claude-code（plan 模式，通过 `--json-schema` 提交）、codex（`-s read-only`，通过 `--output-schema -o` 提交）、gemini-cli（plan 模式；在其 `--policy` 探测通过之前仅限评审类用途）。
 
@@ -202,8 +202,8 @@ Steward 不可以：
 | 产物 | 唯一写者 |
 | --- | --- |
 | 活规格 `.keel/specs/**`、架构模型 `.keel/arch/{model.yaml, rules.yaml, baseline.json}`、已晋升的 ADR `.keel/decisions/**` | 落地归档提交（Steward），依据已批准的增量 |
-| 章程、目标、路由、策略、`allowed_signers` | 董事会（编辑只有在签名并通过治理提交提交之后才生效） |
-| 签名信封 `.keel/signatures/**` | 董事会通过 `keel approve` 生成；由 Steward 提交 |
+| 章程、目标、路由、策略 | 董事会（编辑只有在批准并通过治理提交提交之后才生效） |
+| 批准记录 `.keel/approvals/**` | 董事会通过 `keel approve` 生成；由 Steward 提交 |
 | `proposal.yaml`（仅受理信号） | Steward |
 | `intent.md`、`spec.delta.yaml` | product 的内容，由 Steward 依据其结果写入 |
 | `arch.delta.yaml`、提案中的 `decisions/ADR-*.md` | architect 的内容，由 Steward 依据其结果写入 |
@@ -218,7 +218,7 @@ Steward 不可以：
 | keel 自有的生成接口面（受管的 `AGENTS.md` 区块、技能副本、keel 智能体文件、`.keel/generated.lock.json`） | `keel sync` |
 | 共享运行时设置和模型提供方的值 | 仅限用户；keel 从不读取或写入它们 |
 
-轨道、认领租约和心跳都是账本事件，而不是文件字段。`receipt.md` 在签名之后从不编辑。
+轨道、认领租约和心跳都是账本事件，而不是文件字段。`receipt.md` 在落地批准之后从不编辑。
 
 ## 升级路径、四类停止类别与补救阶梯
 
@@ -272,10 +272,10 @@ Steward 不可以：
 
 只有一条规模适配轴，即轨道（[03-lifecycle.zh-CN.md](03-lifecycle.zh-CN.md)）。镜头集定义在 `org/seats/reviewer.yaml` 中，并在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中解释。
 
-| 轨道 | 席位 | 评审 | 董事会检查点 | 典型的董事会介入次数 |
+| 轨道 | 席位 | 评审 | 董事会检查点 | 典型的董事会确认次数 |
 | --- | --- | --- | --- | --- |
 | spike | product（只读，草稿工作树） | 无 | 无；不落地 | 0 |
-| patch | engineer；仅在需要新 ACC 时加上 product | `patch` 镜头集（一个评审镜头），或在策略落地时为 `policy` 镜头集（两个评审镜头） | contract（或策略路径上的签名请求）；按落地策略进行 land；策略落地后进行回执确认 | 1 到 2 |
+| patch | engineer；仅在需要新 ACC 时加上 product | `patch` 镜头集（一个评审镜头），或在策略落地时为 `policy` 镜头集（两个评审镜头） | contract（或策略路径上已批准的请求）；按落地策略进行 land；策略落地后进行回执确认 | 1 到 2 |
 | feature | product、planner、1..N 个 engineer、Steward | 框定：`frame` 镜头集；规划：`plan` 镜头集；构建：`quick` 镜头集；均运行在不同的声明的模型家族上 | contract、land；仅当某个波次宽度大于 1 或路由偏离时才需要 plan | 2 |
 | system | product、architect、planner、1..N 个 engineer、Steward | 框定：`frame_system` 镜头集；规划：`plan` 镜头集；构建：带 frontier 意图审计员的 `thorough` 镜头集 | contract（含架构增量和失败模型）、plan（始终需要）、land | 3 |
 
@@ -287,6 +287,6 @@ keel 的席位是契约，而不是角色人物。一个席位由它读什么、
 
 - **成熟的工作流正在抛弃人设。** BMAD-METHOD v6 把其 Scrum Master 和 QA 人设合并进了 Developer，并在其变更日志中记录了人设的 A/B 证据（#2675）；Agent OS v3 移除了其角色子智能体。keel 从这一教训出发，而不是重复这个实验。
 - **LLM 管理者的路由不可靠。** CrewAI 的层级委派和 MAST 失败分类法都表明，模型会错误分派和遗漏工作，因此 keel 的路由、认领和状态迁移都是代码（[KP-04](00-vision.zh-CN.md#kp-04-控制归代码产出归-llm)）。
-- **没有机制的部门只是噪音。** keel 保留的每个组织要素都有一个强制点：一个可写 glob、一个 ACK 编号集、一道门禁或一个签名。
+- **没有机制的部门只是噪音。** keel 保留的每个组织要素都有一个强制点：一个可写 glob、一个 ACK 编号集、一道门禁或一份批准记录。
 - **席位必须可退役。** 每份契约都记录其所编码的假设（例如，一个独立的规划席位能发现工程席位会遗漏的覆盖缺口），因此当实测收益不足以支撑时，可以移除某个席位、评审镜头或评审层。
 - **提示词保持厂商中立。** 避免使用强迫性的、针对单一模型调校的提示词语气；确定一个模型是否遵循契约的是一致性测评检查，而不是人设文本（[09-runtimes.zh-CN.md](09-runtimes.zh-CN.md)）。

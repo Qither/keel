@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/config.schema.json",
   "title": "keel project configuration",
-  "description": "The layered project configuration: .keel/config.yaml (team, Board-owned) and .keel/local.yaml (personal, gitignored). Layers merge in the order package defaults (config/keel.defaults.yaml), team, personal: tables deep-merge, arrays of objects keyed by id (or runtime) replace whole entries, and unknown keys are errors at every level. Every key is optional in a layer. Neither file ever holds provider values or secrets; provider routing lives in the Board-signed .keel/routing.yaml as environment variable NAMES only.",
+  "description": "The layered project configuration: .keel/config.yaml (team, Board-owned) and .keel/local.yaml (personal, gitignored). Layers merge in the order package defaults (config/keel.defaults.yaml), team, personal: tables deep-merge, arrays of objects keyed by id (or runtime) replace whole entries, and unknown keys are errors at every level. Every key is optional in a layer. Neither file ever holds provider values or secrets; provider routing lives in the Board-approved .keel/routing.yaml as environment variable NAMES only.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M1a",
   "type": "object",
@@ -215,12 +215,25 @@
       },
       "additionalProperties": false
     },
+    "board": {
+      "description": "Board member settings for keel approve. Meant for the personal layer .keel/local.yaml; a team-layer value applies to everyone who does not override it.",
+      "type": "object",
+      "properties": {
+        "approver": {
+          "description": "The name recorded as approver in every approval record this user confirms. A declared local identity, not an authenticated one; when unset, keel approve asks for it at confirmation.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "additionalProperties": false
+    },
     "land": {
       "description": "Land settings.",
       "type": "object",
       "properties": {
         "policy": {
-          "description": "Name of a Board-signed standing land policy in .keel/policies/, or null to require a land approval for every land.",
+          "description": "Name of a Board-approved standing land policy in .keel/policies/, or null to require a land approval for every land.",
           "anyOf": [{ "$ref": "common.schema.json#/$defs/slug" }, { "type": "null" }]
         }
       },

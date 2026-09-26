@@ -11,14 +11,14 @@
  * Synopses:
  *
  * ```text
- * keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--signer <public key file>] [--yes]
+ * keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--yes]
  * keel sync [--check] [--runtime <id>]
- * keel doctor [--section runtimes|providers|vcs|signing|exposure|arch] [--conformance] [--selftest] [--json]
+ * keel doctor [--section runtimes|providers|vcs|approvals|exposure|arch] [--conformance] [--selftest] [--json]
  * keel new "<title>" [--goal G-nn] [--track spike|patch|feature|system] [--policy <name>]
  * keel approve <subject> --stage contract|plan|land|receipt | --doc <path> | --policy <name> | --request
  *              | --rule answer|budget|track|override|dismiss|degraded|unverified|abandon
  *              [--until <date|land|commit-touching:path>] [--limit <usd|runs|wall_minutes>=<n>]
- *              [--to spike|patch|feature|system] [--quote "<text>"]
+ *              [--to spike|patch|feature|system] [--note "<text>"] [--as <approver>]
  * keel run <P|P.Tn> [--seat <seat>] [--wave] [--runtime <id>] [--resume] [--dry-run] | --hold on|off <P>
  * keel check [<P>] [--gate frame|plan|submit|verify|land|all] [--check <id>] [--at <commit>] [--json]
  * keel land <P> [--preview]
@@ -158,7 +158,7 @@ export interface ExitCodeMap {
   4: "claim_conflict";
   /** Trunk moved (restack and retry), or a worktree with trunk checked out is dirty. */
   5: "stale_or_trunk_dirty";
-  /** Agent-loaded signer key, missing or too old git, unverified ssh-keygen, refusal under KEEL_RUN. */
+  /** Missing or too old git, refusal under KEEL_RUN or a keel-run ancestor. */
   6: "environment";
 }
 
@@ -174,7 +174,7 @@ export type ExitMeaning = ExitCodeMap[ExitCode];
 export type InitVcsOption = "auto" | "git" | "jj";
 
 /** `keel doctor --section`. */
-export type DoctorSection = "runtimes" | "providers" | "vcs" | "signing" | "exposure" | "arch";
+export type DoctorSection = "runtimes" | "providers" | "vcs" | "approvals" | "exposure" | "arch";
 
 /** `keel check --gate`. */
 export type GateSelector = Gate | "all";
@@ -195,12 +195,16 @@ export interface TraceArgs {
   json: boolean;
 }
 
-/** The arguments of each approve mode (`keel approve`, the single Board signing path). */
+/**
+ * The arguments of each approve mode (`keel approve`, the single Board approval path). `note` is the
+ * optional commentary recorded with the approval; `as` overrides the configured `board.approver` name
+ * for this confirmation and is asked for when neither is set.
+ */
 export type ApproveArgs =
-  | { mode: "stage"; subject: ProposalId; stage: ApprovalStage; quote: string | null }
-  | { mode: "doc"; path: RepoPath; quote: string | null }
-  | { mode: "policy"; policy: Slug; quote: string | null }
-  | { mode: "request"; subject: ProposalId; quote: string | null }
+  | { mode: "stage"; subject: ProposalId; stage: ApprovalStage; note: string | null; as: string | null }
+  | { mode: "doc"; path: RepoPath; note: string | null; as: string | null }
+  | { mode: "policy"; policy: Slug; note: string | null; as: string | null }
+  | { mode: "request"; subject: ProposalId; note: string | null; as: string | null }
   | {
       mode: "rule";
       subject: string;
@@ -210,7 +214,8 @@ export type ApproveArgs =
       limit: Budget | null;
       /** `--to <track>` for a track ruling. */
       to: Track | null;
-      quote: string | null;
+      note: string | null;
+      as: string | null;
     };
 
 /** The arguments of `keel new`. */

@@ -2,14 +2,14 @@
   View model: receipt.json (schemas/receipt.schema.json) with the same field names, plus display fields
   keel derives: command_text for each acceptance row, engineer_families (independence.engineer joined with
   ", "), conformance and exposure rows joined per route, agent_notes taken from the engineer seats'
-  result.submitted events, and signed_quote, which the archive commit takes from the land envelope.
+  result.submitted events, and land_approval, which the archive commit takes from the land approval record.
   Rendering uses the logic-less Mustache subset keel uses for rendered templates: values, sections that
   repeat per item or render once when true, inverted sections that render when empty or false, and
   comments like this one, which are dropped. No HTML escaping.
-  The land approval signs the hash of the draft: everything above the "Signed quote" section. That is why
+  The land approval binds the hash of the draft: everything above the "Land approval" section. That is why
   approvals lists only the approvals that existed before land, and the land approval appears only in the
-  Signed quote section, which the archive commit renders from the land envelope; after that receipt.md is
-  never edited.
+  Land approval section, which the archive commit renders from the land approval record; after that
+  receipt.md is never edited.
   Only ids, hashes, aliases, declared families and env NAMES appear here; the projection gate refuses
   URL-shaped and key-shaped tokens other than documented placeholders. }}
 ---
@@ -31,7 +31,7 @@ Track {{track}}; origin {{origin}}; charter {{charter_version}}; trunk `{{trunk}
 - Contract hash: `{{contract_hash}}`
 - Standing policies used: {{#policies}}`{{.}}` {{/policies}}{{^policies}}none{{/policies}}
 - Approvals before land: {{#approvals}}{{.}} {{/approvals}}{{^approvals}}none{{/approvals}}(the land approval
-  is in the Signed quote section)
+  is in the Land approval section)
 
 ## ACC -> command table
 
@@ -153,13 +153,15 @@ authority and was not verified by keel.
 - none
 {{/agent_notes}}
 
-## Signed quote
+## Land approval
 
-{{#signed_quote}}
-> {{text}}
-
-Signed by {{principal}} at {{signed_at}} (land approval {{approval}}, chain head `{{chain_head}}`).
-{{/signed_quote}}
-{{^signed_quote}}
-Not yet signed. The Board signs this draft with `keel approve {{proposal}} --stage land`.
-{{/signed_quote}}
+{{#land_approval}}
+Approved by {{approver}} (declared) at {{approved_at}} (land approval {{approval}}, chain head
+`{{chain_head}}`).
+{{#note}}
+> {{note}}
+{{/note}}
+{{/land_approval}}
+{{^land_approval}}
+Not yet approved. The Board reads this draft and confirms it with `keel approve {{proposal}} --stage land`.
+{{/land_approval}}

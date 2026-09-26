@@ -109,7 +109,7 @@ keel 从不读取、写入或哈希的内容：共享的运行时设置（`.clau
 
 ```mermaid
 flowchart LR
-  R[已签名路由] --> C{协议<br/>兼容？}
+  R[已批准的路由] --> C{协议<br/>兼容？}
   C -- 否 --> B1[blocked runtime_unavailable]
   C -- 是 --> X{暴露规则<br/>与一致性测评状态}
   X -- 拒绝 --> B1
@@ -240,7 +240,7 @@ keel 在 Windows 上原生运行，核心中不使用 bash、tmux、WSL、Docker
 | 简报在上下文压缩后仍然保留 | 由压缩后钩子重新注入 | 在运行时映射了压缩后事件之处重新注入（待探测验证） | 只能拉取（`keel brief`、`keel_context`） | 由人重新粘贴简报 | `submit.brief` 与 `submit.freshness`（BR 回显、重新编译） |
 | 声称的完成是真实的 | 不防止 | 不防止 | 不防止 | 不防止 | `submit.fake-completion`、重新执行的证据（`verify.evidence`、`land.re-execution`） |
 
-在每个梯级上，Steward 都强制执行：签名、ACK id 集差异比对、范围检查、ref 快照与 `ls-remote` 检测、重新执行的证据（evidence）、追溯检查以及暴露拒绝。回执（receipt）会携带暴露面画像，读者可借此看到适用的是哪个梯级。
+在每个梯级上，Steward 都强制执行：批准检查、ACK id 集差异比对、范围检查、ref 快照与 `ls-remote` 检测、重新执行的证据（evidence）、追溯检查以及暴露拒绝。回执（receipt）会携带暴露面画像，读者可借此看到适用的是哪个梯级。
 
 ACK 的先后顺序只在梯级 A（以及钩子能加载的梯级 B）上被防止。其他情况下只能检测，并有以下残余局限：
 

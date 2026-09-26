@@ -1,5 +1,5 @@
-# .keel/routing.yaml (schemas/routing.schema.json). Board-signed: dispatch refuses without a valid
-# signature. Sign after every change with: keel approve --doc .keel/routing.yaml
+# .keel/routing.yaml (schemas/routing.schema.json). Board-approved: dispatch refuses without a valid
+# document approval. Approve after every change with: keel approve --doc .keel/routing.yaml
 #
 # NAMES ONLY. This file holds environment variable names, never values. You set every endpoint, API key
 # and model name yourself, in your own environment or secret manager, outside keel. For example, in your

@@ -11,7 +11,7 @@ keel 是一个本地优先的 TypeScript/Node CLI 设计，用于在普通 git �
 - 来自哪份逐字节一致的简报（brief）；
 - 由 keel 亲自重新执行的哪些证据（evidence）证明；
 - 受哪个架构元素（element）和哪些规则约束；
-- 由哪位人类签署。
+- 由哪位人类在查看了哪些内容之后批准。
 
 这一答案必须在任一受支持的运行时上成立（Claude Code、Codex、Gemini CLI、Qwen Code、Kimi Code、opencode，以及经由宿主运行时或 keel 直连通道接入的 GLM 家族和 Gemini 家族模型），在普通 git 上成立，并在 Windows 上原生成立。
 
@@ -27,13 +27,13 @@ keel 是一个本地优先的 TypeScript/Node CLI 设计，用于在普通 git �
 - `skills/` 和 `templates/` 中的技能、模板与提示词；
 - `examples/acme-notes/` 中的一个黄金示例项目，以及 `test/fixtures/` 中的测试夹具。
 
-唯一声明的工具例外是 `scripts/validate.mjs`，它检查骨架本身。目前还没有 `keel` 可执行文件；文档中出现的命令是设计好的接口。从 M1a 到 M8 的路线图及各里程碑的退出标准见 [docs/15-roadmap.zh-CN.md](docs/15-roadmap.zh-CN.md)。
+唯一声明的工具例外是 `scripts/validate.mjs`，它检查骨架本身。目前还没有 `keel` 可执行文件；文档中出现的命令是设计好的接口。从 M1a 到 M8 的路线图及各里程碑的退出标准见 [docs/15-roadmap.zh-CN.md](docs/15-roadmap.zh-CN.md)。所有文档都由之派生的所有者声明，连同编号 R1–R5、D1–D7 和 P1–P4，位于 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)。
 
 ## 一屏看懂 keel 做什么
 
 - **编译的意图。** 章程（charter）、目标、EARS 需求、ADR 义务（obligation）以及提案（proposal）的冻结意图（frozen intent），被编译成每个席位、每个主题一份带哈希的简报。见 [docs/02-alignment.zh-CN.md](docs/02-alignment.zh-CN.md)。
 - **经过检查的理解。** 每个席位在第一次编辑之前都要对其简报做 ACK（复述确认）；keel 将 ACK 中的编号集与简报做差异比对，席位在提交时还要再次回显简报哈希。
-- **签名的权力。** 董事会的批准是 `ssh-keygen -Y` 签名，绑定到产物哈希和账本（ledger）链头。只要某把董事会密钥可以从 ssh-agent 加载，keel 就拒绝签署或接受批准，除非它是 FIDO2 `-sk` 密钥（此时每次签名都需要一次触碰）。
+- **显式确认的权力。** 董事会的批准是董事会在查看了具体变更之后给出的一次确认；keel 连同产物哈希、声明的批准人和时间一起记录它，已批准内容的任何变更都会使其失效。席位输出永远不能产生批准，也不涉及任何密钥、签名者列表或硬件。见 [docs/02-alignment.zh-CN.md](docs/02-alignment.zh-CN.md)。
 - **重新执行的证据。** 落地时，Steward 在集成后的提交上重新运行完整的验收矩阵。证据文件只是缓存，`not_run` 永远不等于 `pass`。见 [docs/11-verification.zh-CN.md](docs/11-verification.zh-CN.md)。
 - **跨家族评审。** 由一个声明的模型家族与工程席位不同的评审席位来评审工作，其发现项（finding）具有权威性。
 - **可追溯性。** Steward 所做的提交带有提交尾注（trailer），追溯检查会拒绝范围内任何无法回溯到已批准需求和目标的提交。见 [docs/04-trace-and-state.zh-CN.md](docs/04-trace-and-state.zh-CN.md)。
@@ -47,7 +47,7 @@ keel 不是什么（智能体运行时、LLM 路由器、沙箱、托管服务�
 
 | 路径 | 内容 |
 | --- | --- |
-| `docs/` | 设计文档：从 [docs/README.zh-CN.md](docs/README.zh-CN.md) 开始，其中有阅读顺序和单一归属表 |
+| `docs/` | 设计文档：根文档是 [docs/00-mandate.zh-CN.md](docs/00-mandate.zh-CN.md)；从 [docs/README.zh-CN.md](docs/README.zh-CN.md) 开始，其中有阅读顺序和单一归属表；`docs/reference-projects.yaml` 是参考项目登记表（P4） |
 | `docs/adr/` | keel 自身的架构决策记录（从 ADR-0001 起） |
 | `schemas/` | JSON Schema（draft 2020-12）；`common.schema.json` 是编号模式和共享枚举的唯一归属 |
 | `src/` | 与 schema 和接口相对应的纯类型 TypeScript；M0 中没有运行时代码 |
@@ -59,7 +59,7 @@ keel 不是什么（智能体运行时、LLM 路由器、沙箱、托管服务�
 | `templates/` | 项目、提案、运行时和提示词模板，包括各评审镜头（lens） |
 | `examples/` | 黄金示例项目 `acme-notes`、仅含变量名的模型提供方环境变量示例、静态看板样稿 |
 | `test/` | 测试计划和夹具（回环地址上的伪模型提供方、环境变量剥离） |
-| `scripts/validate.mjs` | 声明的 M0 工具例外：schema、示例、严格子集、双语文档、审计和清单检查 |
+| `scripts/validate.mjs` | 声明的 M0 工具例外：schema、示例、严格子集、双语文档、审计、清单和参考项目登记表检查 |
 | `AGENTS.md`、`CLAUDE.md` | 面向开发 keel 本身的智能体的指引 |
 
 完整且经过检查的文件列表，是 [docs/13-artifacts-schemas.zh-CN.md](docs/13-artifacts-schemas.zh-CN.md) 中的清单（manifest）。
@@ -72,7 +72,7 @@ keel 不是什么（智能体运行时、LLM 路由器、沙箱、托管服务�
 npm ci
 npm run check                                  # typecheck + validate, as CI runs it
 node scripts/validate.mjs --only audit         # one check
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
 ```
 
 CI 在 windows-latest 和 ubuntu-latest 上，以 Node 22.13 和 24 运行相同的命令。

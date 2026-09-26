@@ -19,7 +19,7 @@
    - keel 只在内存中读取环境变量取值，而且只在恰好两个模块中：`src/providers/env-policy.ts`（在启动时构建子进程环境，并把 `KEEL_PROFILE_*` 名称映射为原生名称）和 `src/direct/client.ts`（在调用时解包来自 env-policy 的不透明句柄）；
    - keel 从不持久化、打印、记录日志、哈希取值，也从不把取值放进 argv；
    - 一项 CI 检查只允许这两个模块引用模型提供方的环境变量名或解包该句柄。
-2. 已提交、经董事会（Board）签名的 `.keel/routing.yaml` 只保存名称：每个别名有一个来自通用枚举的协议、一个声明的模型家族（declared family）、一个认证模式（`env`、`runtime-login`、`runtime-profile`）、环境变量名称（默认为 `KEEL_PROFILE_<ALIAS>_BASE_URL`、`_API_KEY`、`_MODEL_FRONTIER` 等），以及一个修订号，当别名背后的模型改变时由用户递增。
+2. 已提交、经董事会（Board）批准的 `.keel/routing.yaml` 只保存名称：每个别名有一个来自通用枚举的协议、一个声明的模型家族（declared family）、一个认证模式（`env`、`runtime-login`、`runtime-profile`）、环境变量名称（默认为 `KEEL_PROFILE_<ALIAS>_BASE_URL`、`_API_KEY`、`_MODEL_FRONTIER` 等），以及一个修订号，当别名背后的模型改变时由用户递增。
 3. 每个运行时描述符声明一个仅含名称的模型提供方路径集（主目录环境变量名、运行时凭据位置、用户全局配置、`.env*`）。keel 只用 stat 测试这些路径。
 4. 暴露规则，不提供董事会确认的放行路径：只有当 `tool_env_exposure` 为 `scrubbed` 且 `tool_file_exposure` 为 `none` 或 `blocked` 时，才派发代码执行类席位；否则任务为 `blocked(runtime_unavailable)`。任何工具事件触及该路径集时，摄取即判定该运行失败。
 5. 不记录具体模型名（`policy.record_model_names: false`）。记录保存别名、档位（tier）、声明的模型家族和修订。一项可选检查在内存中比较两个通道由运行时报告的模型 id，只持久化"same"（相同）或"different"（不同）。
@@ -28,7 +28,7 @@
 
 ## 后果
 
-- 用户可以更换模型提供方，除已签名的别名修订外无需改动任何已提交文件。
+- 用户可以更换模型提供方，除已批准的别名修订外无需改动任何已提交文件。
 - 模型家族由董事会声明，显示为"declared"（已声明），从不显示为"verified"（已验证）；keel 无法检查端点。
 - 许多原生 Windows 路由无法承载代码执行类席位；这些席位落到环境清洗已验证的路由上，独立的席位操作系统账户在 M6 中评估（[17-open-decisions.zh-CN.md](../17-open-decisions.zh-CN.md)）。
 - 只有在仅用环境变量的路由经探测验证之后，Codex 才服务自定义端点。

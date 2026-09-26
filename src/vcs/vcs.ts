@@ -207,7 +207,7 @@ export interface RefChange {
 /**
  * A change is explained only by a Steward `vcs.op` ledger event, by a seat commit fast-forwarding the
  * seat's own task branch (preserved under refs/keel/snap), or by a move of the ledger anchor
- * `refs/keel/ledger/head` that matches the supervising Steward's own appends or a Board-signed approval.
+ * `refs/keel/ledger/head` that matches the supervising Steward's own appends.
  */
 export interface RefExplanation {
   ref: string;

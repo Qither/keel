@@ -12,7 +12,7 @@ submitting. The goals this proposal serves are recorded in proposal.yaml, not re
 Everything between the keel:frozen markers is the frozen block. contract_hash = sha256 of the normalized
 frozen block + the spec.delta.yaml blob (+ the arch.delta.yaml blob on the system track) + the rev_hash of
 every covered requirement. It is frozen at contract approval: after that, any byte change invalidates the
-approval, and acceptance changes only through an amendment the Board re-signs.
+approval, and acceptance changes only through an amendment the Board reads and approves again.
 Keep the headings, their order and the table columns exactly as they are; keel parses them
 deterministically. The filling guide is at the end of this file, outside the frozen block.
 -->

@@ -1,11 +1,9 @@
 ---
 # examples/acme-notes/.keel/charter.md frontmatter (schemas/charter.schema.json).
-# Signed by the Board with `keel approve --doc .keel/charter.md` (approval AP-1c4e6a8b0d2f in the ledger
+# Approved by the Board with `keel approve --doc .keel/charter.md` (approval AP-1c4e6a8b0d2f in the ledger
 # sample) and committed to trunk by a Steward governance commit.
 charter_version: "1.0.0"
 mission: "Acme Notes keeps each user's notes private, quick to find and easy to organize."
-# Fake fingerprint of the root Board signer (board-owner@example.com in .keel/board/allowed_signers).
-root_signer: "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
 invariants:
   - id: INV-01
     level: must

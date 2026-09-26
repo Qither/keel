@@ -2,8 +2,8 @@
 
 Guide for AI agents (and humans) developing keel itself. keel is a TypeScript/Node CLI design for running a
 small company of multi-vendor AI coding agents: a human Board, a deterministic Steward and five LLM seats,
-with compiled intent, signed Board approvals, re-executed evidence, git-first traceability and architecture
-intelligence.
+with compiled intent, explicitly confirmed Board approvals, re-executed evidence, git-first traceability
+and architecture intelligence.
 
 ## Status: M0 is design and skeleton only
 
@@ -17,6 +17,9 @@ intelligence.
 
 - `docs/README.md` holds the reading order and the single-home table: every concept has exactly one home
   document. Update the home, and link to it from elsewhere instead of restating it.
+- `docs/00-mandate.md` is the owner's statement and the source of the ids R1–R5, D1–D7, P1–P4; when any
+  file disagrees with it, the file is wrong. `docs/reference-projects.yaml` is the reference registry for
+  P4.
 - `schemas/common.schema.json` is the only home of id patterns and shared enums. `src/core/ids.ts` mirrors
   them as types without patterns.
 - Other canonical tables: `org/reserved-actions.yaml`, `runtimes/hook-events.yaml`, the lens sets in
@@ -51,6 +54,13 @@ intelligence.
   status" (verified | failed | unverified).
 - **Borrow ideas, not dependencies (P3).** No OpenSpec CLI dependency. Do not copy text or code from
   ELv2-licensed projects or from non-OSS sources; `docs/16-sources-credits.md` records every credited idea.
+- **Frontend is TanStack (P2).** Any frontend keel ships uses TanStack libraries on the React
+  adapter, headless over native markup with hand-written CSS tokens, pre-rendered then hydrated, bundled at
+  package build and never a runtime dependency (ADR-0009).
+- **Refresh discipline (P4).** At every refactor or milestone-exit review run the procedure in
+  `docs/00-mandate.md` section 4: pull the reference clones to their latest version, diff, re-derive keel
+  as a first-time design, scout GitHub for new workflows, prompt the owner to pull candidates locally, merge
+  adopted ideas with credits, record in the registry.
 - **Bilingual docs (D5).** Human-facing docs (everything under `docs/`, the root README,
   `runtimes/README.md` and `test/README.md`) are English canonical in `<name>.md` with a Simplified Chinese
   mirror in `<name>.zh-CN.md` that has an identical heading structure. Identifiers, file names, schemas,
@@ -75,7 +85,7 @@ npm ci
 npm run check                      # typecheck + validate
 npm run typecheck                  # tsc --noEmit -p tsconfig.json
 node scripts/validate.mjs          # all checks
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
 ```
 
 Every check prints `<check>: <passed>/<total>` and its errors; any error fails the run. CI runs the same

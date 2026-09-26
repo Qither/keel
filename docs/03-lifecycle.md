@@ -3,7 +3,7 @@
 This document owns how a change moves through keel: the track and its ratchet, the seven phases, the patch
 track and the policy path, the proposal and task state machines, standing policies, the liveness invariant
 and budgets. The checks inside each gate are catalogued only in [11-verification.md](11-verification.md);
-who signs what is in [01-org-model.md](01-org-model.md).
+who approves what is in [01-org-model.md](01-org-model.md).
 
 ## Track signals and the upward-only ratchet (including the no-index fallback)
 
@@ -76,15 +76,15 @@ checks, their statuses and their negative controls are in [11-verification.md](1
 ### Phase 0 Intake
 
 - **Entry.** The Board runs `keel new "<title>" [--goal G-nn] [--track …] [--policy <name>]` outside any keel
-  run. The request cites an active goal. The policy path needs a Board-signed request envelope.
+  run. The request cites an active goal. The policy path needs the Board's request approval.
 - **Who.** The Steward: id minting, anchor check, predicted impact, track classification.
 - **Produces.** Branch `keel/<P>/main` from trunk and the planning worktree `<workspace_root>/<P>.plan`;
   `proposal.yaml` with intake signals; the ledger events `proposal.created` (with the origin) and
   `track.decided`. For a spike, the product seat then answers read-only in a scratch worktree and
   submits `answer.md`; the proposal closes without land.
 - **Gate.** The intake part of `gate:frame`: the goal is active, the charter is current, and on the policy
-  path the request is signed.
-- **Board.** Signs the request on the policy path. Lowering the track needs `--rule track`.
+  path the request is approved.
+- **Board.** Approves the request on the policy path. Lowering the track needs `--rule track`.
 
 ### Phase 1 Frame (and design on system)
 
@@ -95,7 +95,7 @@ checks, their statuses and their negative controls are in [11-verification.md](1
   `decisions/ADR-*.md` with obligations and typed `keel arch plan` ops.
 - **Gate.** `gate:frame`: deterministic checks, plus a separate frame-review check over the synthesized lens
   verdicts.
-- **Board.** Contract approval, `keel approve <P> --stage contract`, which signs `contract_hash`, the
+- **Board.** Contract approval, `keel approve <P> --stage contract`, which binds `contract_hash`, the
   `keel/<P>/main` commit and the chain head ([02-alignment.md](02-alignment.md)).
 
 ### Phase 2 Plan
@@ -107,7 +107,7 @@ checks, their statuses and their negative controls are in [11-verification.md](1
   `routing.snapshot.yaml`; impact records `IM-*` (in `.git/keel/records`, projected at land).
 - **Gate.** `gate:plan`, with readiness PASS, CONCERNS or FAIL.
 - **Board.** Plan approval, `keel approve <P> --stage plan`, when required: always on system; on feature
-  when a wave is wider than 1 or routing deviates from the signed routing. After the plan is approved (or
+  when a wave is wider than 1 or routing deviates from the approved routing. After the plan is approved (or
   found not to need approval) the planning worktree is removed; it can be re-created.
 
 ### Phase 3 Build
@@ -186,10 +186,10 @@ submit.
 
 The contract comes from one of two routes:
 
-| Route | What is signed | When it applies |
+| Route | What is approved | When it applies |
 | --- | --- | --- |
 | Per-change contract | A contract approval over a frozen block derived deterministically from the request, the anchors and the cited scenarios (drafted by product when new ACC are needed) | Any patch; required whenever new ACC are needed |
-| Policy path | A Board-signed request envelope (`keel new --policy <name>`), a Board-signed standing policy, and deterministically derived fields | Only when every predicate of the policy holds and no new ACC are needed |
+| Policy path | A Board-approved request record (`keel new --policy <name>`), a Board-approved standing policy, and deterministically derived fields | Only when every predicate of the policy holds and no new ACC are needed |
 
 A **policy land** has extra requirements, because no human looked at the change before it was built:
 
@@ -202,7 +202,7 @@ A **policy land** has extra requirements, because no human looked at the change 
 
 ```mermaid
 flowchart LR
-  N["keel new --policy quick-patch"] --> S["Board signs the verbatim request"]
+  N["keel new --policy quick-patch"] --> S["Board views and approves the verbatim request"]
   S --> W["Steward derives one work order"]
   W --> B["Build: engineer, gate:submit"]
   B --> V["Verify: red/green proof, policy lens set"]
@@ -303,15 +303,15 @@ Where the owner looks for each one is in [00a-owner-guide.md](00a-owner-guide.md
 
 ## Standing policy limits
 
-A standing policy is a Board-signed file `.keel/policies/<name>.yaml` (schema `schemas/policy.schema.json`,
-template `templates/project/policies/quick-patch.yaml`), signed with `keel approve --policy <name>`
-(envelope kind `policy`). Policies are revocable, and every receipt lists the policies it used.
+A standing policy is a Board-approved file `.keel/policies/<name>.yaml` (schema `schemas/policy.schema.json`,
+template `templates/project/policies/quick-patch.yaml`), approved with `keel approve --policy <name>`
+(record kind `policy`). Policies are revocable, and every receipt lists the policies it used.
 
 Adopted defaults ([17-open-decisions.md](17-open-decisions.md)):
 
 - **quick-patch**: at most 5 files and 100 LOC; one element or unmapped paths; no protected globs, INV or
-  obligations touched; a signed request; a red-before/green-after proof; the `policy` lens set.
-- **Land policy for patches**: a land approval on shared trunks; a signed land policy plus a receipt
+  obligations touched; an approved request; a red-before/green-after proof; the `policy` lens set.
+- **Land policy for patches**: a land approval on shared trunks; an approved land policy plus a receipt
   acknowledgement on solo repositories.
 
 What a standing policy can never do:
@@ -319,8 +319,8 @@ What a standing policy can never do:
 - approve acceptance drafted by an LLM: new ACC always need a per-change contract approval;
 - apply to feature or system work: if the ratchet raises the track at submit, the policy stops applying and
   the normal checkpoints return;
-- waive the exposure rule, a signature check, the trace check or land re-execution;
-- start a change on its own: the request that names the change is always signed by the Board.
+- waive the exposure rule, an approval check, the trace check or land re-execution;
+- start a change on its own: the request that names the change is always approved by the Board.
 
 After a policy land the Board acknowledges the receipt with `keel approve <P> --stage receipt`. The
 acknowledgement does not block, but an unacknowledged receipt blocks the next change that touches the same

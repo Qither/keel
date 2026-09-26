@@ -12,7 +12,7 @@ primitives. Two candidates were considered.
 
 - git is everywhere keel runs, including native Windows with Git for Windows, and every agent CLI expects a
   git checkout. It offers commit trailers, create-only compare-and-swap ref updates, worktrees with sparse
-  checkout, `merge-tree --write-tree` previews, temporary-index snapshots and ssh-signed data.
+  checkout, `merge-tree --write-tree` previews and temporary-index snapshots.
 - jj (Jujutsu) adds stable change ids, an operation log, an evolution log, first-class conflicts,
   `jj run` and revsets. It is pre-1.0. Its secondary workspaces are not git checkouts, which breaks agent
   CLIs that need one, and `jj workspace add --colocate` is unreleased as of jj 0.45.1 (verify by probe).

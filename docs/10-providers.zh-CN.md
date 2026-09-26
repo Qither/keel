@@ -26,7 +26,7 @@ keel 确实知道的：环境变量名、协议 id、别名、声明的模型家
 
 ## 2. routing.yaml 与声明的模型家族
 
-`.keel/routing.yaml` 把每个席位绑定到一个运行时、一个配置档（profile）别名和一个档位（tier）。它由董事会（Board）签名（没有有效签名时派发会拒绝），由 `schemas/routing.schema.json` 校验，且只保存名称。模板是 `templates/project/routing.yaml`；黄金示例是 `examples/acme-notes/.keel/routing.yaml`。
+`.keel/routing.yaml` 把每个席位绑定到一个运行时、一个配置档（profile）别名和一个档位（tier）。它由董事会（Board）批准（没有有效的文档批准时派发会拒绝），由 `schemas/routing.schema.json` 校验，且只保存名称。模板是 `templates/project/routing.yaml`；黄金示例是 `examples/acme-notes/.keel/routing.yaml`。
 
 ```yaml
 profiles:
@@ -87,9 +87,9 @@ policy:
 | `policy.record_model_names` | 默认 `false`：记录中只保存别名、档位、声明的模型家族和修订号 |
 | `policy.allow_degraded` | 单一家族的设置是否可以在每次变更使用 `keel approve <P> --rule degraded` 之后继续 |
 
-声明的模型家族。家族是董事会签名的声明，因为在 P1 之下 keel 无法检查端点或模型名称。回执（receipt）、看板（dashboard）和评审检查把它显示为“declared”（声明的），从不显示为“verified”。当出现声明的模型家族塌缩（工程席位与其评审席位为同一家族）时，`keel doctor` 会发出警告。一项可选、需主动开启的检查会在内存中比较两条通道输出流 `init` 事件中运行时报告的模型 id，只打印“same”或“different”；不持久化任何内容，也不从环境变量或配置中读取任何内容。独立性规则本身位于 [11-verification.zh-CN.md](11-verification.zh-CN.md)。
+声明的模型家族。家族是董事会批准的声明，因为在 P1 之下 keel 无法检查端点或模型名称。回执（receipt）、看板（dashboard）和评审检查把它显示为“declared”（声明的），从不显示为“verified”。当出现声明的模型家族塌缩（工程席位与其评审席位为同一家族）时，`keel doctor` 会发出警告。一项可选、需主动开启的检查会在内存中比较两条通道输出流 `init` 事件中运行时报告的模型 id，只打印“same”或“different”；不持久化任何内容，也不从环境变量或配置中读取任何内容。独立性规则本身位于 [11-verification.zh-CN.md](11-verification.zh-CN.md)。
 
-原生的模型提供方名称（例如 `ANTHROPIC_BASE_URL`）只出现在各运行时描述符的映射中，从不出现在 `routing.yaml` 中。在计划批准时，Steward 把 `routing.snapshot.yaml` 写入提案（proposal）（`schemas/routing-snapshot.schema.json`）；它记录每个席位解析后的运行时、别名、档位、声明的模型家族和修订号，并与计划一同签名。
+原生的模型提供方名称（例如 `ANTHROPIC_BASE_URL`）只出现在各运行时描述符的映射中，从不出现在 `routing.yaml` 中。在计划批准时，Steward 把 `routing.snapshot.yaml` 写入提案（proposal）（`schemas/routing-snapshot.schema.json`）；它记录每个席位解析后的运行时、别名、档位、声明的模型家族和修订号，并在需要计划批准时由该计划批准绑定。
 
 值存放在哪里：Windows 用户环境变量、shell 配置文件，或把变量注入单个进程的密钥管理器，例如 `op run -- keel run P-7F3K9Q`。`examples/providers.env.example` 只列出名称，每个名称配以占位符 `<set-in-your-own-environment>`；凡需要展示端点形态之处，文档对 anthropic-messages 使用 `https://provider.example.invalid`，对两种 OpenAI 协议使用 `https://provider.example.invalid/v1`，因为用户设置的基础 URL 在不同协议下形态不同（第 5 节）。
 
@@ -114,7 +114,7 @@ policy:
 ```mermaid
 flowchart LR
   P[父进程环境<br/>值在别处从不读取] --> A[env-policy.ts]
-  S[已签名路由：<br/>配置档名称] --> A
+  S[已批准的路由：<br/>配置档名称] --> A
   D[描述符映射：<br/>原生名称] --> A
   A --> C[子进程环境允许列表]
   A --> R[argv.redacted.json<br/>含占位符]
@@ -140,7 +140,7 @@ flowchart LR
 | opencode | 无；每次运行的 `opencode.json` 引用 `{env:KEEL_PROFILE_<ALIAS>_...}` 名称 | 该配置档的变量原样通过允许列表 |
 | direct | 无；请求构建器接收一个不透明句柄 | `src/direct/client.ts` 在调用时解开它 |
 
-从不传给席位的内容：其他配置档的变量、`SSH_AUTH_SOCK`、`KEEL_BOARD_KEY` 和 `KEEL_BOARD_PRINCIPAL`（仅有的两个 `KEEL_BOARD_*` 名称，定义见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)），以及 git 凭据助手（由 git 加固重置）。运行记录中的 `argv.redacted.json` 保留 `${ENV:NAME}` 占位符，且没有任何路由会把模型名称、URL 或密钥放进 argv。Steward 进程本身从不调用模型；直连通道是一个与任何运行时一样被派生的独立子进程。
+从不传给席位的内容：其他配置档的变量、`SSH_AUTH_SOCK`（这样席位就无法使用用户的 git 传输密钥进行推送），以及 git 凭据助手（由 git 加固重置）。运行记录中的 `argv.redacted.json` 保留 `${ENV:NAME}` 占位符，且没有任何路由会把模型名称、URL 或密钥放进 argv。Steward 进程本身从不调用模型；直连通道是一个与任何运行时一样被派生的独立子进程。
 
 ## 4. 暴露规则（环境变量与文件）
 
@@ -220,7 +220,7 @@ keel 在运行时支持路径规则之处，依据该集合生成禁读规则（
 
 ```text
 $ keel doctor --section providers
-routing: .keel/routing.yaml signed by SHA256:<board-key-fingerprint> at <commit>
+routing: .keel/routing.yaml approved by <approver> (declared) in AP-<sha12> at <commit>
 
 profile anthropic-main  (revision 1)
   protocol            anthropic-messages

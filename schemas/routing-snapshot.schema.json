@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/routing-snapshot.schema.json",
   "title": "keel routing snapshot",
-  "description": "The per-proposal .keel/proposals/<P>-<slug>/routing.snapshot.yaml, written by the Steward at planning and signed as part of the plan approval. It freezes the resolved routes, the conformance status and the exposure profile for each seat.",
+  "description": "The per-proposal .keel/proposals/<P>-<slug>/routing.snapshot.yaml, written by the Steward at planning and bound by the plan approval when one is required. It freezes the resolved routes, the conformance status and the exposure profile for each seat.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M2",
   "type": "object",
@@ -12,11 +12,11 @@
       "type": "object",
       "properties": {
         "blob": {
-          "description": "sha256 of the normalized routing.yaml blob at the last Board-signed trunk revision.",
+          "description": "sha256 of the normalized routing.yaml blob at the last Board-approved trunk revision.",
           "$ref": "common.schema.json#/$defs/sha256"
         },
         "approval": {
-          "description": "The document approval that signed that blob.",
+          "description": "The document approval that covers that blob.",
           "$ref": "common.schema.json#/$defs/approvalId"
         }
       },
@@ -30,7 +30,7 @@
       "minItems": 1
     },
     "deviations": {
-      "description": "Differences from the signed routing. On the feature track a deviation makes plan approval required.",
+      "description": "Differences from the approved routing. On the feature track a deviation makes plan approval required.",
       "type": "array",
       "items": { "$ref": "#/$defs/deviation" }
     },

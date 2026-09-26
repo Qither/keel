@@ -25,7 +25,7 @@ such as `P-7F3K9Q`, `<RUN>` a run id such as `RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A`.
   .opencode/agents/keel-<seat>.md   keel-owned agent files (keel sync)
   .keel/                            declared plane (committed)
     config.yaml  local.yaml (gitignored)  charter.md  goals.yaml  routing.yaml
-    policies/  board/allowed_signers  signatures/  specs/  decisions/  arch/
+    policies/  approvals/  specs/  decisions/  arch/
     proposals/<P>-<slug>/           only on keel/<P>/main until land
     archive/<yyyy>/<P>-<slug>/      projections written by the archive commit
     generated.lock.json
@@ -36,12 +36,11 @@ such as `P-7F3K9Q`, `<RUN>` a run id such as `RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A`.
 | Path | Plane | Format | Written by | Schema |
 | --- | --- | --- | --- | --- |
 | `.keel/config.yaml` (+ `.keel/local.yaml`, gitignored) | declared | YAML, layered: package defaults, then team, then personal; tables deep-merge, arrays keyed by id replace, unknown keys are errors | Board (`local.yaml`: the individual, never secrets) | `schemas/config.schema.json` |
-| `.keel/charter.md` | declared | Markdown + YAML frontmatter | Board, signed | `schemas/charter.schema.json` |
-| `.keel/goals.yaml` | declared | YAML | Board, signed | `schemas/goals.schema.json` |
-| `.keel/routing.yaml` | declared | YAML, names only | Board, signed; dispatch refuses without a valid signature | `schemas/routing.schema.json` |
-| `.keel/policies/<name>.yaml` | declared | YAML | Board, signed | `schemas/policy.schema.json` |
-| `.keel/board/allowed_signers` | declared | OpenSSH allowed_signers | Board; changes signed by an existing signer | format fixed by OpenSSH ([14-trust-security.md](14-trust-security.md)) |
-| `.keel/signatures/<blob-sha256>.<kind>.json` | declared | JSON detached envelope with an ssh signature | `keel approve`; the Steward commits it as soon as it is signed: on trunk (documents, policies, receipts), on `keel/<P>/main` (contract, plan, request, rulings) or in the archive commit (land) | `schemas/approval.schema.json` |
+| `.keel/charter.md` | declared | Markdown + YAML frontmatter | Board, approved | `schemas/charter.schema.json` |
+| `.keel/goals.yaml` | declared | YAML | Board, approved | `schemas/goals.schema.json` |
+| `.keel/routing.yaml` | declared | YAML, names only | Board, approved; dispatch refuses without a valid document approval | `schemas/routing.schema.json` |
+| `.keel/policies/<name>.yaml` | declared | YAML | Board, approved | `schemas/policy.schema.json` |
+| `.keel/approvals/<record-sha256>.<kind>.json` | declared | JSON approval record (subject, artifact hashes, declared approver, local time, chain head) | `keel approve`, after the Board's explicit confirmation; the Steward commits it as soon as it is written: on trunk (documents, policies, receipts), on `keel/<P>/main` (contract, plan, request, rulings) or in the archive commit (land) | `schemas/approval.schema.json` |
 | `.keel/specs/<area>/spec.yaml` | declared | YAML | the land archive commit only | `schemas/spec.schema.json` |
 | `.keel/decisions/ADR-<5>-<slug>.md` | declared | Markdown + frontmatter + `## Obligations` | promoted at land | `schemas/decision.schema.json` |
 | `.keel/arch/model.yaml`, `rules.yaml`, `baseline.json`, `series.jsonl` | declared | YAML, JSON, JSONL | architect through `arch.delta` at land; Steward appends the series | `arch-model`, `arch-rules`, `arch-baseline`; `arch-report` (M4 stub) |
@@ -76,6 +75,7 @@ keel/
   .github/workflows/ci.yml          windows-latest and ubuntu-latest, Node 22.13 and 24
   scripts/validate.mjs              the declared D1 tooling exception
   docs/                             design documents, each with a .zh-CN.md mirror; docs/adr/
+  docs/reference-projects.yaml      reference registry for the refresh discipline (P4)
   schemas/                          JSON Schema 2020-12 files and examples.map.json
   src/                              type-only TypeScript
   org/                              seat contracts, reserved actions, checkpoints
@@ -98,6 +98,8 @@ The tables below are the repository manifest. The first cell of each row lists r
 they cover every file except `package-lock.json` (listed anyway) and the `*.zh-CN.md` mirrors (listed next
 to their English canonical files). For example files, the binding that `validate` actually checks is
 `schemas/examples.map.json`; the "Example" column here names the intended example.
+`docs/reference-projects.yaml` is a YAML data file that lives under `docs/`; the `examples` check validates
+it against its schema and the `references` check of section 6 cross-references it.
 
 <!-- keel:manifest:start -->
 
@@ -123,7 +125,9 @@ to their English canonical files). For example files, the binding that `validate
 | Path | Home of |
 | --- | --- |
 | `docs/README.md`, `docs/README.zh-CN.md` | Reading order, document index, single-home table |
-| `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | Positioning, requirement mapping, principles, glossary, end-to-end example |
+| `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | The owner's statement, binding ids, precedence, refresh discipline |
+| `docs/reference-projects.yaml` | Reference registry and scouting record (P4); schema `reference-registry` |
+| `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | Positioning, how the design meets the mandate, principles, glossary, end-to-end example |
 | `docs/00a-owner-guide.md`, `docs/00a-owner-guide.zh-CN.md` | The owner's one-page guide |
 | `docs/01-org-model.md`, `docs/01-org-model.zh-CN.md` | Board, Steward, seats, ownership, escalation, staffing |
 | `docs/02-alignment.md`, `docs/02-alignment.zh-CN.md` | Alignment chain, brief, ACK, approvals, amendments, rulings |
@@ -132,13 +136,13 @@ to their English canonical files). For example files, the binding that `validate
 | `docs/05-vcs.md`, `docs/05-vcs.zh-CN.md` | Vcs interface, git mechanisms, land cases, reserved operations, jj |
 | `docs/06-parallelism.md`, `docs/06-parallelism.zh-CN.md` | Waves, claims, Windows process model, integration |
 | `docs/07-architecture-intelligence.md`, `docs/07-architecture-intelligence.zh-CN.md` | Declared and derived architecture, search, drift, impact |
-| `docs/08-dashboard.md`, `docs/08-dashboard.zh-CN.md` | Read-only native-HTML dashboard |
+| `docs/08-dashboard.md`, `docs/08-dashboard.zh-CN.md` | Read-only TanStack dashboard |
 | `docs/09-runtimes.md`, `docs/09-runtimes.zh-CN.md` | Generated surfaces, descriptors, spawn contract, channels, rungs, conformance |
 | `docs/10-providers.md`, `docs/10-providers.zh-CN.md` | Names-only providers, exposure rule, protocols, fakes |
 | `docs/11-verification.md`, `docs/11-verification.zh-CN.md` | Gate catalogue, evidence, lenses, findings authority |
 | `docs/12-cli-api-mcp.md`, `docs/12-cli-api-mcp.zh-CN.md` | Verbs and modes, envelope, exit codes, api, MCP, hooks |
 | `docs/13-artifacts-schemas.md`, `docs/13-artifacts-schemas.zh-CN.md` | This document |
-| `docs/14-trust-security.md`, `docs/14-trust-security.zh-CN.md` | Threat model, signing hygiene, exposure profile, limits |
+| `docs/14-trust-security.md`, `docs/14-trust-security.zh-CN.md` | Threat model, what approval records prove, exposure profile, limits |
 | `docs/15-roadmap.md`, `docs/15-roadmap.zh-CN.md` | M0 to M8 with exit criteria |
 | `docs/16-sources-credits.md`, `docs/16-sources-credits.zh-CN.md` | Credits, licences, provenance and shape audits |
 | `docs/17-open-decisions.md`, `docs/17-open-decisions.zh-CN.md` | Adopted and open decisions |
@@ -146,10 +150,11 @@ to their English canonical files). For example files, the binding that `validate
 | `docs/adr/ADR-0002-node-windows-native.md`, `docs/adr/ADR-0002-node-windows-native.zh-CN.md` | Node built-ins plus `yaml` and `ajv`; native Windows |
 | `docs/adr/ADR-0003-control-plane-in-git-common-dir.md`, `docs/adr/ADR-0003-control-plane-in-git-common-dir.zh-CN.md` | Control-plane location, hash chain, exposure honesty |
 | `docs/adr/ADR-0004-steward-commits-and-submit-channels.md`, `docs/adr/ADR-0004-steward-commits-and-submit-channels.zh-CN.md` | Seats never commit; final message, MCP, outbox |
-| `docs/adr/ADR-0005-signed-board-approvals.md`, `docs/adr/ADR-0005-signed-board-approvals.zh-CN.md` | `ssh-keygen -Y`, committed envelopes, agent fail-closed |
+| `docs/adr/ADR-0005-explicit-confirmation-approvals.md`, `docs/adr/ADR-0005-explicit-confirmation-approvals.zh-CN.md` | Explicit-confirmation approvals: show, confirm, re-hash, record (D6) |
 | `docs/adr/ADR-0006-provider-values-by-reference.md`, `docs/adr/ADR-0006-provider-values-by-reference.zh-CN.md` | P1 invariant and exposure rule |
 | `docs/adr/ADR-0007-declared-vs-derived-architecture.md`, `docs/adr/ADR-0007-declared-vs-derived-architecture.zh-CN.md` | keel YAML model plus the IndexProvider port |
-| `docs/adr/ADR-0008-read-only-dashboard.md`, `docs/adr/ADR-0008-read-only-dashboard.zh-CN.md` | No second approval path |
+| `docs/adr/ADR-0008-read-only-dashboard.md`, `docs/adr/ADR-0008-read-only-dashboard.zh-CN.md` | Read-only dashboard, serve boundary, no second approval path |
+| `docs/adr/ADR-0009-tanstack-frontend.md`, `docs/adr/ADR-0009-tanstack-frontend.zh-CN.md` | TanStack on React, headless, pre-rendered, bundled (P2) |
 
 ### Schemas
 
@@ -164,7 +169,7 @@ schema governs; "Template" and "Example" name the illustrating files, if any.
 | `schemas/charter.schema.json` | Charter frontmatter and INV obligations | `templates/project/charter.md` | `examples/acme-notes/.keel/charter.md` | stable |
 | `schemas/goals.schema.json` | `.keel/goals.yaml` | `templates/project/goals.yaml` | `examples/acme-notes/.keel/goals.yaml` | stable |
 | `schemas/routing.schema.json` | `.keel/routing.yaml`: profiles, seats, policy | `templates/project/routing.yaml` | `examples/acme-notes/.keel/routing.yaml` | stable |
-| `schemas/routing-snapshot.schema.json` | Per-proposal `routing.snapshot.yaml`, signed at plan approval | none (Steward-written) | `examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/routing.snapshot.yaml` | stable |
+| `schemas/routing-snapshot.schema.json` | Per-proposal `routing.snapshot.yaml`, bound by the plan approval when one is required | none (Steward-written) | `examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/routing.snapshot.yaml` | stable |
 | `schemas/policy.schema.json` | `.keel/policies/<name>.yaml` | `templates/project/policies/quick-patch.yaml` | `examples/acme-notes/.keel/policies/quick-patch.yaml` | stable |
 | `schemas/seat.schema.json` | `org/seats/*.yaml`, including execution class, ACK id set, lens sets, assumption | none | `org/seats/*.yaml` | stable |
 | `schemas/reserved-actions.schema.json` | `org/reserved-actions.yaml` | none | `org/reserved-actions.yaml` | stable |
@@ -188,7 +193,7 @@ schema governs; "Template" and "Example" name the illustrating files, if any.
 | `schemas/verdict.schema.json` | Lens verdict (strict subset) | `templates/prompts/lens-*.md` | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/verdicts/VD-5b1d2e3f4a6c.json` | stable |
 | `schemas/triage.schema.json` | Planner triage record | none | none | stable |
 | `schemas/evidence.schema.json` | EV record, source-state binding, red/green proof | none | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/evidence/EV-3a9c0e1b2d4f.json` | stable |
-| `schemas/approval.schema.json` | Signed envelope (stage, doc, policy, request, rule, tofu) including the chain head; rulings carry their budget limit or track change | `templates/project/signatures/README.md` | `examples/acme-notes/.keel/signatures/example.contract.json` | stable |
+| `schemas/approval.schema.json` | Approval record (stage, doc, policy, request, rule): subject, artifact hashes, note, declared approver, chain head, local time; rulings carry their budget limit or track change | `templates/project/approvals/README.md` | `examples/acme-notes/.keel/approvals/example.contract.json` | stable |
 | `schemas/governance-record.schema.json` | Ruling, amendment and override records, degraded and unverified acks | none | none | stable |
 | `schemas/claim.schema.json` | Claim lock token and workspace | none | none | stable |
 | `schemas/ledger-event.schema.json` | Ledger event union with the `prev`/`hash` chain | none | `examples/acme-notes/git-common-dir/keel/ledger.sample.json` | stable |
@@ -197,6 +202,7 @@ schema governs; "Template" and "Example" name the illustrating files, if any.
 | `schemas/conformance.schema.json` | Plumbing and behaviour scenarios and their results | none | `conformance/scenarios.yaml` | stub (M6) |
 | `schemas/generated-lock.schema.json` | `.keel/generated.lock.json` | none | none | stable |
 | `schemas/api-envelope.schema.json` | CLI JSON envelope and diagnostics ([12-cli-api-mcp.md](12-cli-api-mcp.md)) | none | none | stable |
+| `schemas/reference-registry.schema.json` | `docs/reference-projects.yaml` (P4 registry) | none | `docs/reference-projects.yaml` | stable |
 
 ### Type-only TypeScript
 
@@ -213,7 +219,7 @@ schema governs; "Template" and "Example" name the illustrating files, if any.
 | `src/core/ack.ts` | `Ack`, `AckDiff` | M0 |
 | `src/core/gates.ts` | `PhaseGate`, `CheckId`, `CheckResult`, `Readiness` (no rule values) | M0 |
 | `src/core/evidence.ts` | `EvidenceRecord`, `SourceStateBinding`, `RedGreenProof` | M0 |
-| `src/core/governance.ts` | `SignedEnvelope`, `ChangeRequest`, `Approval`, `Amendment`, `Ruling`, `Override`, `StandingPolicy`, `Signer` | M0 |
+| `src/core/governance.ts` | `ApprovalRecord`, `ChangeRequest`, `Approval`, `ApprovalInvalidity`, `ConfirmationStep`, `Amendment`, `Ruling`, `Override`, `StandingPolicy` | M0 |
 | `src/core/trace-graph.ts` | Trace nodes and edges, `RtmRow`, `TraceDriftKind` | M0 |
 | `src/core/liveness.ts` | `LivenessHold`, `TrackRecord` | M0 |
 | `src/org/seats.ts` | `SeatContract`, `ExecutionClass`, `Independence` | M0 |
@@ -296,8 +302,7 @@ which kind it is in its header comment. The brief template marks its unhashed he
 | `templates/project/goals.yaml` | `.keel/goals.yaml` | `schemas/goals.schema.json` |
 | `templates/project/routing.yaml` | `.keel/routing.yaml` with placeholder aliases, declared families and env NAMES | `schemas/routing.schema.json` |
 | `templates/project/policies/quick-patch.yaml` | Standing policy with red/green and lens predicates | `schemas/policy.schema.json` |
-| `templates/project/allowed_signers.example` | Board signer format | OpenSSH allowed_signers |
-| `templates/project/signatures/README.md` | Explains the committed envelope directory | `schemas/approval.schema.json` |
+| `templates/project/approvals/README.md` | Explains the committed approval-record directory | `schemas/approval.schema.json` |
 | `templates/project/arch-model.yaml` | `.keel/arch/model.yaml` | `schemas/arch-model.schema.json` |
 | `templates/project/arch-rules.yaml` | `.keel/arch/rules.yaml` | `schemas/arch-rules.schema.json` |
 | `templates/proposal/proposal.yaml` | Proposal intake signals | `schemas/proposal.schema.json` |
@@ -308,7 +313,7 @@ which kind it is in its header comment. The brief template marks its unhashed he
 | `templates/proposal/workorder.yaml` | Work order with the ACC to command table | `schemas/workorder.schema.json` |
 | `templates/proposal/decision.md` | ADR with `## Obligations` | `schemas/decision.schema.json` |
 | `templates/proposal/answer.md` | Spike answer | none (prose) |
-| `templates/proposal/receipt.md` | Receipt: AGENT section plus the rendered signed quote | `schemas/receipt.schema.json` (the JSON twin) |
+| `templates/proposal/receipt.md` | Receipt: AGENT section plus the rendered Land approval section | `schemas/receipt.schema.json` (the JSON twin) |
 | `templates/runtime/AGENTS.block.md.tmpl` | Managed pointer block | `schemas/generated-lock.schema.json` (lock entry) |
 | `templates/runtime/CLAUDE.md.tmpl` | `@AGENTS.md` bridge | lock entry |
 | `templates/runtime/claude-run-settings.json.tmpl` | Per-run hooks, allowed tools, deny rules | keel-owned per-run file |
@@ -348,8 +353,7 @@ plane.
 | `examples/acme-notes/.keel/goals.yaml` | Goal G-03 | `goals` (yaml) |
 | `examples/acme-notes/.keel/routing.yaml` | Engineer on claude-code (env), reviewer on opencode with declared family google, GLM via opencode; names only | `routing` (yaml) |
 | `examples/acme-notes/.keel/policies/quick-patch.yaml` | Standing policy | `policy` (yaml) |
-| `examples/acme-notes/.keel/board/allowed_signers` | A fake placeholder signer key | OpenSSH format (not mapped) |
-| `examples/acme-notes/.keel/signatures/example.contract.json` | Illustrative contract envelope with a fake signature | `approval` (json) |
+| `examples/acme-notes/.keel/approvals/example.contract.json` | Illustrative contract approval record with a declared approver | `approval` (json) |
 | `examples/acme-notes/.keel/specs/notes/spec.yaml` | Requirement R-notes-4QX7B | `spec` (yaml) |
 | `examples/acme-notes/.keel/decisions/ADR-7KQ2B-tag-storage.md` | ADR with `## Obligations` | `decision` (md-frontmatter) |
 | `examples/acme-notes/.keel/arch/model.yaml` | Elements | `arch-model` (yaml) |
@@ -366,12 +370,12 @@ plane.
 | `examples/acme-notes/workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/outbox/0001-ack.json` | Matching ACK drop | `ack` (json) |
 | `examples/acme-notes/workspace-root/_runs/RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A/outbox/0002-result.json` | Result drop | `result` (json) |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.json` | Receipt projection | `receipt` (json) |
-| `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md` | The receipt the Board read and signed, rendered from `receipt.json` with the Signed quote section from the land envelope | not mapped (rendered Markdown) |
+| `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/receipt.md` | The receipt the Board read and approved, rendered from `receipt.json` with the Land approval section from the land record | not mapped (rendered Markdown) |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/verdicts/VD-*.json` | Every cross-family verdict the receipt names: spec, plan verification-gap, test-task verification-gap, blind-diff and build verification-gap | `verdict` (json) |
 | `examples/acme-notes/.keel/archive/2026/P-7F3K9Q-note-tags/evidence/EV-*.json` | Runner evidence with source-state binding: the test task red (`verify.test-red`) and the build task green | `evidence` (json) |
 | `examples/acme-notes/commit-message.txt` | Steward commit showing every trailer | `common#/$defs/trailers` (illustrative text) |
 | `examples/providers.env.example` | Placeholder variable NAMES only | not mapped (names list) |
-| `examples/dashboard/sample.html` | Static native-HTML mock; the M5 shell and CSS are deferred | not mapped (HTML) |
+| `examples/dashboard/sample.html` | Hand-written static mock of the markup and token rules the M5 TanStack page reproduces | not mapped (HTML) |
 
 ### Tests
 
@@ -404,7 +408,7 @@ Deferred in M0:
   `schemas/conformance.schema.json` and `src/direct/client.ts` (M6), `src/vcs/jj.ts` (M7), campaign plans in
   `schemas/plan.schema.json` (M8);
 - not shipped at all: the advisory git/jj shims and the optional `commit-msg` hook (M2), and the dashboard
-  HTML shell and CSS (M5; M0 has only `examples/dashboard/sample.html`);
+  TanStack shell, CSS and package-build bundle (M5; M0 has only `examples/dashboard/sample.html`);
 - illustrative only: the brief hash in the example run (until the M1 golden test) and the ledger sample as
   a JSON array (JSONL is validated from M1).
 
@@ -419,11 +423,11 @@ idea comes from BMAD-METHOD).
 - A migration is a data record naming `from` and `to` versions, the schema it applies to, and a list of
   field operations (rename, add with a default, remap an enum value, drop). No migration runs arbitrary
   code.
-- Ledger lines are never rewritten, because the hash chain and the chain heads inside signed envelopes
+- Ledger lines are never rewritten, because the hash chain and the chain heads inside approval records
   would break. Readers upcast old events on read, using the migration records.
-- Declared-plane files that the Board signed are migrated by producing new bytes and a new signature: the
-  Steward proposes the migrated file, the Board signs it with `keel approve --doc`, and a governance commit
-  lands it. Old signatures stay valid for the old bytes.
+- Declared-plane files that the Board approved are migrated by producing new bytes and a new approval: the
+  Steward proposes the migrated file, the Board views and approves it with `keel approve --doc`, and a
+  governance commit lands it. Old records stay a valid history of the old bytes.
 - Derived data (`.git/keel/cache/`, `trace.db`, the index) is rebuilt, never migrated.
 - M0 ships no migration file; the first schema change after M1 introduces the migration directory and its
   schema.
@@ -437,7 +441,7 @@ file that may hold provider values or credentials, and reports such a file by na
 ```sh
 npm run check                                    # typecheck + validate (what CI runs)
 node scripts/validate.mjs                        # all checks
-node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest
+node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,references
 ```
 
 Output is `<check>: <passed>/<total> <unit>` followed by `x <error>` lines; exit 1 on any error, 2 on bad
@@ -451,6 +455,7 @@ arguments.
 | `i18n` | Every `.md` under `docs/`, the root `README.md`, `runtimes/README.md` and `test/README.md` has a `.zh-CN.md` mirror with the identical sequence of heading levels; no orphan mirrors | Translation quality; other Markdown (templates, skills, agent guides) |
 | `audit` | The D2 term list (in paths and contents), P1 key-shaped tokens, real provider API hosts, non-placeholder URL hosts outside `docs/**`, `README*.md` and `AGENTS.md`, forbidden credential file names; D1: no `bin` and no `dependencies` in `package.json`, and type-only statements in every `src/` file | Meaning: a design that is wrong but uses allowed words passes |
 | `manifest` | Every path in the marked tables of section 3 exists, and every repository file except `package-lock.json` and `*.zh-CN.md` is covered | Whether the "Purpose" text is accurate |
+| `references` | Parses `docs/reference-projects.yaml`; every project with `named_by_owner` true is named in `docs/00-mandate.md` and `docs/16-sources-credits.md`; `local_clone` is null or a relative path outside the repository and is never opened | Whether a review actually happened; upstream state |
 
 `npm run typecheck` (`tsc --noEmit -p tsconfig.json`) covers the TypeScript: strict mode, NodeNext module
 resolution, `verbatimModuleSyntax` and `isolatedModules`. Together with the `audit` check it enforces that

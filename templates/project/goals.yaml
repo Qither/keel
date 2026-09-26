@@ -1,6 +1,6 @@
-# .keel/goals.yaml (schemas/goals.schema.json). Board-owned; takes effect only once signed:
+# .keel/goals.yaml (schemas/goals.schema.json). Board-owned; takes effect only once approved:
 #   keel approve --doc .keel/goals.yaml
-# Replace every {{token}} before signing. Goal ids G-nn are serialized by the Board. Every proposal must
+# Replace every {{token}} before approving. Goal ids G-nn are serialized by the Board. Every proposal must
 # cite at least one active goal, and every brief's why-chain starts at its goal.
 # Goal progress = requirements verified at head / total.
 charter_version: "{{charter_version}}"

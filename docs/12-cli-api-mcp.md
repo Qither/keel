@@ -7,8 +7,8 @@ envelope, the exit codes, the agent-facing `keel api`, the MCP server with the w
 codes) and `src/api/contract.ts` (api ops, submit channels, envelope); `src/mcp/tools.ts` types the MCP
 tools. This document and those files must list the same verbs, modes and codes.
 
-Related homes: what each gate checks in [11-verification.md](11-verification.md); signing and approval
-semantics in [02-alignment.md](02-alignment.md); submit channels per runtime in
+Related homes: what each gate checks in [11-verification.md](11-verification.md); approval semantics in
+[02-alignment.md](02-alignment.md); submit channels per runtime in
 [09-runtimes.md](09-runtimes.md); the owner's daily commands in [00a-owner-guide.md](00a-owner-guide.md).
 
 ## 1. 16 verbs and at most 40 modes
@@ -17,9 +17,9 @@ The surface budget (KP-14) is 16 top-level verbs and at most 40 verb modes; the 
 surface sprawl of oh-my-claudecode, oh-my-codex, BMAD-METHOD and superpowers. Synopses:
 
 ```text
-keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--signer <public key file>] [--yes]
+keel init [--vcs auto|git|jj] [--runtimes <id,...>] [--yes]
 keel sync [--check] [--runtime <id>]
-keel doctor [--section runtimes|providers|vcs|signing|exposure|arch] [--conformance] [--selftest] [--json]
+keel doctor [--section runtimes|providers|vcs|approvals|exposure|arch] [--conformance] [--selftest] [--json]
 keel new "<title>" [--goal G-nn] [--track spike|patch|feature|system] [--policy <name>]
 keel approve <subject> --stage contract|plan|land|receipt
 keel approve --doc <path>
@@ -27,7 +27,7 @@ keel approve --policy <name>
 keel approve <subject> --request
 keel approve <subject> --rule answer|budget|track|override|dismiss|degraded|unverified|abandon
              [--until <date|land|commit-touching:path>] [--limit <usd|runs|wall_minutes>=<n>]
-             [--to spike|patch|feature|system] [--quote "<text>"]
+             [--to spike|patch|feature|system] [--note "<text>"] [--as <approver>]
 keel run <P|P.Tn> [--seat <seat>] [--wave] [--runtime <id>] [--resume] [--dry-run]
 keel run --hold on|off <P>
 keel check [<P>] [--gate frame|plan|submit|verify|land|all] [--check <id>] [--at <commit>] [--json]
@@ -45,12 +45,12 @@ keel hook <canonical event> --runtime <id>
 ```
 
 Counting rule. A mode is a subcommand word, or a flag that selects a different operation (a different
-side effect, a different signed subject kind, or a check-only variant of an operation). Not counted: enum
+side effect, a different approved subject kind, or a check-only variant of an operation). Not counted: enum
 parameter values (`--stage`, `--rule`, `--section`, `--gate` values), output views (`--json`, `--format`,
 `--next`, `--matrix`), filters (`--check <id>`, `--at`, `--seat`, `--runtime`) and tuners (`--wave`,
-`--resume`, `--until`, `--limit`, `--to`, `--quote`, `--out`, `--port`, `--http`, `--goal`, `--track`,
-`--vcs`, `--runtimes`, `--signer`, `--yes`). `keel new --policy <name>` is intake plus the `approve --request`
-signing flow, so the signing is counted once, under `approve`.
+`--resume`, `--until`, `--limit`, `--to`, `--note`, `--as`, `--out`, `--port`, `--http`, `--goal`,
+`--track`, `--vcs`, `--runtimes`, `--yes`). `keel new --policy <name>` is intake plus the `approve --request`
+confirmation flow, so the approval is counted once, under `approve`.
 
 | Verb | Counted modes | Count | Under `KEEL_RUN` | Phase |
 | --- | --- | --- | --- | --- |
@@ -77,37 +77,41 @@ The budget is full: a new mode must replace an existing one.
 What each verb does:
 
 - **init** scaffolds `.keel/`, the control plane `.git/keel/` and the workspace root, sets `trace.since`
-  (the trace epoch) and, with consent, registers the first Board signer from `--signer <public key file>`
-  (trust on first use, with a quoted consent recorded in `.keel/signatures/`; key selection is in
-  [14-trust-security.md](14-trust-security.md)) and runs `sync`. Idempotent.
+  (the trace epoch) and runs `sync`. It needs no key, signer or hardware; the Board approves the scaffolded
+  documents afterwards with `keel approve --doc`. Idempotent.
 - **sync** generates keel-owned surfaces and prints snippets for shared settings
   ([09-runtimes.md](09-runtimes.md)). `--check` writes nothing and fails on drift or handbook budget
   overruns.
 - **doctor** runs capability probes and prints verification status: SET/UNSET env names and
   PRESENT/ABSENT provider paths (stat only), compatibility, auth mode, the exposure profile (tool env, tool
-  file, control plane, shim coverage), trust state, signing hygiene (agent-loaded keys, the verified
-  `ssh-keygen` path, `-sk`), the git floor, ref-conflict and jj hazard checks, and inert architecture
+  file, control plane, shim coverage), the approval state (records without a ledger event, approvals whose
+  bound content has changed, documents and policies about to expire), the git floor, ref-conflict and jj hazard checks, and inert architecture
   checks. `--conformance` runs behaviour scenarios on real routes when the user opts in; `--selftest`
   exercises every verb in a scratch repository.
 - **new** mints a proposal id, checks anchors, classifies the track, and creates `keel/<P>/main` and the
-  planning worktree. With `--policy` the Board signs the verbatim request in the same interactive flow.
-- **approve** is the single Board signing path. It builds a hash-bound, chain-anchored envelope, confirms
-  interactively (a TTY, or a typed confirmation code under Git Bash mintty), shows exactly what to read, and
-  the envelope is committed under `.keel/signatures/`. `--stage` signs a checkpoint, `--doc` a governance
-  document, `--policy` a standing policy, `--request` a verbatim change request, `--rule` a ruling (`--until`
-  sets an override's expiry, `--limit` the new limit of a budget ruling, `--to` the track a track ruling sets;
-  both values are signed in the envelope's `rule` object). It exits 6 while any allowed signer key is
-  agent-listed and is not `-sk`.
-- **run** is the deterministic dispatcher: resolve signed routing, compatibility, the exposure rule and
+  planning worktree. With `--policy` the Board views and approves the verbatim request in the same
+  interactive flow.
+- **approve** is the single Board approval path. It shows exactly what to read and the change itself, takes
+  the explicit confirmation (the confirmation word at a TTY, or a shown confirmation code under Git Bash
+  mintty), re-hashes the bound artifacts, and writes the record under `.keel/approvals/` with its
+  `approval.recorded` event ([02-alignment.md](02-alignment.md)). `--stage` approves a checkpoint, `--doc` a
+  governance document, `--policy` a standing policy, `--request` a verbatim change request, `--rule` a ruling
+  (`--until` sets an override's expiry, `--limit` the new limit of a budget ruling, `--to` the track a track
+  ruling sets; both values are recorded in the record's `rule` object). `--note` adds commentary; `--as`
+  names the approver for this confirmation when `board.approver` is not configured. It refuses under a keel
+  run, waits for the supervisor lock while a seat runs, and refuses with `changed-during-confirmation` when
+  a bound artifact changed while it was on screen.
+- **run** is the deterministic dispatcher: resolve approved routing, compatibility, the exposure rule and
   conformance status; claim; create the sparse worktree; snapshot refs; compile the brief; spawn headless
   with per-run config; ingest submit channels; make Steward commits. `--dry-run` stops before the claim
   and the spawn and prints the resolved route and argv template. `--hold on|off <P>` holds or releases a
   proposal.
 - **check** runs phase gates; see [11-verification.md](11-verification.md).
 - **land** integrates, previews, re-executes acceptance on the integrated commit and writes the receipt
-  draft. Without a land approval over that draft (or a signed land policy) it stops there and exits 3.
-  After `keel approve <P> --stage land`, a second `keel land` verifies the signature, writes the archive
-  commit (which projects the signed receipt) and advances trunk (ff-only or CAS). `--preview` stops after
+  draft. Without a land approval over that draft (or an approved land policy) it stops there and exits 3.
+  After `keel approve <P> --stage land`, a second `keel land` checks that the draft still hashes to what the
+  record binds, writes the archive commit (which projects the approved receipt) and advances trunk (ff-only
+  or CAS). `--preview` stops after
   the preview. Abandonment is `keel approve <P> --rule abandon`.
 - **status** computes state from the ledger; `--next` lists the legal next actions.
 - **trace** walks the trace graph from a file line, symbol, commit or id; `--matrix` prints the RTM
@@ -119,8 +123,7 @@ What each verb does:
 - **audit** runs the liveness, lease, override and chain sweep; `--rebuild` compares `trace.db` against a
   full rebuild by set difference; `--export-vcs` exports the jj op log and evolog; `--backfill` fills the
   metrics series.
-- **dashboard** builds the read-only native-HTML dashboard or serves it on loopback
-  ([08-dashboard.md](08-dashboard.md)).
+- **dashboard** builds the read-only dashboard or serves it on loopback ([08-dashboard.md](08-dashboard.md)).
 - **api** and **hook** are the agent and runtime entry points (sections 4 to 6).
 
 Seat-proof verbs. Every refused mode in the table refuses when `KEEL_RUN` or `KEEL_RUN_ID` is set, or when
@@ -188,7 +191,7 @@ keel's own exit codes, shared by every verb:
 | 3 | needs a human | A Board item is pending: approval, ask, ruling, stop class, `blocked(...)` requiring a decision |
 | 4 | claim conflict | A lost CAS on a claim ref; never retried automatically |
 | 5 | stale, or checked-out trunk dirty | Trunk moved (restack and retry), or a worktree with trunk checked out is dirty |
-| 6 | environment | Agent-loaded signer key, missing or too old git, unverified `ssh-keygen`, refusal under `KEEL_RUN` |
+| 6 | environment | Missing or too old git, refusal under `KEEL_RUN` or a keel-run ancestor |
 
 Runtime exit codes (for example 53 turn limit, 55 budget, 42 input error, 143 on POSIX only) are a
 different thing: descriptors map them to canonical run outcomes ([09-runtimes.md](09-runtimes.md)).

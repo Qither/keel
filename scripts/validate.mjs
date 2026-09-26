@@ -1,11 +1,12 @@
 // scripts/validate.mjs: the declared D1 tooling exception.
 //
 // This is the only non-type code in keel M0. It checks the design skeleton (schemas,
-// examples, the strict subset, bilingual docs, the D2/P1/D1 audit and the docs/13
-// manifest) and holds no product logic. P1: it never opens a file that may hold
-// provider values or credentials; such a file is reported by name only.
+// examples, the strict subset, bilingual docs, the D2/P1/D1 audit, the docs/13
+// manifest and the P4 reference registry) and holds no product logic. P1: it never
+// opens a file that may hold provider values or credentials; such a file is reported
+// by name only.
 //
-// Usage: node scripts/validate.mjs [--only schemas,examples,strict,i18n,audit,manifest]
+// Usage: node scripts/validate.mjs [--only schemas,examples,strict,i18n,audit,manifest,references]
 // Each check prints "<check>: <passed>/<total> <unit>" followed by its errors.
 // Exit code: 0 ok, 1 when any selected check reports an error, 2 on usage errors.
 
@@ -18,12 +19,14 @@ import YAML from "yaml";
 import ts from "typescript";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CHECKS = ["schemas", "examples", "strict", "i18n", "audit", "manifest"];
+const CHECKS = ["schemas", "examples", "strict", "i18n", "audit", "manifest", "references"];
 const SCHEMA_BASE = "https://keel.invalid/schemas/";
 const DRAFT = "https://json-schema.org/draft/2020-12/schema";
 const FORMATS = ["yaml", "json", "jsonl", "json-array", "md-frontmatter"];
 const MAP_FILE = "schemas/examples.map.json";
 const MANIFEST_DOC = "docs/13-artifacts-schemas.md";
+const REGISTRY = "docs/reference-projects.yaml";
+const REGISTRY_DOCS = ["docs/00-mandate.md", "docs/16-sources-credits.md"];
 
 // ---------- repository files ----------
 const SKIP_DIRS = new Set([".git", "node_modules", "dist", "coverage", ".codegraph"]);
@@ -385,8 +388,41 @@ function checkManifest() {
   return { passed: repoFiles.length - uncovered.length, total: repoFiles.length, unit: `repo files listed (${listed.length} manifest paths)`, errors };
 }
 
+// ---------- references (P4 registry cross-referenced with the mandate and the credits) ----------
+// The name looked up is the display_name, or the part before its parenthesis, as a case-sensitive substring.
+const registryName = (p) => String(p?.display_name ?? "").split("(")[0].trim();
+
+function checkReferences() {
+  if (!FILE_SET.has(REGISTRY)) return { skipped: `${REGISTRY} missing` };
+  const errors = [];
+  const registry = attempt(errors, REGISTRY, () => parseYaml(read(REGISTRY)));
+  const projects = Array.isArray(registry?.projects) ? registry.projects : [];
+  if (registry && projects !== registry.projects) errors.push(`${REGISTRY}: needs projects[]`);
+  const texts = REGISTRY_DOCS.map((d) => (FILE_SET.has(d) ? read(d) : null));
+  let [total, passed] = [0, 0];
+  projects.forEach((p, i) => {
+    const where = `${REGISTRY}: projects[${i}] (${p?.id ?? "no id"})`;
+    const clone = p?.local_clone;
+    // Never opened: only the shape is checked, and it must leave the repository.
+    if (clone !== null && !(typeof clone === "string" && clone.startsWith("../"))) {
+      errors.push(`${where}: local_clone must be null or a relative path starting with ../`);
+    }
+    if (p?.named_by_owner !== true) return;
+    total++;
+    const name = registryName(p);
+    const before = errors.length;
+    if (!name) errors.push(`${where}: display_name is empty`);
+    else REGISTRY_DOCS.forEach((d, k) => {
+      if (texts[k] === null) errors.push(`${where}: ${d} missing, cannot cross-reference "${name}"`);
+      else if (!texts[k].includes(name)) errors.push(`${where}: owner-named project "${name}" is not named in ${d}`);
+    });
+    if (errors.length === before) passed++;
+  });
+  return { passed, total, unit: "owner-named projects cross-referenced", errors };
+}
+
 // ---------- main ----------
-const RUN = { schemas: checkSchemas, examples: checkExamples, strict: checkStrict, i18n: checkI18n, audit: checkAudit, manifest: checkManifest };
+const RUN = { schemas: checkSchemas, examples: checkExamples, strict: checkStrict, i18n: checkI18n, audit: checkAudit, manifest: checkManifest, references: checkReferences };
 const argv = process.argv.slice(2);
 const onlyArg = argv.length === 0 ? CHECKS.join(",") : argv[0] === "--only" && argv.length === 2 ? argv[1] : argv.length === 1 && argv[0].startsWith("--only=") ? argv[0].slice(7) : "";
 const selected = onlyArg.split(",").map((s) => s.trim()).filter(Boolean);

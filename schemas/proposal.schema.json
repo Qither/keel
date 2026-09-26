@@ -42,14 +42,14 @@
   "additionalProperties": false,
   "$defs": {
     "origin": {
-      "description": "board-signed: started with keel new --policy <id>, the Board signed the verbatim request; contract-approved: the Board signs a contract approval later. Receipts show it.",
-      "enum": ["board-signed", "contract-approved"]
+      "description": "board-requested: started with keel new --policy <id>, the Board approved the verbatim request; contract-approved: the Board confirms a contract approval later. Receipts show it.",
+      "enum": ["board-requested", "contract-approved"]
     },
     "request": {
       "type": "object",
       "properties": {
         "text": {
-          "description": "The verbatim request text as the Board typed it; on the policy path the Board signs exactly these bytes.",
+          "description": "The verbatim request text as the Board typed it; on the policy path the Board approves exactly these bytes.",
           "type": "string",
           "minLength": 1
         },
@@ -58,7 +58,7 @@
           "anyOf": [{ "$ref": "common.schema.json#/$defs/slug" }, { "type": "null" }]
         },
         "approval": {
-          "description": "The signed request envelope on the policy path, or null.",
+          "description": "The request approval on the policy path, or null.",
           "anyOf": [{ "$ref": "common.schema.json#/$defs/approvalId" }, { "type": "null" }]
         }
       },

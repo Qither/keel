@@ -1,42 +1,8 @@
 [
   {
     "v": 1,
-    "id": "EVT-01J9Z8A0003B03J2AYJBYQ2XTN",
-    "prev": null,
-    "ts": "2026-09-01T09:00:00Z",
-    "type": "approval.recorded",
-    "actor": {
-      "kind": "board",
-      "seat": null,
-      "runtime": null,
-      "declared_family": null,
-      "alias": null,
-      "run": null
-    },
-    "subject": null,
-    "refs": {
-      "brief": null,
-      "pg": null,
-      "contract_hash": null,
-      "charter_version": "1.0.0",
-      "commit": "6411b381f395f4745aa8a1f345959a5a42178749",
-      "tree": null,
-      "op": null
-    },
-    "data": {
-      "approval": "AP-0b3d5f7a9c1e",
-      "kind": "tofu",
-      "stage": null,
-      "rule": null,
-      "envelope": ".keel/signatures/08b7d4e6afb76be6621502248c1992d3e8bcb79c074fd92642a0b33237cadc61.tofu.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
-    },
-    "hash": "7df335635c76681c93d294a354043d4fceeec9160f6f9fd12444fcfe2d3943e0"
-  },
-  {
-    "v": 1,
     "id": "EVT-01J9Z8A865NV0T525Z1KRJYQ61",
-    "prev": "7df335635c76681c93d294a354043d4fceeec9160f6f9fd12444fcfe2d3943e0",
+    "prev": null,
     "ts": "2026-09-01T09:05:00Z",
     "type": "approval.recorded",
     "actor": {
@@ -62,15 +28,15 @@
       "kind": "doc",
       "stage": null,
       "rule": null,
-      "envelope": ".keel/signatures/193784c2da46e725d3e7b5a5471621aa3933b93d6329e8d96802756ffa77ab07.doc.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/193784c2da46e725d3e7b5a5471621aa3933b93d6329e8d96802756ffa77ab07.doc.json",
+      "approver": "board-owner"
     },
-    "hash": "b29085e7c74fb7096ce98cabe0fcf2071073567ae973ee81e3c1d285c4c18ec4"
+    "hash": "cbba2efcb6d955c3fbb4b23a1e2cce9055c53bce81cbf8ec791f2f5e7e86ef30"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8AGCBA0N9E3BHCNAX1S1Z",
-    "prev": "b29085e7c74fb7096ce98cabe0fcf2071073567ae973ee81e3c1d285c4c18ec4",
+    "prev": "cbba2efcb6d955c3fbb4b23a1e2cce9055c53bce81cbf8ec791f2f5e7e86ef30",
     "ts": "2026-09-01T09:06:00Z",
     "type": "approval.recorded",
     "actor": {
@@ -96,15 +62,15 @@
       "kind": "doc",
       "stage": null,
       "rule": null,
-      "envelope": ".keel/signatures/f0672a61e14f288da9d2c6e19cbf6fb4b02c1a5b743a4543886046c6d7cb8c6c.doc.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/f0672a61e14f288da9d2c6e19cbf6fb4b02c1a5b743a4543886046c6d7cb8c6c.doc.json",
+      "approver": "board-owner"
     },
-    "hash": "25f24a4d7b70015fa0f217be2ba32dbb013ba3843159e122df2e1a3a395f2fb5"
+    "hash": "5c3cd98dffb1b0fe8675a916dc9f4c1c82472bc3823997815874a283044ff57a"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8ARJHM7PNK4F82JM5NEJS",
-    "prev": "25f24a4d7b70015fa0f217be2ba32dbb013ba3843159e122df2e1a3a395f2fb5",
+    "prev": "5c3cd98dffb1b0fe8675a916dc9f4c1c82472bc3823997815874a283044ff57a",
     "ts": "2026-09-01T09:07:00Z",
     "type": "approval.recorded",
     "actor": {
@@ -130,15 +96,15 @@
       "kind": "doc",
       "stage": null,
       "rule": null,
-      "envelope": ".keel/signatures/1f8ad2fedb9fd40d2f48a772580e75193e6add33a36e9f24f987e939e0599ac5.doc.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/1f8ad2fedb9fd40d2f48a772580e75193e6add33a36e9f24f987e939e0599ac5.doc.json",
+      "approver": "board-owner"
     },
-    "hash": "d1a5b528d027ac8a0ea971843a511195ca7cfd1de66b1811a57ac50367274fdd"
+    "hash": "23805eae615721d96df234e1e46fab402ba831a807139641b0127496acfea649"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8B0RQ20RJ5N0BMEM7JQMY",
-    "prev": "d1a5b528d027ac8a0ea971843a511195ca7cfd1de66b1811a57ac50367274fdd",
+    "prev": "23805eae615721d96df234e1e46fab402ba831a807139641b0127496acfea649",
     "ts": "2026-09-01T09:08:00Z",
     "type": "approval.recorded",
     "actor": {
@@ -164,15 +130,15 @@
       "kind": "policy",
       "stage": null,
       "rule": null,
-      "envelope": ".keel/signatures/2449c6e3d2acc79ff82d7c78c10bd490a637d28cf15cc37f2b8441b9362a93ed.policy.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/2449c6e3d2acc79ff82d7c78c10bd490a637d28cf15cc37f2b8441b9362a93ed.policy.json",
+      "approver": "board-owner"
     },
-    "hash": "17937d518455d8b9b13b4471b73ef1f9d3f3117b9d1c70d79d69859962509ff8"
+    "hash": "7f9aa6e21ccdb6ed7f52484b9fb325692827fc30b5833246838a8feb38add76f"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8B8YX6FMMX4F9PYP5ER1T",
-    "prev": "17937d518455d8b9b13b4471b73ef1f9d3f3117b9d1c70d79d69859962509ff8",
+    "prev": "7f9aa6e21ccdb6ed7f52484b9fb325692827fc30b5833246838a8feb38add76f",
     "ts": "2026-09-10T15:20:00Z",
     "type": "approval.recorded",
     "actor": {
@@ -198,15 +164,15 @@
       "kind": "doc",
       "stage": null,
       "rule": null,
-      "envelope": ".keel/signatures/73876ea007e67dce0739e53ec8b39f98820b2be9048c9d67b184451f9bf37d50.doc.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/73876ea007e67dce0739e53ec8b39f98820b2be9048c9d67b184451f9bf37d50.doc.json",
+      "approver": "board-owner"
     },
-    "hash": "4cb690bb541a93e86240cebbc1ad0301efbce54d9d9e5a6f881958879361fcd0"
+    "hash": "6cfd6b558f10a8ad0ad73318bb09115dd641a1c231ba6d610f5531da682bc096"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8BH53DM5FEFS780JB2HDE",
-    "prev": "4cb690bb541a93e86240cebbc1ad0301efbce54d9d9e5a6f881958879361fcd0",
+    "prev": "6cfd6b558f10a8ad0ad73318bb09115dd641a1c231ba6d610f5531da682bc096",
     "ts": "2026-09-21T09:00:00Z",
     "type": "proposal.created",
     "actor": {
@@ -239,12 +205,12 @@
       "base": "3c92a83801e21ff2840baa3b2eb7f43ea69c6a17",
       "branch": "keel/P-7F3K9Q/main"
     },
-    "hash": "5c9de14aa0332cd38fcdc6e06aa4a6ac55cf5d2f009955d67d93c9c69e1e142d"
+    "hash": "e686dace3f6f5c416dea869d3fa024cb5b06c0b6a5a002a2c866cc85152f1b55"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8BSB9XGKM6MQJA344YCMS",
-    "prev": "5c9de14aa0332cd38fcdc6e06aa4a6ac55cf5d2f009955d67d93c9c69e1e142d",
+    "prev": "e686dace3f6f5c416dea869d3fa024cb5b06c0b6a5a002a2c866cc85152f1b55",
     "ts": "2026-09-21T09:00:01Z",
     "type": "track.decided",
     "actor": {
@@ -271,12 +237,12 @@
       "cause": "intake",
       "ruling": null
     },
-    "hash": "d70d5e6318f4b7366195e2f54b24d8b48c3e5ecd0a75ab44cdf8decba4a3b5d3"
+    "hash": "45ff27c21d07458324fbb9d530d4bf29de64935dc158acf3d48ddab6a73842ba"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8C1HF5AXNB2FG4NX55659",
-    "prev": "d70d5e6318f4b7366195e2f54b24d8b48c3e5ecd0a75ab44cdf8decba4a3b5d3",
+    "prev": "45ff27c21d07458324fbb9d530d4bf29de64935dc158acf3d48ddab6a73842ba",
     "ts": "2026-09-21T09:00:02Z",
     "type": "impact.recorded",
     "actor": {
@@ -301,12 +267,12 @@
       "impact": "IM-5e0b7c9d1f23",
       "kind": "predicted"
     },
-    "hash": "304d6ddf1a17a7db03acc3afa728068638b03cb8950e6e359e8f540e3e8705fc"
+    "hash": "69ae73647cf87c8016f29390adf29450bf3bde7bfa17bf900ee666e567b78c0d"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8C9QN85ER6P6YYB3SPGAX",
-    "prev": "304d6ddf1a17a7db03acc3afa728068638b03cb8950e6e359e8f540e3e8705fc",
+    "prev": "69ae73647cf87c8016f29390adf29450bf3bde7bfa17bf900ee666e567b78c0d",
     "ts": "2026-09-21T09:01:00Z",
     "type": "dispatch.queued",
     "actor": {
@@ -338,12 +304,12 @@
         "revision": 1
       }
     },
-    "hash": "281ed7944e3803855d40c35114b4d7b6dede007a78c8e00da00577d181bef720"
+    "hash": "b20697ac564e8ce8086b61e7e6643de78a375b4b7ad48a7b3523bdd922197fb4"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8CHXTGQB6F3GGRD0KECAT",
-    "prev": "281ed7944e3803855d40c35114b4d7b6dede007a78c8e00da00577d181bef720",
+    "prev": "b20697ac564e8ce8086b61e7e6643de78a375b4b7ad48a7b3523bdd922197fb4",
     "ts": "2026-09-21T09:01:05Z",
     "type": "run.started",
     "actor": {
@@ -386,12 +352,12 @@
       "submit_channel": "final-message",
       "rung": "A"
     },
-    "hash": "f70ea1f647951d46a8a6fc5b903c28560a9f5f0891e5215f18e6aca9660b1296"
+    "hash": "8d1baf794b70a3b5863c1776d5358558cd54c025fa5e816313c3caa85264df69"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8CT402DCV1G21HSGY4V1N",
-    "prev": "f70ea1f647951d46a8a6fc5b903c28560a9f5f0891e5215f18e6aca9660b1296",
+    "prev": "8d1baf794b70a3b5863c1776d5358558cd54c025fa5e816313c3caa85264df69",
     "ts": "2026-09-21T09:03:12Z",
     "type": "ack.recorded",
     "actor": {
@@ -421,12 +387,12 @@
       "write_set_ok": true,
       "hash_ok": true
     },
-    "hash": "46aad802f1de79df0333b8613f063039fe777921a807f7204e632881d1b7026a"
+    "hash": "418ef8a3108d19a180dabb179c8b1bb50bed07686cea2cb754de937f0b3b7b18"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8D2A6Y7SVNTKM5X8AA5S2",
-    "prev": "46aad802f1de79df0333b8613f063039fe777921a807f7204e632881d1b7026a",
+    "prev": "418ef8a3108d19a180dabb179c8b1bb50bed07686cea2cb754de937f0b3b7b18",
     "ts": "2026-09-21T09:40:27Z",
     "type": "result.submitted",
     "actor": {
@@ -451,12 +417,12 @@
       "status": "DONE",
       "channel": "final-message"
     },
-    "hash": "fe9b78cbc8f74cf3c67a600c8987a61cbf55c08c9374d4752f0f58a32f7f91f0"
+    "hash": "d0b6cdd920fcac05836bdc9b3f517ee9cee4c5e3558ce5472fda553e22ca4105"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8DAGCWVJR9ERNXKYZGASW",
-    "prev": "fe9b78cbc8f74cf3c67a600c8987a61cbf55c08c9374d4752f0f58a32f7f91f0",
+    "prev": "d0b6cdd920fcac05836bdc9b3f517ee9cee4c5e3558ce5472fda553e22ca4105",
     "ts": "2026-09-21T09:40:29Z",
     "type": "run.finished",
     "actor": {
@@ -482,12 +448,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "9a4c7fb116a13df2d1835275c853e429f73fcd93ba2e86fc8162b56ae6110b8d"
+    "hash": "c24058e7256858d6f7cfc63ce7016b473bb89cac21bbe1c09fa1029dabc1bd6b"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8DJPJ1MYMHT2K0JEYFWC2",
-    "prev": "9a4c7fb116a13df2d1835275c853e429f73fcd93ba2e86fc8162b56ae6110b8d",
+    "prev": "c24058e7256858d6f7cfc63ce7016b473bb89cac21bbe1c09fa1029dabc1bd6b",
     "ts": "2026-09-21T09:41:00Z",
     "type": "vcs.op",
     "actor": {
@@ -514,12 +480,12 @@
       "ref": "refs/heads/keel/P-7F3K9Q/main",
       "jj_op": null
     },
-    "hash": "2628b77bb58ac014be7ebb99058bd1be1878365c446a3f945a815cf38b3302f1"
+    "hash": "f6c7eead9affaf9c51082fa10890d69b80a469187ec8710498198113297bb6ca"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8DTWRMVZAQQ0CW072DNMM",
-    "prev": "2628b77bb58ac014be7ebb99058bd1be1878365c446a3f945a815cf38b3302f1",
+    "prev": "f6c7eead9affaf9c51082fa10890d69b80a469187ec8710498198113297bb6ca",
     "ts": "2026-09-21T09:42:05Z",
     "type": "run.started",
     "actor": {
@@ -562,12 +528,12 @@
       "submit_channel": "mcp",
       "rung": "C"
     },
-    "hash": "2acbdca5ebd8b3377b5ee2819137f6ae14c695d2353c60394e715ba85606c386"
+    "hash": "09bbe5a97cd282c628212f47679ed5d549e4e4e5031a2d0633e2a9c059ad8774"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8E32Y31X5PFH8BT8MRCDE",
-    "prev": "2acbdca5ebd8b3377b5ee2819137f6ae14c695d2353c60394e715ba85606c386",
+    "prev": "09bbe5a97cd282c628212f47679ed5d549e4e4e5031a2d0633e2a9c059ad8774",
     "ts": "2026-09-21T09:55:40Z",
     "type": "verdict.recorded",
     "actor": {
@@ -593,12 +559,12 @@
       "lens": "spec",
       "recommendation": "approve"
     },
-    "hash": "520686d8758862c969cb96816a9c35ca5ccb948abe8416f7c70bbbc1a293452a"
+    "hash": "59d89386028bb21b2d596d8024d6eb05596ecb1d86a110874aa88c7ee8d08171"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8EB94V32JPN8J71YEX6NF",
-    "prev": "520686d8758862c969cb96816a9c35ca5ccb948abe8416f7c70bbbc1a293452a",
+    "prev": "59d89386028bb21b2d596d8024d6eb05596ecb1d86a110874aa88c7ee8d08171",
     "ts": "2026-09-21T09:55:42Z",
     "type": "run.finished",
     "actor": {
@@ -624,12 +590,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "9559bb06ea00c709e900ab8ee0edadfc4c105dfe980c3e1fbc46dc326222ae40"
+    "hash": "8ed7a86be5996a18445b88aa101642a86e98b3db79b900ce2eefbee7bc92ec6d"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8EKFAN0K34635A68D3DW0",
-    "prev": "9559bb06ea00c709e900ab8ee0edadfc4c105dfe980c3e1fbc46dc326222ae40",
+    "prev": "8ed7a86be5996a18445b88aa101642a86e98b3db79b900ce2eefbee7bc92ec6d",
     "ts": "2026-09-21T09:56:00Z",
     "type": "gate.checked",
     "actor": {
@@ -658,12 +624,12 @@
       "unit": "lens verdicts in the frame set",
       "reason": null
     },
-    "hash": "2786b79551090dd7e42ecee2b29fa2efc6c2ed07907ac6d3f7f9218781341645"
+    "hash": "a20ce2e75c819179d0e749a61c62a14d6f0412afdac6d8c5c53d241d9a70d97e"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8EVNF2ZWW9XC5GXBCZPYE",
-    "prev": "2786b79551090dd7e42ecee2b29fa2efc6c2ed07907ac6d3f7f9218781341645",
+    "prev": "a20ce2e75c819179d0e749a61c62a14d6f0412afdac6d8c5c53d241d9a70d97e",
     "ts": "2026-09-21T14:30:12Z",
     "type": "approval.recorded",
     "actor": {
@@ -689,15 +655,15 @@
       "kind": "stage",
       "stage": "contract",
       "rule": null,
-      "envelope": ".keel/signatures/8f7e3bd76036e139a6de4c465e88bad8ff88520fbc48485d5c036ab68f19af3d.contract.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/8f7e3bd76036e139a6de4c465e88bad8ff88520fbc48485d5c036ab68f19af3d.contract.json",
+      "approver": "board-owner"
     },
-    "hash": "bfe1d9e450feec088707a502b3fdb8e6021236954456bfd6b03e302950af7574"
+    "hash": "0c429d2fc58b26f7e6b5ce7c9e70b39d6a5dfd9c5cf9a7e41a52d88b707a28e4"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8F3VNG7Z8S5H02GP88MXM",
-    "prev": "bfe1d9e450feec088707a502b3fdb8e6021236954456bfd6b03e302950af7574",
+    "prev": "0c429d2fc58b26f7e6b5ce7c9e70b39d6a5dfd9c5cf9a7e41a52d88b707a28e4",
     "ts": "2026-09-21T14:30:20Z",
     "type": "vcs.op",
     "actor": {
@@ -724,12 +690,12 @@
       "ref": "refs/heads/keel/P-7F3K9Q/main",
       "jj_op": null
     },
-    "hash": "f286965554a927b20604ff3cad14148557a6cfbe9cbdae389f6af1698178453c"
+    "hash": "0127bdc0ef4e60088f060f80274dd1b68ee5c15c264546b6d6eb42943a1f1fb5"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8FC1V6R60WXF9W69KE3RM",
-    "prev": "f286965554a927b20604ff3cad14148557a6cfbe9cbdae389f6af1698178453c",
+    "prev": "0127bdc0ef4e60088f060f80274dd1b68ee5c15c264546b6d6eb42943a1f1fb5",
     "ts": "2026-09-21T14:35:00Z",
     "type": "dispatch.queued",
     "actor": {
@@ -761,12 +727,12 @@
         "revision": 1
       }
     },
-    "hash": "dea024c6aaf963aaed783cd6bb33c6e3871a069885296c26e354830dedc26df6"
+    "hash": "5f345d65a104ee37956a3b77f3afaa1124c042d008ef20b2f11c1adfd55e70de"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8FM81Z97XW3PMHXSVATQR",
-    "prev": "dea024c6aaf963aaed783cd6bb33c6e3871a069885296c26e354830dedc26df6",
+    "prev": "5f345d65a104ee37956a3b77f3afaa1124c042d008ef20b2f11c1adfd55e70de",
     "ts": "2026-09-21T14:35:05Z",
     "type": "run.started",
     "actor": {
@@ -809,12 +775,12 @@
       "submit_channel": "final-message",
       "rung": "A"
     },
-    "hash": "99938fc17818786b6d0c6959d307a50d6d4d9a7574103ff7fb0b4871bbedd2ed"
+    "hash": "3abb43755653464818061562fe42f96dec6b366dcd4dac0578ca6f314f49235f"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8FWE7MMZDS8TMFPN8KGTJ",
-    "prev": "99938fc17818786b6d0c6959d307a50d6d4d9a7574103ff7fb0b4871bbedd2ed",
+    "prev": "3abb43755653464818061562fe42f96dec6b366dcd4dac0578ca6f314f49235f",
     "ts": "2026-09-21T14:37:44Z",
     "type": "ack.recorded",
     "actor": {
@@ -844,12 +810,12 @@
       "write_set_ok": true,
       "hash_ok": true
     },
-    "hash": "45736824e07d134e328fa90b67849bcc9cc7acc52d3007f43faaba2c23a13db7"
+    "hash": "3c20993eee9b82afed995818ee084d3a2adf69eb365ae74700b91821682d41d6"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8G4MDKNBAYMPR6VRHQX9Y",
-    "prev": "45736824e07d134e328fa90b67849bcc9cc7acc52d3007f43faaba2c23a13db7",
+    "prev": "3c20993eee9b82afed995818ee084d3a2adf69eb365ae74700b91821682d41d6",
     "ts": "2026-09-21T15:09:58Z",
     "type": "result.submitted",
     "actor": {
@@ -874,12 +840,12 @@
       "status": "DONE",
       "channel": "final-message"
     },
-    "hash": "1c7530696f0df7476259ad30c0eb601b86acbc1f9c388c7ad01744c3d4758cdb"
+    "hash": "74ad1eb537bb2a719cdacb1d9405f621de29feb459f3f96b476865bfc1dbce20"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8GCTKQ38P3KY4QE1WN3NF",
-    "prev": "1c7530696f0df7476259ad30c0eb601b86acbc1f9c388c7ad01744c3d4758cdb",
+    "prev": "74ad1eb537bb2a719cdacb1d9405f621de29feb459f3f96b476865bfc1dbce20",
     "ts": "2026-09-21T15:10:00Z",
     "type": "run.finished",
     "actor": {
@@ -905,12 +871,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "1f5a9016420bd17738469f526f88eafad0b80583e80638235468c388676ffbc2"
+    "hash": "03eeb44ab7cea173d54886bfd3a8cfa98b2f7fe738703be4c61ab0e529d85674"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8GN0SHRR81G33TTKWCVKF",
-    "prev": "1f5a9016420bd17738469f526f88eafad0b80583e80638235468c388676ffbc2",
+    "prev": "03eeb44ab7cea173d54886bfd3a8cfa98b2f7fe738703be4c61ab0e529d85674",
     "ts": "2026-09-21T15:11:00Z",
     "type": "vcs.op",
     "actor": {
@@ -937,12 +903,12 @@
       "ref": "refs/heads/keel/P-7F3K9Q/main",
       "jj_op": null
     },
-    "hash": "641f87b4d744d3ee113f199132515324b21c9061a409943d5dc26b5230ba1494"
+    "hash": "36f0e71e67dfa48ab2ade91c9abcb3ff2d9e4f59c61b1099cd0f00982a910730"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8GX6ZKK7478RAEDHGXH89",
-    "prev": "641f87b4d744d3ee113f199132515324b21c9061a409943d5dc26b5230ba1494",
+    "prev": "36f0e71e67dfa48ab2ade91c9abcb3ff2d9e4f59c61b1099cd0f00982a910730",
     "ts": "2026-09-21T15:12:05Z",
     "type": "run.started",
     "actor": {
@@ -985,12 +951,12 @@
       "submit_channel": "mcp",
       "rung": "C"
     },
-    "hash": "6ff3fd8d58d1c829b46d12c4b03139a675812e125b9360852d3036305bdbbca8"
+    "hash": "955281f46f6a1eb91b25882d0eb63708a9f0e02b00760db2f66f7350692a2d95"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8H5D4PBTGV3TEQRNQ0JKK",
-    "prev": "6ff3fd8d58d1c829b46d12c4b03139a675812e125b9360852d3036305bdbbca8",
+    "prev": "955281f46f6a1eb91b25882d0eb63708a9f0e02b00760db2f66f7350692a2d95",
     "ts": "2026-09-21T15:25:10Z",
     "type": "verdict.recorded",
     "actor": {
@@ -1016,12 +982,12 @@
       "lens": "verification-gap",
       "recommendation": "approve"
     },
-    "hash": "cde7b9351d956af54f144701c3f8ee95e83791e534a05d8d84278aa881c62506"
+    "hash": "d296505634eaf63491f7e0e79b6c1009ff0c06ccd30d4b4c0a2280e3a3c11731"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8HDKATM52K6Q8QEY46DC1",
-    "prev": "cde7b9351d956af54f144701c3f8ee95e83791e534a05d8d84278aa881c62506",
+    "prev": "d296505634eaf63491f7e0e79b6c1009ff0c06ccd30d4b4c0a2280e3a3c11731",
     "ts": "2026-09-21T15:25:12Z",
     "type": "run.finished",
     "actor": {
@@ -1047,12 +1013,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "a778251f21fe3655f199bfd18c8a4c4eaa3ba738ad3250468f9cf2099de461e7"
+    "hash": "272d3b366c9a7cdaa9b088b831ed5e7894eebf685dd33cadf04f6f4b27757de2"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8HNSGCV0M1ZT05BDYRTDZ",
-    "prev": "a778251f21fe3655f199bfd18c8a4c4eaa3ba738ad3250468f9cf2099de461e7",
+    "prev": "272d3b366c9a7cdaa9b088b831ed5e7894eebf685dd33cadf04f6f4b27757de2",
     "ts": "2026-09-21T15:26:00Z",
     "type": "gate.checked",
     "actor": {
@@ -1081,12 +1047,12 @@
       "unit": "plan checks",
       "reason": null
     },
-    "hash": "e257ead2dd698e38261934564010a994d3a9d9312b0fd9ac05cb70e2c456c822"
+    "hash": "53d90cb3815f03a7f3e2206d696a09415a7cc758de08ff696165823f284b8e9a"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8HXZPCEB08MDV0CEBBZGN",
-    "prev": "e257ead2dd698e38261934564010a994d3a9d9312b0fd9ac05cb70e2c456c822",
+    "prev": "53d90cb3815f03a7f3e2206d696a09415a7cc758de08ff696165823f284b8e9a",
     "ts": "2026-09-22T08:00:00Z",
     "type": "dispatch.queued",
     "actor": {
@@ -1118,12 +1084,12 @@
         "revision": 1
       }
     },
-    "hash": "bad67404795a90338c4cbecac93cbb4f40edc51f4e79bda85a9f7cf6de17e740"
+    "hash": "c8a47f876da2b876bc3cc72790ea124b1e5ab209ed610b15e989c927965a3529"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8J65W09FDSW2N447FSEV5",
-    "prev": "bad67404795a90338c4cbecac93cbb4f40edc51f4e79bda85a9f7cf6de17e740",
+    "prev": "c8a47f876da2b876bc3cc72790ea124b1e5ab209ed610b15e989c927965a3529",
     "ts": "2026-09-22T08:00:03Z",
     "type": "claim.acquired",
     "actor": {
@@ -1162,12 +1128,12 @@
         "lock_reason": "keel:P-7F3K9Q.T1:RUN-01J9Z8M0N00B8F8BH3C84ZZE5X"
       }
     },
-    "hash": "edc0afc24f01c603ba79bda46687b54e5fea488d08c047bce1229664cc5fdf1b"
+    "hash": "68de159ba7570c8c0737693a5044b2a8ba975ee36cca967071de3afcd5f02a30"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8JEC26QX7HMZSW6R9FWVP",
-    "prev": "edc0afc24f01c603ba79bda46687b54e5fea488d08c047bce1229664cc5fdf1b",
+    "prev": "68de159ba7570c8c0737693a5044b2a8ba975ee36cca967071de3afcd5f02a30",
     "ts": "2026-09-22T08:00:05Z",
     "type": "run.started",
     "actor": {
@@ -1210,12 +1176,12 @@
       "submit_channel": "outbox",
       "rung": "C"
     },
-    "hash": "d17ef3bba5ae3683949fd0f2509fd70e1b090bce034c8c7d43ac403ea6b03abd"
+    "hash": "2c1a9c03df3ce312f66a4cb8442558614c50d69068bfd88dfb8341cea0747382"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8JPJ8D4YCGP357SKN8M0P",
-    "prev": "d17ef3bba5ae3683949fd0f2509fd70e1b090bce034c8c7d43ac403ea6b03abd",
+    "prev": "2c1a9c03df3ce312f66a4cb8442558614c50d69068bfd88dfb8341cea0747382",
     "ts": "2026-09-22T08:01:20Z",
     "type": "ack.recorded",
     "actor": {
@@ -1245,12 +1211,12 @@
       "write_set_ok": true,
       "hash_ok": true
     },
-    "hash": "5bdd85f77e0f1548183a0e2bf3316241eba527d243d4b4d50710ad554fdbe494"
+    "hash": "6a4071f81fdc83ccba148923ba036390119ca51831bb513211b9930a5749e82d"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8JYREA36E3AM4KVJ39CKJ",
-    "prev": "5bdd85f77e0f1548183a0e2bf3316241eba527d243d4b4d50710ad554fdbe494",
+    "prev": "6a4071f81fdc83ccba148923ba036390119ca51831bb513211b9930a5749e82d",
     "ts": "2026-09-22T08:29:50Z",
     "type": "result.submitted",
     "actor": {
@@ -1275,12 +1241,12 @@
       "status": "DONE",
       "channel": "outbox"
     },
-    "hash": "588324aca6586bb9c66170022a94dc27747afcd20da7751a096447d7d32126e4"
+    "hash": "c1600848a67a95b3e5843c35cb8d2396c83bde08d475bce70760f202f53accea"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8K6YM6KXV4HYHP5BZB3TY",
-    "prev": "588324aca6586bb9c66170022a94dc27747afcd20da7751a096447d7d32126e4",
+    "prev": "c1600848a67a95b3e5843c35cb8d2396c83bde08d475bce70760f202f53accea",
     "ts": "2026-09-22T08:29:52Z",
     "type": "run.finished",
     "actor": {
@@ -1306,12 +1272,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "67306fb38e2141c562cf772894e3cceeb832eb75e70a02de621ef0ff020c3786"
+    "hash": "90b0229c01dd97246053a8eaaad909c502747e57ba4ae878ebd05fed75a4e7af"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8KF4SQR2RNZHEPVSFR1ND",
-    "prev": "67306fb38e2141c562cf772894e3cceeb832eb75e70a02de621ef0ff020c3786",
+    "prev": "90b0229c01dd97246053a8eaaad909c502747e57ba4ae878ebd05fed75a4e7af",
     "ts": "2026-09-22T08:30:40Z",
     "type": "round.committed",
     "actor": {
@@ -1339,12 +1305,12 @@
       "branch": "keel/P-7F3K9Q/t/1",
       "snapshots": []
     },
-    "hash": "19da05f3596d9a0d05ef0b4c65014c705fdc24e907cbbc37fa0e473bb89b6524"
+    "hash": "3eefea0968ebbcfc195f7898e04cd758f624a9f63e19db5dfef34018d4e74fd3"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8KQAZ8TWSNFFF780B1ETP",
-    "prev": "19da05f3596d9a0d05ef0b4c65014c705fdc24e907cbbc37fa0e473bb89b6524",
+    "prev": "3eefea0968ebbcfc195f7898e04cd758f624a9f63e19db5dfef34018d4e74fd3",
     "ts": "2026-09-22T08:31:00Z",
     "type": "gate.checked",
     "actor": {
@@ -1373,12 +1339,12 @@
       "unit": "changed paths inside write_set",
       "reason": null
     },
-    "hash": "de1c9e09b782368d9aa206f593decd6ea0c1720141fa2c346200cd95497699e9"
+    "hash": "1ab4db816ba5fce9015b5ea933d671d3da2bab1f7d60acf07ffa59dd04a27ef2"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8KZH555GW0TZJJA8S9HAS",
-    "prev": "de1c9e09b782368d9aa206f593decd6ea0c1720141fa2c346200cd95497699e9",
+    "prev": "1ab4db816ba5fce9015b5ea933d671d3da2bab1f7d60acf07ffa59dd04a27ef2",
     "ts": "2026-09-22T08:31:30Z",
     "type": "gate.checked",
     "actor": {
@@ -1407,12 +1373,12 @@
       "unit": "declared submit commands passing",
       "reason": null
     },
-    "hash": "c2b934ba3b50511baef2a9818c60d61a0df957ca7cd792f41c2df74cc9583105"
+    "hash": "2bf4cd6b5de03d613494ee4df2cb0079401b1e5eb16e930ae30e5dfd9cbb71a9"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8M7QBSJDEWZ5K3AGZQED1",
-    "prev": "c2b934ba3b50511baef2a9818c60d61a0df957ca7cd792f41c2df74cc9583105",
+    "prev": "2bf4cd6b5de03d613494ee4df2cb0079401b1e5eb16e930ae30e5dfd9cbb71a9",
     "ts": "2026-09-22T08:31:31Z",
     "type": "claim.released",
     "actor": {
@@ -1436,12 +1402,12 @@
     "data": {
       "reason": "submitted"
     },
-    "hash": "96b01d652aa823d320ff3699808fb82ac3d18ee593edba876280401559444dee"
+    "hash": "5020f351340d9f7b39dd4b1305863dd8c59d1c38a48148232c72df0ade7d69e1"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8MFXHY5JYNWW45E4M60VS",
-    "prev": "96b01d652aa823d320ff3699808fb82ac3d18ee593edba876280401559444dee",
+    "prev": "5020f351340d9f7b39dd4b1305863dd8c59d1c38a48148232c72df0ade7d69e1",
     "ts": "2026-09-22T08:32:00Z",
     "type": "evidence.recorded",
     "actor": {
@@ -1467,12 +1433,12 @@
       "commit": "b9ccc3c4b0db5a8287cdd9829dfa6fe7e06ebfa1",
       "status": "fail"
     },
-    "hash": "c1cfe9194d679d0a19640949fba5983b04ab40658eea4cbb11a171d237c0197f"
+    "hash": "521f5571b7c45bf455a7a9d665dfc8435ef0f12282f171ea8dba5dc58a7fd561"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8MR3QNWKWGJXK7BQ5GFAS",
-    "prev": "c1cfe9194d679d0a19640949fba5983b04ab40658eea4cbb11a171d237c0197f",
+    "prev": "521f5571b7c45bf455a7a9d665dfc8435ef0f12282f171ea8dba5dc58a7fd561",
     "ts": "2026-09-22T08:32:05Z",
     "type": "gate.checked",
     "actor": {
@@ -1501,12 +1467,12 @@
       "unit": "cited rows red at the task commit",
       "reason": null
     },
-    "hash": "67998c63c2fa7bc4da727d4b15877cfd546abc034b9a11b29e42284e10c6b18b"
+    "hash": "a3ada5d3a32c3bd825d8e1aa90ce29762775c18a67c21ca837c82015680fecf1"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8N09XN73J28ZM2G1V0MQ4",
-    "prev": "67998c63c2fa7bc4da727d4b15877cfd546abc034b9a11b29e42284e10c6b18b",
+    "prev": "a3ada5d3a32c3bd825d8e1aa90ce29762775c18a67c21ca837c82015680fecf1",
     "ts": "2026-09-22T08:32:06Z",
     "type": "gate.checked",
     "actor": {
@@ -1535,12 +1501,12 @@
       "unit": "declared verify commands passing",
       "reason": "not applicable: the only declared verify command has purpose test, which verify.test-red judges for a test task"
     },
-    "hash": "fb70a1f3a395a845e9fc0d324f56d71bddaeda4edde96f8d7fb2b3516b0d86f0"
+    "hash": "46648a3a955067cc79442b12349b76d06e916cc85d8d7a10a636648976147f0c"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8N8G32Q3HAKF1ZMF9KP1Y",
-    "prev": "fb70a1f3a395a845e9fc0d324f56d71bddaeda4edde96f8d7fb2b3516b0d86f0",
+    "prev": "46648a3a955067cc79442b12349b76d06e916cc85d8d7a10a636648976147f0c",
     "ts": "2026-09-22T08:33:05Z",
     "type": "run.started",
     "actor": {
@@ -1583,12 +1549,12 @@
       "submit_channel": "mcp",
       "rung": "C"
     },
-    "hash": "b9f6bd5b5bcbd400d079cf605ea3fde7186f63de04b511e685d5a7d21c2d4ce7"
+    "hash": "194bab272f3204537b376fbb445bd7c9efffb85222d2dcf7cdc4ac09839d96f8"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8NGP9F3NRQ1FX3SX5AT2X",
-    "prev": "b9f6bd5b5bcbd400d079cf605ea3fde7186f63de04b511e685d5a7d21c2d4ce7",
+    "prev": "194bab272f3204537b376fbb445bd7c9efffb85222d2dcf7cdc4ac09839d96f8",
     "ts": "2026-09-22T08:38:10Z",
     "type": "verdict.recorded",
     "actor": {
@@ -1614,12 +1580,12 @@
       "lens": "verification-gap",
       "recommendation": "approve"
     },
-    "hash": "146a496f8cd2bc8ac63d0bb91837f4146225e76ed2d091e38e78fcdcd459b4dc"
+    "hash": "17361315dce87d4225607d2f702f1c71a3d8d27854fbe62191ed140fa19c0a30"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8NRWEBR6VFEPMDNKWB80X",
-    "prev": "146a496f8cd2bc8ac63d0bb91837f4146225e76ed2d091e38e78fcdcd459b4dc",
+    "prev": "17361315dce87d4225607d2f702f1c71a3d8d27854fbe62191ed140fa19c0a30",
     "ts": "2026-09-22T08:38:12Z",
     "type": "run.finished",
     "actor": {
@@ -1645,12 +1611,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "99a0671130a75812b1694c4242e36da1c7d8b00b7dc778b2d28e62984b059439"
+    "hash": "bd2063229d353b87cd699f93127775fcf5604fefc7b3ca8416f9d0e165bbb017"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8P12M6VBAEATEPVKK01Y2",
-    "prev": "99a0671130a75812b1694c4242e36da1c7d8b00b7dc778b2d28e62984b059439",
+    "prev": "bd2063229d353b87cd699f93127775fcf5604fefc7b3ca8416f9d0e165bbb017",
     "ts": "2026-09-22T08:38:30Z",
     "type": "gate.checked",
     "actor": {
@@ -1679,12 +1645,12 @@
       "unit": "lenses of the test_task set approving",
       "reason": null
     },
-    "hash": "c18cca83aaa404d0a448f04d5cc5dae24de210f4431a1ad72d2d828f7491bba4"
+    "hash": "761440d7eb3664a49c959d0351978fbe4491a57e5bdc1931744a81a351d8344b"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8P98TWKVAXC63C29CRQ36",
-    "prev": "c18cca83aaa404d0a448f04d5cc5dae24de210f4431a1ad72d2d828f7491bba4",
+    "prev": "761440d7eb3664a49c959d0351978fbe4491a57e5bdc1931744a81a351d8344b",
     "ts": "2026-09-22T08:40:00Z",
     "type": "vcs.op",
     "actor": {
@@ -1711,12 +1677,12 @@
       "ref": "refs/heads/keel/P-7F3K9Q/main",
       "jj_op": null
     },
-    "hash": "30a072c3f2e511ddda1a23d01e0daa31d1feff926dac4c94012b2204d874e5d4"
+    "hash": "6a04bd407ac04a752aab0380c97b6dda51fc2c7106016d5c2dcbb494ae9927c6"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8PHF0GF3FS8028SVGTXAR",
-    "prev": "30a072c3f2e511ddda1a23d01e0daa31d1feff926dac4c94012b2204d874e5d4",
+    "prev": "6a04bd407ac04a752aab0380c97b6dda51fc2c7106016d5c2dcbb494ae9927c6",
     "ts": "2026-09-22T09:00:00Z",
     "type": "dispatch.queued",
     "actor": {
@@ -1748,12 +1714,12 @@
         "revision": 1
       }
     },
-    "hash": "51ecf9180575e50a265e8c3bf33d87297937682c16891338ccfb900e79dffe0f"
+    "hash": "904170477494af4c27be8c7ab1e6d92fccedfbe5fd3edab32cd8ee87ea454a38"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8PSN6RXET4XFZYQ0R0SQZ",
-    "prev": "51ecf9180575e50a265e8c3bf33d87297937682c16891338ccfb900e79dffe0f",
+    "prev": "904170477494af4c27be8c7ab1e6d92fccedfbe5fd3edab32cd8ee87ea454a38",
     "ts": "2026-09-22T09:00:03Z",
     "type": "claim.acquired",
     "actor": {
@@ -1792,12 +1758,12 @@
         "lock_reason": "keel:P-7F3K9Q.T2:RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A"
       }
     },
-    "hash": "3586b607c385d74cb409664d44cc5a72db25a3408f4b935201e76fa7adf7b386"
+    "hash": "398394b00729d497f7739711d19155f75d96de3662e482fef9434bdf2f729c9a"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8Q1VCT8Q37HS3K635HFTE",
-    "prev": "3586b607c385d74cb409664d44cc5a72db25a3408f4b935201e76fa7adf7b386",
+    "prev": "398394b00729d497f7739711d19155f75d96de3662e482fef9434bdf2f729c9a",
     "ts": "2026-09-22T09:00:05Z",
     "type": "run.started",
     "actor": {
@@ -1840,12 +1806,12 @@
       "submit_channel": "outbox",
       "rung": "A"
     },
-    "hash": "5567df342e1afdd95511ddf93895033f9d6179a8d067f64444e12a3cb69b5d20"
+    "hash": "c096621b2e81145c0dfba4228ce9ad8410200020835c52db567e23dbadf4bd8f"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8QA1J9PNE4SGYMBZ1G895",
-    "prev": "5567df342e1afdd95511ddf93895033f9d6179a8d067f64444e12a3cb69b5d20",
+    "prev": "c096621b2e81145c0dfba4228ce9ad8410200020835c52db567e23dbadf4bd8f",
     "ts": "2026-09-22T09:01:10Z",
     "type": "ack.recorded",
     "actor": {
@@ -1875,12 +1841,12 @@
       "write_set_ok": true,
       "hash_ok": true
     },
-    "hash": "c07d56458525a28179d8165f632e9cfe124ae0cdd2dc6df96deba4706fec0050"
+    "hash": "478d5c33799cec555aae890a6eb15c76b845029265de982a8085f1acc16cc12d"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8QJ7RKA5MMEDER982HZ8P",
-    "prev": "c07d56458525a28179d8165f632e9cfe124ae0cdd2dc6df96deba4706fec0050",
+    "prev": "478d5c33799cec555aae890a6eb15c76b845029265de982a8085f1acc16cc12d",
     "ts": "2026-09-22T09:20:00Z",
     "type": "claim.heartbeat",
     "actor": {
@@ -1904,12 +1870,12 @@
     "data": {
       "lease_until": "2026-09-22T09:50:00Z"
     },
-    "hash": "7fcefcb4b4fa5c100a8a03e91950f2e52c57174cbbf960348ac226a3ba26bcdd"
+    "hash": "e6362fc4501e1cc64859f9796dbe72fe204f4af990458c84265d4ff5a8fbcecd"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8QTDY12ZG8K8AYMBC0CAP",
-    "prev": "7fcefcb4b4fa5c100a8a03e91950f2e52c57174cbbf960348ac226a3ba26bcdd",
+    "prev": "e6362fc4501e1cc64859f9796dbe72fe204f4af990458c84265d4ff5a8fbcecd",
     "ts": "2026-09-22T09:38:15Z",
     "type": "ruling.made",
     "actor": {
@@ -1935,12 +1901,12 @@
       "clause": "ADR-7KQ2B.O1",
       "flagged": false
     },
-    "hash": "9290d203ebf9ce4af5f213c64c47d039c6ff56f3ae00851254d5df2d9bf9d13b"
+    "hash": "24116f7906774f3b96ce4570c676bb0034efc066195e74992bb3d34ac93d6634"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8R2M4N6P8Q0S2T4V6W8X0",
-    "prev": "9290d203ebf9ce4af5f213c64c47d039c6ff56f3ae00851254d5df2d9bf9d13b",
+    "prev": "24116f7906774f3b96ce4570c676bb0034efc066195e74992bb3d34ac93d6634",
     "ts": "2026-09-22T09:42:00Z",
     "type": "result.submitted",
     "actor": {
@@ -1965,12 +1931,12 @@
       "status": "DONE",
       "channel": "outbox"
     },
-    "hash": "148f615c605aed263381fe5b895986197346f9838010def4917605e66defea8d"
+    "hash": "21ce358a16cc43e97fbeae7f5cf36a36983e9a3e74cf6fde8e0830c1d91d2628"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8RBMPP8JJQG2999JXA99Z",
-    "prev": "148f615c605aed263381fe5b895986197346f9838010def4917605e66defea8d",
+    "prev": "21ce358a16cc43e97fbeae7f5cf36a36983e9a3e74cf6fde8e0830c1d91d2628",
     "ts": "2026-09-22T09:42:02Z",
     "type": "run.finished",
     "actor": {
@@ -1996,12 +1962,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "709095d90f0df91401a14ef8adc502ea1a3936e28cfee1a198c363f2d4cfe487"
+    "hash": "f8fc070259c904721262d3a5390d7a27a4e69b0cbcfb2daf22279b40367d7757"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8RMN8Z5M7668ZBV4DZDKH",
-    "prev": "709095d90f0df91401a14ef8adc502ea1a3936e28cfee1a198c363f2d4cfe487",
+    "prev": "f8fc070259c904721262d3a5390d7a27a4e69b0cbcfb2daf22279b40367d7757",
     "ts": "2026-09-22T09:43:00Z",
     "type": "round.committed",
     "actor": {
@@ -2029,12 +1995,12 @@
       "branch": "keel/P-7F3K9Q/t/2",
       "snapshots": []
     },
-    "hash": "b5a968385332709bef0b2dcf4ea3c8cf5e2a5fe83299672f93c8c7ed818e1d12"
+    "hash": "ef02e1f39e5ac7e340f1618615b6dea3c67c3a474b83d3565ae1840b6d17ac15"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8RXNT00KT0TEE65MB2S7G",
-    "prev": "b5a968385332709bef0b2dcf4ea3c8cf5e2a5fe83299672f93c8c7ed818e1d12",
+    "prev": "ef02e1f39e5ac7e340f1618615b6dea3c67c3a474b83d3565ae1840b6d17ac15",
     "ts": "2026-09-22T09:43:30Z",
     "type": "gate.checked",
     "actor": {
@@ -2063,12 +2029,12 @@
       "unit": "changed paths inside write_set",
       "reason": null
     },
-    "hash": "69e74085d949ba08dc8b73964659b14f2cc6f359eaa7355662208fe5d5fd9b45"
+    "hash": "7148449df65671a91466da7e898760e1b98c6b4e9c5864d47507a9b0fc0a6fc4"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8S6PC3MFGNZW9CX0KC6VA",
-    "prev": "69e74085d949ba08dc8b73964659b14f2cc6f359eaa7355662208fe5d5fd9b45",
+    "prev": "7148449df65671a91466da7e898760e1b98c6b4e9c5864d47507a9b0fc0a6fc4",
     "ts": "2026-09-22T09:44:30Z",
     "type": "gate.checked",
     "actor": {
@@ -2097,12 +2063,12 @@
       "unit": "declared submit commands passing",
       "reason": null
     },
-    "hash": "ba1bdcdbd3cc75bdef073742372952b42cd7d406b9af6393dd5437ad089e4cf8"
+    "hash": "693572d7be7bbca05a358e66a83b8b83d6c4aa1052b96670913c5f61f0fae96e"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8SFPYFV6TWE5DXA2NYBZK",
-    "prev": "ba1bdcdbd3cc75bdef073742372952b42cd7d406b9af6393dd5437ad089e4cf8",
+    "prev": "693572d7be7bbca05a358e66a83b8b83d6c4aa1052b96670913c5f61f0fae96e",
     "ts": "2026-09-22T09:44:31Z",
     "type": "claim.released",
     "actor": {
@@ -2126,12 +2092,12 @@
     "data": {
       "reason": "submitted"
     },
-    "hash": "00c9b984d76f3820b77ac08b5a4d57697790a5bd2a3a745f27292177d3e7271d"
+    "hash": "6c636cc1fd46f6d09cf2dd6fb8a2ef19c48546dfb96e0525c51288bd5a45bd00"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8SRQGDBVWVWQA8R6TA9WD",
-    "prev": "00c9b984d76f3820b77ac08b5a4d57697790a5bd2a3a745f27292177d3e7271d",
+    "prev": "6c636cc1fd46f6d09cf2dd6fb8a2ef19c48546dfb96e0525c51288bd5a45bd00",
     "ts": "2026-09-22T09:50:00Z",
     "type": "evidence.recorded",
     "actor": {
@@ -2157,12 +2123,12 @@
       "commit": "3f1c2e9bbe37e64d9b279c5e82fb04be3f2be493",
       "status": "pass"
     },
-    "hash": "eb3309e8a244bf4093d37a1bbb54a438b355959214907f2cdc4ea1a31f21078f"
+    "hash": "044f1fa47a509225feb535f6b64fc381d2711a5e59039e9d946356a6072fdc9f"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8T1R25KETTNTDGPYBFDR7",
-    "prev": "eb3309e8a244bf4093d37a1bbb54a438b355959214907f2cdc4ea1a31f21078f",
+    "prev": "044f1fa47a509225feb535f6b64fc381d2711a5e59039e9d946356a6072fdc9f",
     "ts": "2026-09-22T09:50:05Z",
     "type": "gate.checked",
     "actor": {
@@ -2191,12 +2157,12 @@
       "unit": "acceptance matrix rows",
       "reason": null
     },
-    "hash": "e5deb55140efaaecad7bbff7a9a4caec9154b59820bd631a3f6e4dd35bbb99ea"
+    "hash": "82c1a0be7ce8884db513157836ee917f32fe7119ec741aecb6c7b034a2312a48"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8TARMZ2C7AGFG3M49V38B",
-    "prev": "e5deb55140efaaecad7bbff7a9a4caec9154b59820bd631a3f6e4dd35bbb99ea",
+    "prev": "82c1a0be7ce8884db513157836ee917f32fe7119ec741aecb6c7b034a2312a48",
     "ts": "2026-09-22T09:50:10Z",
     "type": "gate.checked",
     "actor": {
@@ -2225,12 +2191,12 @@
       "unit": "declared verify commands passing",
       "reason": null
     },
-    "hash": "df6b5e8d5a2b26fca46a23229b2ad0ff39602beb66a15a19cce39d943264b18b"
+    "hash": "d3ad01fe6075b3cf98b6db200f1b8bd7a3e4d9c71d92147111662cb975136ea8"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8TKS6QEWCFZRGPCJM26Z6",
-    "prev": "df6b5e8d5a2b26fca46a23229b2ad0ff39602beb66a15a19cce39d943264b18b",
+    "prev": "d3ad01fe6075b3cf98b6db200f1b8bd7a3e4d9c71d92147111662cb975136ea8",
     "ts": "2026-09-22T09:51:05Z",
     "type": "run.started",
     "actor": {
@@ -2273,12 +2239,12 @@
       "submit_channel": "mcp",
       "rung": "C"
     },
-    "hash": "7b14fae1ddafe21b79a3ec737e0937775cbd3884665da3ff29d21da3d3d7541f"
+    "hash": "bdf762a250d88ae25ed631f7110f0089d4615697a60a10751e6494f3398329c1"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8TWSRN6JBK3Y745PZ32FP",
-    "prev": "7b14fae1ddafe21b79a3ec737e0937775cbd3884665da3ff29d21da3d3d7541f",
+    "prev": "bdf762a250d88ae25ed631f7110f0089d4615697a60a10751e6494f3398329c1",
     "ts": "2026-09-22T09:51:06Z",
     "type": "run.started",
     "actor": {
@@ -2321,12 +2287,12 @@
       "submit_channel": "mcp",
       "rung": "C"
     },
-    "hash": "405a60b3563b50f16a922ed7abd409926ed8d2afc1f97d9eca266a48ab8ed253"
+    "hash": "28a82be8b58e9375a0f50d3c1721a93cc4befba068f7f741b80d5fd7d711b45f"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8V5TBSJQXHC07Z7C3TAKT",
-    "prev": "405a60b3563b50f16a922ed7abd409926ed8d2afc1f97d9eca266a48ab8ed253",
+    "prev": "28a82be8b58e9375a0f50d3c1721a93cc4befba068f7f741b80d5fd7d711b45f",
     "ts": "2026-09-22T10:04:30Z",
     "type": "verdict.recorded",
     "actor": {
@@ -2352,12 +2318,12 @@
       "lens": "blind-diff",
       "recommendation": "approve"
     },
-    "hash": "084e2f038aca34404a30263d5f350bc176475a63a519c99864a7545fb6dcfc05"
+    "hash": "c65de4ba61f5d269add4f03cfbc28889a03950a549ce56842ae8206c334cee82"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8VETXY5KYH30EN2J6H1NW",
-    "prev": "084e2f038aca34404a30263d5f350bc176475a63a519c99864a7545fb6dcfc05",
+    "prev": "c65de4ba61f5d269add4f03cfbc28889a03950a549ce56842ae8206c334cee82",
     "ts": "2026-09-22T10:04:32Z",
     "type": "run.finished",
     "actor": {
@@ -2383,12 +2349,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "bfcc18a03d7032b7940af3be417995a95ffdddb2b165e3fe02b7107bd8f0c64c"
+    "hash": "d0bc3a2ef53f5f2f62a36b2cf8d36d39829d6aecf632d4f5de0127542903beee"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8VQVFPPK4GPVPC9M9B1Y2",
-    "prev": "bfcc18a03d7032b7940af3be417995a95ffdddb2b165e3fe02b7107bd8f0c64c",
+    "prev": "d0bc3a2ef53f5f2f62a36b2cf8d36d39829d6aecf632d4f5de0127542903beee",
     "ts": "2026-09-22T10:06:10Z",
     "type": "verdict.recorded",
     "actor": {
@@ -2414,12 +2380,12 @@
       "lens": "verification-gap",
       "recommendation": "approve"
     },
-    "hash": "a17e513dbad6717f19c2e5ff4c9f095afd370897dd2b15f9c14de01409b8139c"
+    "hash": "4bfe9ad39deff2dfb05de83ff36f6d20e065765593684a8914f04743df984c4b"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8W0W16GY0FM37Z77EBVG1",
-    "prev": "a17e513dbad6717f19c2e5ff4c9f095afd370897dd2b15f9c14de01409b8139c",
+    "prev": "4bfe9ad39deff2dfb05de83ff36f6d20e065765593684a8914f04743df984c4b",
     "ts": "2026-09-22T10:06:12Z",
     "type": "run.finished",
     "actor": {
@@ -2445,12 +2411,12 @@
       "outcome": "completed",
       "exit_code": 0
     },
-    "hash": "54fc60a97b3e6d10d2216aa516a8b58299144294e6bf917bd0ca3ec80ef54542"
+    "hash": "8f661f6f126afc2e9503e0353fba8c8ab2ca6226cd16055754ac5a252150227d"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8W9WK1X9SQ5J8AK4APGZJ",
-    "prev": "54fc60a97b3e6d10d2216aa516a8b58299144294e6bf917bd0ca3ec80ef54542",
+    "prev": "8f661f6f126afc2e9503e0353fba8c8ab2ca6226cd16055754ac5a252150227d",
     "ts": "2026-09-22T10:07:00Z",
     "type": "gate.checked",
     "actor": {
@@ -2479,12 +2445,12 @@
       "unit": "lenses of the quick set approving",
       "reason": null
     },
-    "hash": "0687c7263a8036e59ee2c28e19aabf330bc9eeda2e95607e3dc6d27174d2966c"
+    "hash": "3039b462ad71ab0e6298ba15ba2edac091cf6fb76a4ac730656d4b0993bd86ae"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8WJX5K6BB4SD0G24Q6C20",
-    "prev": "0687c7263a8036e59ee2c28e19aabf330bc9eeda2e95607e3dc6d27174d2966c",
+    "prev": "3039b462ad71ab0e6298ba15ba2edac091cf6fb76a4ac730656d4b0993bd86ae",
     "ts": "2026-09-23T10:00:00Z",
     "type": "vcs.op",
     "actor": {
@@ -2511,12 +2477,12 @@
       "ref": "refs/heads/keel/P-7F3K9Q/main",
       "jj_op": null
     },
-    "hash": "c2f2881f896791fc8f92138041e5d08bfe0c21bf947bc4e8baa4774886e46abe"
+    "hash": "ff059b19e53d8a760b9512b84c056bbaea55c44562de42998e06aa75bfdccb24"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8WVXQQQX9FDHK9X8K8CKA",
-    "prev": "c2f2881f896791fc8f92138041e5d08bfe0c21bf947bc4e8baa4774886e46abe",
+    "prev": "ff059b19e53d8a760b9512b84c056bbaea55c44562de42998e06aa75bfdccb24",
     "ts": "2026-09-23T10:05:00Z",
     "type": "gate.checked",
     "actor": {
@@ -2545,12 +2511,12 @@
       "unit": "acceptance matrix rows on the integrated commit",
       "reason": null
     },
-    "hash": "0b358628ff0bea1f0aa412f140d3fc687396bb0802306bfd9fb4adb98e9c7565"
+    "hash": "beba6a5e345a8c77ef0d5f71a05e9da8e9f451977600ec75e41d481dffc85a23"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8X4Y943S99R239AGQB7J7",
-    "prev": "0b358628ff0bea1f0aa412f140d3fc687396bb0802306bfd9fb4adb98e9c7565",
+    "prev": "beba6a5e345a8c77ef0d5f71a05e9da8e9f451977600ec75e41d481dffc85a23",
     "ts": "2026-09-23T10:30:08Z",
     "type": "approval.recorded",
     "actor": {
@@ -2576,15 +2542,15 @@
       "kind": "stage",
       "stage": "land",
       "rule": null,
-      "envelope": ".keel/signatures/a64e8eb312c365dd6293e71709b4eb0567bd9a7a6c796ebe67635225b3046715.land.json",
-      "fingerprint": "SHA256:FakeKeelBoardOwnerKey0000000000000000000000"
+      "record": ".keel/approvals/a64e8eb312c365dd6293e71709b4eb0567bd9a7a6c796ebe67635225b3046715.land.json",
+      "approver": "board-owner"
     },
-    "hash": "0db3ac06ebd5415c68bf736233ca01ff5e1dd8ea38ff042716b49577eea42ef6"
+    "hash": "abc7dbf631a51729f4dfeb159cbf9f7ebd48bf21a38d316315ad1e91fbebd2c7"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8XDYV4YNRJ3PM202HKR8H",
-    "prev": "0db3ac06ebd5415c68bf736233ca01ff5e1dd8ea38ff042716b49577eea42ef6",
+    "prev": "abc7dbf631a51729f4dfeb159cbf9f7ebd48bf21a38d316315ad1e91fbebd2c7",
     "ts": "2026-09-23T10:31:00Z",
     "type": "land.completed",
     "actor": {
@@ -2612,12 +2578,12 @@
       "approval": "AP-7a1c3e5f9b2d",
       "policy": null
     },
-    "hash": "699a9351810b24c17793045c8ffc1e03edd85c81d5d5adc25a822b295ab72c94"
+    "hash": "0f1269f7c00e3cd16a6385ce2d3753158061bd7bcd57c44b00e583861d7efe4e"
   },
   {
     "v": 1,
     "id": "EVT-01J9Z8XPZDF8EBDC6QGMX0EGRJ",
-    "prev": "699a9351810b24c17793045c8ffc1e03edd85c81d5d5adc25a822b295ab72c94",
+    "prev": "0f1269f7c00e3cd16a6385ce2d3753158061bd7bcd57c44b00e583861d7efe4e",
     "ts": "2026-09-23T10:32:00Z",
     "type": "cleanup.completed",
     "actor": {
@@ -2642,6 +2608,6 @@
       "worktrees": 3,
       "refs": 4
     },
-    "hash": "9a89ad0977e8d5714e52377b35a53f217c4f67b26fc39df86cd18f0ef1784c55"
+    "hash": "9fca01bba7ce030c8e3bd66c4b3b244cfebece86b3414d77217cd8a210984a80"
   }
 ]

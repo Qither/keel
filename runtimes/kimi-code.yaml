@@ -192,5 +192,5 @@ capability_probes:
 notes:
   - Rung D until conformance verifies the agent-file tools allowlist plus static deny rules, or the ACP driver. Every runtime can fall back to rung D.
   - Hooks are user-global only (the [[hooks]] array in the config.toml under KIMI_CODE_HOME); three events can block (PreToolUse, Stop, UserPromptSubmit). keel prints templates/runtime/kimi-hooks.snippet.tmpl and never writes or opens that file.
-  - "-m takes an alias the user defined in their own config ({runtime_profile} from the signed routing), never a model name."
+  - "-m takes an alias the user defined in their own config ({runtime_profile} from the approved routing), never a model name."
   - Invocation text for skills is rewritten as /skill:keel-<name>.

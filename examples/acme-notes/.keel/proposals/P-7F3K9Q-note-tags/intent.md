@@ -6,8 +6,8 @@ charter_version: "1.0.0"
 
 <!--
 examples/acme-notes/.keel/proposals/P-7F3K9Q-note-tags/intent.md (schemas/intent.schema.json), written by
-the product seat and approved by the Board at touch 1 (`keel approve P-7F3K9Q --stage contract`, approval
-AP-2d9e4f6a8b0c; the envelope is shown in .keel/signatures/example.contract.json). The approval binds the
+the product seat and approved by the Board at confirmation 1 (`keel approve P-7F3K9Q --stage contract`, approval
+AP-2d9e4f6a8b0c; the record is shown in .keel/approvals/example.contract.json). The approval binds the
 contract_hash, which covers the frozen block below, the spec.delta.yaml blob and the rev_hash of
 R-notes-4QX7B; any byte change inside the markers voids it.
 -->

@@ -139,7 +139,7 @@ The dispatch pipeline that uses the descriptor:
 
 ```mermaid
 flowchart LR
-  R[signed routing] --> C{compatible<br/>protocol?}
+  R[approved routing] --> C{compatible<br/>protocol?}
   C -- no --> B1[blocked runtime_unavailable]
   C -- yes --> X{exposure rule<br/>and conformance status}
   X -- refused --> B1
@@ -342,7 +342,7 @@ effect for each run.
 | The brief survives context compaction | re-injected by the post-compact hook | re-injected where the runtime maps post-compact (verify by probe) | pull only (`keel brief`, `keel_context`) | the human re-pastes the brief | `submit.brief` and `submit.freshness` (BR echo, recompilation) |
 | Claimed completion is real | not prevented | not prevented | not prevented | not prevented | `submit.fake-completion`, re-executed evidence (`verify.evidence`, `land.re-execution`) |
 
-At every rung the Steward enforces signatures, the ACK id-set diff, the scope check, ref-snapshot and
+At every rung the Steward enforces the approval checks, the ACK id-set diff, the scope check, ref-snapshot and
 `ls-remote` detection, re-executed evidence, the trace check and the exposure refusal. Receipts carry the
 exposure profile so a reader can see which rung applied.
 

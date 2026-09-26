@@ -32,7 +32,7 @@ Every check fails closed and writes one status (the common `checkStatus` enum) w
 | `waived` | An unexpired Board override (`keel approve <subject> --rule override --until ...`) names this check and subject |
 
 A gate passes only when each required check is `pass` or `waived`. `not_run` is never shown as `pass`.
-The checks that verify Board authority or P1 (`frame.signatures`, `land.signature`, `land.projection`)
+The checks that verify Board authority or P1 (`frame.approvals`, `land.approval`, `land.projection`)
 cannot be waived. Results are ledger events; the dashboard shows the five statuses distinctly.
 
 ```mermaid
@@ -49,7 +49,7 @@ flowchart LR
 ### gate:frame
 
 Runs before the contract checkpoint. The intake checks (`frame.goal-active`, `frame.charter-current`,
-`frame.signatures` on the policy path) also run at `keel new`.
+`frame.approvals` on the policy path) also run at `keel new`.
 
 | Check | Verifies | Fails when | Since |
 | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ Runs before the contract checkpoint. The intake checks (`frame.goal-active`, `fr
 | `frame.acc-coverage` | Every ACC covers R or R#S and names a feasible evidence mode | Uncovered ACC or infeasible mode | M1a |
 | `frame.open-questions` | The frozen intent's Open questions list is empty | Any open question | M1a |
 | `frame.charter-current` | Artifacts stamp the current `charter_version` | A MAJOR or MINOR lag | M1a |
-| `frame.signatures` | Governance documents (charter, goals, routing, policies, allowed_signers) carry valid signatures; on the policy path, the Board-signed request | Missing, invalid or stale signature | M1b |
+| `frame.approvals` | Governance documents (charter, goals, routing, policies) have valid approvals: a record written by `keel approve` with its `approval.recorded` event, and current content hashes equal to the recorded ones; on the policy path, the Board's request approval over the verbatim request | Missing approval, or a bound artifact whose current hash differs from the record | M1b |
 | `frame.skills-trigger-only` | Skill descriptions state triggers only | A description that carries procedure | M1a |
 | `frame.budgets` | The proposal budget fits its goal budget; handbook budgets hold | Over budget | M1a |
 | `frame.arch-to-be` | On system: the to-be model passes `rules.yaml`; baseline growth is flagged for the contract | New rule violation, or unflagged baseline growth | M4 |
@@ -98,7 +98,7 @@ the name-only listing of the worktree.
 | `submit.frozen-paths` | No change to `frozen_tests`, protected globs or `.keel/**` | Any touch | M2 |
 | `submit.fake-completion` | No `.skip`, `.only`, `xit`, `it.todo`, filtered test runs, TODO-implement markers or not-implemented stubs | Any hit | M3 |
 | `submit.ratchet` | The actual track recomputed from the diff and impact is not higher than the recorded track; without an index, the path fallback applies | Higher track: `blocked(track_raised)` | M3 |
-| `submit.reserved-op` | Ref snapshot, worktree HEAD, reflog tail and `git ls-remote` diffs are clean (plus the op log with jj); every ledger event appended during the run window is the supervisor's own append or a Board-signed approval, and the ledger anchor matches ([04-trace-and-state.md](04-trace-and-state.md)) | Any change keel did not make: `blocked(reserved_op)` | M2 |
+| `submit.reserved-op` | Ref snapshot, worktree HEAD, reflog tail and `git ls-remote` diffs are clean (plus the op log with jj); every ledger event appended during the run window is the supervisor's own append, and the ledger anchor matches ([04-trace-and-state.md](04-trace-and-state.md)) | Any change keel did not make: `blocked(reserved_op)` | M2 |
 | `submit.provider-path-events` | No `tool_use` event touched the provider path set, and no changed or untracked worktree path matches it, `.env*` or a credential basename (name-only listing before any staging) | Any touch or match; the path is never staged | M2 |
 | `submit.subagent-events` | No spawned-subagent event from a builder seat | Any spawn | M2 |
 | `submit.obligations-cheap` | Cheap INV and ADR obligation checks | A failing cheap check | M3 |
@@ -125,7 +125,7 @@ Runs in the land process after integration; see [05-vcs.md](05-vcs.md) for the l
 | Check | Verifies | Fails when | Since |
 | --- | --- | --- | --- |
 | `land.trace` | The range `merge-base(trunk, keel/<P>/main)..tip` and history after `trace.since` walk back to approved requirements and goals | Any failing drift class of [04-trace-and-state.md](04-trace-and-state.md) | M1b logic, M3 gate |
-| `land.signature` | A land approval over the receipt draft hash and the chain head, or a signed land policy plus a signed request plus the red/green proof; signer verified against `allowed_signers` at the last Board-signed trunk revision; no signer key is agent-loaded unless it is FIDO2 `-sk` | Missing or invalid signature; agent-loaded key (exit 6) | M1b logic, M3 gate |
+| `land.approval` | A land approval whose record binds the receipt draft hash (and whose `approval.recorded` event is on the verified chain), or an approved land policy plus an approved request plus the red/green proof; the draft's current hash equals the recorded one | Missing approval; a draft whose hash differs from the record; an approval whose subject or stage does not match | M1b logic, M3 gate |
 | `land.ancestry` | Trunk is an ancestor of the archive commit; a worktree with trunk checked out is clean | Not an ancestor; dirty checked-out trunk (exit 5) | M3 |
 | `land.re-execution` | The full acceptance matrix, re-run in-process on a fresh detached checkout of the integrated commit | Any failing row | M3 |
 | `land.preview` | The integration preview is green with no conflicts | Red preview or conflict | M3 |
@@ -185,7 +185,7 @@ Feature and system tracks:
 2. `frozen_tests` are excluded from the builder's `write_set` (`plan.test-independence`,
    `submit.frozen-paths`).
 3. Missing tests become a test task (a work order of kind `test`) on a different declared family that
-   lands first. Test tasks take the Board-signed `seats.engineer.test_route`
+   lands first. Test tasks take the Board-approved `seats.engineer.test_route`
    ([10-providers.md](10-providers.md)); without one, a test task on another family is a routing deviation
    that needs plan approval.
 4. At the plan gate, a cross-family verification-gap lens checks the ACC to command table and the
@@ -253,9 +253,9 @@ Independence:
   artifact: the spec lens from product's, the architecture lens from the architect's, the verification-gap
   lens from the planner's and from the test task's, and the build lenses from the engineer's. That is why the
   reviewer's `independent_of` lists product, architect, planner and engineer (`org/seats/reviewer.yaml`).
-  Families come from the Board-signed routing ([10-providers.md](10-providers.md)) and are shown as "declared"
+  Families come from the Board-approved routing ([10-providers.md](10-providers.md)) and are shown as "declared"
   in receipts, the dashboard and `verify.review`. The declared engineer families (the build route and, when
-  used, the test route) and the reviewer family are part of the land envelope.
+  used, the test route) and the reviewer family are part of the land approval record.
 - If only one family is available, independence is `degraded` and each change needs
   `keel approve <P> --rule degraded`. An unavailable review lane means "not approved", never "skipped".
 
@@ -319,8 +319,11 @@ Every check ships a negative control: a seeded fault that must make the check fa
 
 | Check | Seeded fault | Pinned failure |
 | --- | --- | --- |
-| `land.signature` (and `keel approve`) | A passphrase signer key loaded into the ssh-agent (socket or the Windows agent pipe) | Refusal with exit 6: agent-loaded signer key |
-| `land.signature` | A one-byte edit of the frozen block after contract approval | Contract approval invalid |
+| `land.approval` | A one-byte edit of the frozen block after contract approval | Contract approval invalid (`missing-approval`: artifact changed) |
+| `land.approval` | A receipt draft edited after the land approval was recorded | Land refused; the draft is shown again for a fresh approval |
+| `keel approve` | A bound artifact rewritten between the display and the confirmation keystroke | Refusal `changed-during-confirmation`; nothing recorded |
+| `frame.approvals` | An approval record dropped under `.keel/approvals/` with no `approval.recorded` event, and a seat drop that says "approved" | Ignored as authority; dispatch refuses |
+| `frame.approvals` | An unrelated file changed and unrelated ledger events appended after a document approval | The approval stays valid (negative control for over-invalidation) |
 | `submit.scope` | A work order whose `write_set` glob matches zero paths | Zero-match scope |
 | `land.ancestry` | A dirty worktree with trunk checked out | Refusal with exit 5 |
 | `keel doctor --section vcs` | A nested ref name (a branch `keel/<P>` next to `keel/<P>/main`) | Directory/file ref conflict |

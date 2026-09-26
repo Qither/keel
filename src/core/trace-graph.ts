@@ -5,7 +5,7 @@
  * @packageDocumentation
  * docs/04-trace-and-state.md is the only home of trace. `keel trace <query>` follows blame (or jj annotate,
  * verify by probe) to trailers, round, task, ACC and requirement, then the goal; ledger records give
- * evidence, verdicts, signatures and rulings; path lift gives the element, owner, obligations and rules.
+ * evidence, verdicts, approvals and rulings; path lift gives the element, owner, obligations and rules.
  * The trace check covers `merge-base(trunk, keel/<P>/main)..tip` at land and trunk history after
  * `trace.since` in audit; history before the epoch never fails. `trace.db` (node:sqlite) is a derived
  * index only. Implemented in M1b (check) and M3 (gate).
@@ -173,7 +173,7 @@ export type TraceDriftKind =
   | "realization-mismatch"
   | "citation-drift"
   | "charter-lag"
-  | "unsigned-approval"
+  | "missing-approval"
   | "unacknowledged-receipt"
   | "chain-break";
 

@@ -1,6 +1,6 @@
-# examples/acme-notes/.keel/routing.yaml (schemas/routing.schema.json). Board-signed with
+# examples/acme-notes/.keel/routing.yaml (schemas/routing.schema.json). Board-approved with
 # `keel approve --doc .keel/routing.yaml` (approval AP-4f6b8d0c2e5a in the ledger sample); dispatch refuses
-# without a valid signature.
+# without a valid document approval.
 #
 # NAMES ONLY. Every value below is a protocol id, a declared family, an auth mode or an environment
 # variable NAME. The acme-notes owner sets the endpoints, keys and model names in their own environment

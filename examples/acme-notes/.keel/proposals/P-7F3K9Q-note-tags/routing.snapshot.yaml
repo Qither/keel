@@ -4,9 +4,9 @@
 # exposure profile that dispatch will use. Names only: aliases, declared families, protocols, revisions.
 # Hash values are illustrative.
 #
-# T1 is a test-first task, so it takes the signed seats.engineer.test_route (opencode, glm-main, declared
+# T1 is a test-first task, so it takes the approved seats.engineer.test_route (opencode, glm-main, declared
 # zhipu): plan.test-independence requires its tests to come from a declared family different from T2's
-# builder. T2 takes the signed seats.engineer route and the lenses the signed seats.reviewer route. Nothing
+# builder. T2 takes the approved seats.engineer route and the lenses the approved seats.reviewer route. Nothing
 # deviates, so the feature needs no plan approval.
 #
 # Assumption: the exposure profiles below show tool_env_exposure scrubbed for claude-code and opencode.
@@ -16,7 +16,7 @@
 # T2 are refused with blocked(runtime_unavailable) and the doctor reason.
 proposal: P-7F3K9Q
 routing:
-  # sha256 of the normalized .keel/routing.yaml blob at the last Board-signed trunk revision.
+  # sha256 of the normalized .keel/routing.yaml blob at the last Board-approved trunk revision.
   blob: "ef8178a5bb4e7c66e0d2494225709b971f02eb34e851bd2c4cbd3a3f0edfc96c"
   approval: AP-4f6b8d0c2e5a
 taken_at: "2026-09-21T15:10:30Z"

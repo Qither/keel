@@ -1,15 +1,17 @@
 /**
- * Board governance: the signed documents (charter, goals, standing policies, signers), the ssh-signed
- * envelope, rulings and other governance records, and the receipt.
+ * Board governance: the approved documents (charter, goals, standing policies), the approval record,
+ * rulings and other governance records, and the receipt.
  *
  * @packageDocumentation
  * Mirrors schemas/charter, goals, policy, approval, governance-record and receipt. Every Board act is an
- * ssh signature (`ssh-keygen -Y sign -n keel-approval`) over a hash-bound, chain-anchored envelope,
- * committed as a detached file at `.keel/signatures/<blob-sha256>.<kind>.json` and verified with
- * `ssh-keygen -Y verify` against `allowed_signers` at the last Board-signed trunk revision, never a
- * working-tree copy. approve, dispatch and land exit 6 while any allowed signer key is agent-listed and is
- * not a FIDO2 `-sk` key. receipt.md is never edited after signing. Implemented in M1b (signing) and M3
- * (receipts).
+ * explicit confirmation of a shown subject at one content version: `keel approve` shows the subject and
+ * its change, the Board confirms, and the Steward writes a record binding the subject, the normalized
+ * content hash of every bound artifact, the declared approver and the local time, committed at
+ * `.keel/approvals/<record-sha256>.<kind>.json` (docs/02-alignment.md). A record is valid only while every
+ * bound artifact still hashes to the recorded value; any change to approved content invalidates it. The
+ * hash binds content, the approver is a declared local identity and the time is the local clock: none is
+ * an authenticated identity or an anti-forgery proof (docs/14-trust-security.md, ADR-0005). receipt.md is
+ * never edited after the land approval. Implemented in M1b (approvals) and M3 (receipts).
  */
 import type { CommandLine } from "./evidence.js";
 import type { CheckId } from "./gates.js";
@@ -43,7 +45,6 @@ import type {
   Semver,
   Sha256,
   Slug,
-  SshFingerprint,
   StopClass,
   TaskId,
   Track,
@@ -102,7 +103,6 @@ export interface Charter {
   charter_version: Semver;
   /** At most 200 characters. */
   mission: string;
-  root_signer: SshFingerprint;
   invariants: Invariant[];
   decision_boundaries: DecisionBoundaries;
   precedence: Precedence;
@@ -159,13 +159,13 @@ export interface PolicyPredicates {
 
 /** What a standing policy requires in exchange. */
 export interface PolicyRequirements {
-  signed_request?: boolean;
+  approved_request?: boolean;
   red_green_proof?: boolean;
   lens_set?: LensSetName;
 }
 
 /**
- * `.keel/policies/<id>.yaml`, Board-signed, revocable and listed in receipts. A contract policy stands in
+ * `.keel/policies/<id>.yaml`, Board-approved, revocable and listed in receipts. A contract policy stands in
  * for the per-change contract approval of a change started with `keel new --policy`; a land policy stands
  * in for the per-change land approval, followed by a receipt acknowledgement.
  */
@@ -180,42 +180,10 @@ export interface StandingPolicy {
   expires: string | null;
 }
 
-// ---- Signers ----
+// ---- Approval records ----
 
-/** An OpenSSH SHA256 key fingerprint; the shape lives with the other ids. */
-export type { SshFingerprint } from "./ids.js";
-
-/** One Board identity from `.keel/board/allowed_signers`. */
-export interface Signer {
-  principal: string;
-  key_type: string;
-  fingerprint: SshFingerprint;
-  /** A FIDO2 `-sk` key; recommended on Windows (support verify by probe). */
-  hardware_backed: boolean;
-}
-
-/**
- * The fail-closed key check: a signer key listed by `ssh-add -L` (through SSH_AUTH_SOCK or the Windows
- * agent pipe) that is not `-sk` makes approve, dispatch and land exit 6.
- */
-export interface SignerHygiene {
-  fingerprint: SshFingerprint;
-  agent_listed: boolean;
-  hardware_backed: boolean;
-  refuse: boolean;
-}
-
-/** Where trust comes from: the root fingerprint pinned in the signed charter and the signer list revision. */
-export interface TrustRoot {
-  root_signer: SshFingerprint;
-  allowed_signers_at: GitOid;
-  tofu: ApprovalId | null;
-}
-
-// ---- Envelopes ----
-
-/** What an envelope signs. `tofu` is the trust-on-first-use envelope keel init writes. */
-export type ApprovalKind = "stage" | "doc" | "policy" | "request" | "rule" | "tofu";
+/** What a record approves. */
+export type ApprovalKind = "stage" | "doc" | "policy" | "request" | "rule";
 
 /** One approved artifact with its normalized blob hash. */
 export interface ApprovalArtifact {
@@ -233,9 +201,9 @@ export interface TrackChange {
 }
 
 /**
- * The ruling of a `--rule` envelope. A budget ruling carries the new limit (`--limit
+ * The ruling of a `--rule` approval record. A budget ruling carries the new limit (`--limit
  * <usd|runs|wall_minutes>=<n>`), a track ruling the track change (`--to <track>`); both are null for other
- * kinds, so the signed envelope holds the parameter the Board decided.
+ * kinds, so the approval record holds the parameter the Board decided.
  */
 export interface ApprovalRule {
   kind: RuleKind;
@@ -253,15 +221,22 @@ export interface LandBinding {
   families: FamilyPair;
 }
 
-/** The signing principal. */
+/**
+ * The declared approver: the `board.approver` name from the personal configuration layer, or the name
+ * typed at confirmation. A recorded name, not an authenticated identity.
+ */
 export interface Approver {
-  principal: string;
-  fingerprint: SshFingerprint;
-  key_type: string;
+  name: string;
 }
 
-/** The signed payload; its canonical JSON is what `ssh-keygen -Y sign` signs. */
-export interface ApprovalPayload<K extends ApprovalKind = ApprovalKind> {
+/**
+ * The approval record (`AP-<sha12>` of its normalized bytes), committed at
+ * `.keel/approvals/<record-sha256>.<kind>.json`. The hashes in `artifacts` are what the approval covers:
+ * a change to any of them invalidates it, a change elsewhere does not, and the record never hashes
+ * itself.
+ */
+export interface ApprovalRecord<K extends ApprovalKind = ApprovalKind> {
+  v: 1;
   kind: K;
   stage: ApprovalStage | null;
   rule: ApprovalRule | null;
@@ -269,40 +244,48 @@ export interface ApprovalPayload<K extends ApprovalKind = ApprovalKind> {
   subject: string;
   /** keel/<P>/main for stages, trunk for documents. */
   commit: GitOid;
-  /** Empty for a request envelope. */
+  /** Empty for a request record, whose bound content is `request`. */
   artifacts: ApprovalArtifact[];
   contract_hash: ContractHash | null;
-  /** The verbatim request, for request envelopes. */
+  /** The verbatim request, for request records. */
   request: string | null;
   land: LandBinding | null;
-  /** The quoted consent, with any Board commentary. */
-  quote: string;
+  /** Optional Board commentary typed at confirmation (`--note`). */
+  note: string | null;
   approver: Approver;
-  /** Null only in the trust-on-first-use envelope. */
+  /** For consistency checks; null only when the ledger has no event yet. */
   ledger_chain_head: Sha256 | null;
-  ts: IsoDateTime;
-  nonce: Sha256;
+  /** The local machine time at confirmation; not a trusted timestamp. */
+  approved_at: IsoDateTime;
 }
 
-/** An armored SSHSIG over the payload. */
-export interface SshSignature {
-  namespace: "keel-approval";
-  format: "sshsig";
-  armored: string;
-}
+/** A Board approval of a checkpoint, document, policy or ruling. */
+export type Approval = ApprovalRecord<Exclude<ApprovalKind, "request">>;
 
-/** The detached, self-authenticating envelope (`AP-<sha12>`). */
-export interface SignedEnvelope<K extends ApprovalKind = ApprovalKind> {
-  v: 1;
-  payload: ApprovalPayload<K>;
-  signature: SshSignature;
-}
+/** A Board-approved verbatim change request (`keel new --policy`, one confirmation). */
+export type ChangeRequest = ApprovalRecord<"request">;
 
-/** A Board approval of a checkpoint, document, policy, ruling or trust root. */
-export type Approval = SignedEnvelope<Exclude<ApprovalKind, "request">>;
+/**
+ * Why the Steward treats an approval as invalid at a gate (`missing-approval` in the trace drift
+ * classes). `changed-during-confirmation` is the refusal `keel approve` itself gives when a bound
+ * artifact changed between being shown and being confirmed; nothing is recorded in that case.
+ */
+export type ApprovalInvalidity =
+  | "no-record"
+  | "no-ledger-event"
+  | "subject-mismatch"
+  | "artifact-changed"
+  | "superseded-by-amendment"
+  | "expired"
+  | "chain-head-not-on-chain"
+  | "changed-during-confirmation";
 
-/** A Board-signed verbatim change request (`keel new --policy`, one touch). */
-export type ChangeRequest = SignedEnvelope<"request">;
+/**
+ * The confirmation flow of `keel approve`, in order: show the subject and its change, take the explicit
+ * confirmation, re-hash the bound artifacts and compare them with what was shown, then record. A bare
+ * Enter or any word other than the confirmation word is a refusal.
+ */
+export type ConfirmationStep = "show" | "confirm" | "recheck" | "record";
 
 // ---- Rulings, questions and other records ----
 
@@ -348,7 +331,7 @@ export interface QuestionRecord {
 
 /**
  * `AM-<sha12>`: derived from git when the frozen block or an ACC changes after contract approval. It
- * invalidates the contract and plan approvals until the Board re-signs.
+ * invalidates the contract and plan approvals until the Board looks again and approves again.
  */
 export interface Amendment {
   record: "amendment";
@@ -423,7 +406,7 @@ export interface ReceiptRulingRow {
 }
 
 /**
- * `.keel/archive/<yyyy>/<P>-<slug>/receipt.json`; receipt.md renders it for the Board. The signed draft
+ * `.keel/archive/<yyyy>/<P>-<slug>/receipt.json`; receipt.md renders it for the Board. The approved draft
  * names the integrated commit and the expected trunk tip; the landed sha goes in `land.completed`.
  */
 export interface Receipt {
@@ -455,8 +438,8 @@ export interface Receipt {
   exposure: { runtime: RuntimeId; profile: ExposureProfile }[];
   /**
    * Approvals that existed before land (contract, plan, request, rulings). The land approval is never
-   * listed: it signs the draft, and its id hashes an envelope that contains the draft hash. receipt.md shows
-   * it in the Signed quote section, filled by the archive commit from the land envelope.
+   * listed: it binds the draft hash, and its id hashes a record that contains the draft hash. receipt.md
+   * shows it in the Land approval section, filled by the archive commit from the land approval record.
    */
   approvals: ApprovalId[];
   policies: Slug[];

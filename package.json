@@ -2,7 +2,7 @@
   "name": "@qither/keel",
   "version": "0.0.0",
   "private": true,
-  "description": "keel runs a small company of multi-vendor AI coding agents with compiled intent, signed Board approvals, re-executed evidence and git-first traceability. M0: design documents and repository skeleton only.",
+  "description": "keel runs a small company of multi-vendor AI coding agents with compiled intent, explicitly confirmed Board approvals, re-executed evidence and git-first traceability. M0: design documents and repository skeleton only.",
   "type": "module",
   "license": "MIT",
   "engines": {

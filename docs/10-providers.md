@@ -37,8 +37,8 @@ refusal message (`blocked(runtime_unavailable)` with the doctor reason) and the 
 
 ## 2. routing.yaml and declared families
 
-`.keel/routing.yaml` binds each seat to a runtime, a profile alias and a tier. It is Board-signed (dispatch
-refuses without a valid signature), validated by `schemas/routing.schema.json`, and holds names only. The
+`.keel/routing.yaml` binds each seat to a runtime, a profile alias and a tier. It is Board-approved (dispatch
+refuses without a valid document approval), validated by `schemas/routing.schema.json`, and holds names only. The
 template is `templates/project/routing.yaml`; the golden example is
 `examples/acme-notes/.keel/routing.yaml`.
 
@@ -105,7 +105,7 @@ replaced by `_` (`gemini-compat` becomes `KEEL_PROFILE_GEMINI_COMPAT_API_KEY`).
 | `policy.record_model_names` | `false` by default: records hold alias, tier, declared family and revision only |
 | `policy.allow_degraded` | Whether a single-family setup may proceed with `keel approve <P> --rule degraded` per change |
 
-Declared families. The family is the Board's signed declaration, because under P1 keel cannot inspect an
+Declared families. The family is the Board's approved declaration, because under P1 keel cannot inspect an
 endpoint or a model name. Receipts, the dashboard and the review check show it as "declared", never as
 "verified". `keel doctor` warns on a declared-family collapse (the same family on the engineer and its
 reviewer). An optional, opt-in check compares the runtime-reported model ids from the stream `init` events
@@ -115,7 +115,7 @@ env or config. The independence rule itself lives in [11-verification.md](11-ver
 Native provider names (for example `ANTHROPIC_BASE_URL`) appear only in each runtime descriptor's mapping,
 never in `routing.yaml`. At plan approval the Steward writes `routing.snapshot.yaml` into the proposal
 (`schemas/routing-snapshot.schema.json`); it records the resolved runtime, alias, tier, declared family
-and revision per seat, and is signed with the plan.
+and revision per seat, and is bound by the plan approval when one is required.
 
 Where values live: Windows user environment variables, a shell profile, or a secret manager that injects
 variables into one process, for example `op run -- keel run P-7F3K9Q`. `examples/providers.env.example`
@@ -146,7 +146,7 @@ the parent environment minus some names.
 ```mermaid
 flowchart LR
   P[parent env<br/>values never read elsewhere] --> A[env-policy.ts]
-  S[signed routing:<br/>profile names] --> A
+  S[approved routing:<br/>profile names] --> A
   D[descriptor mapping:<br/>native names] --> A
   A --> C[child env allowlist]
   A --> R[argv.redacted.json<br/>with placeholders]
@@ -173,9 +173,8 @@ Mapping per runtime:
 | opencode | none; the per-run `opencode.json` references `{env:KEEL_PROFILE_<ALIAS>_...}` names | The profile's variables pass through the allowlist unchanged |
 | direct | none; the request builder receives an opaque handle | `src/direct/client.ts` unwraps it at call time |
 
-Never passed to a seat: other profiles' variables, `SSH_AUTH_SOCK`, `KEEL_BOARD_KEY` and
-`KEEL_BOARD_PRINCIPAL` (the only `KEEL_BOARD_*` names, defined in
-[14-trust-security.md](14-trust-security.md)), and git credential helpers (reset by the git hardening).
+Never passed to a seat: other profiles' variables, `SSH_AUTH_SOCK` (so a seat cannot use the user's git
+transport keys to push) and git credential helpers (reset by the git hardening).
 `argv.redacted.json` in the run record keeps `${ENV:NAME}` placeholders, and no route puts a model name, URL
 or key in argv. The Steward process itself never calls a model; the direct lane is a separate child process
 spawned like any runtime.
@@ -289,7 +288,7 @@ envelope of [12-cli-api-mcp.md](12-cli-api-mcp.md). The sample uses the illustra
 
 ```text
 $ keel doctor --section providers
-routing: .keel/routing.yaml signed by SHA256:<board-key-fingerprint> at <commit>
+routing: .keel/routing.yaml approved by <approver> (declared) in AP-<sha12> at <commit>
 
 profile anthropic-main  (revision 1)
   protocol            anthropic-messages

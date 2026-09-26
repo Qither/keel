@@ -1,9 +1,0 @@
-# examples/acme-notes/.keel/board/allowed_signers: the Board's signing identities in the OpenSSH
-# allowed_signers format (docs/14-trust-security.md). Public keys only.
-#
-# FAKE: both key bodies below are obviously fake placeholders and verify nothing. keel init wrote the
-# first line from the owner's public key (trust on first use, approval AP-0b3d5f7a9c1e in the ledger
-# sample); its fingerprint is pinned as root_signer in the signed charter. The deputy line was added later
-# with a signed `keel approve --doc .keel/board/allowed_signers`.
-board-owner@example.com namespaces="keel-approval" sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29t-fake-keel-example acme-owner-security-key
-board-deputy@example.com namespaces="keel-approval",valid-before="20271231" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA-fake-keel-example acme-deputy-key

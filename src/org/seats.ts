@@ -91,12 +91,12 @@ export interface SeatContract {
 /**
  * `independent` when the reviewer's declared family differs from the engineer's; `degraded` when one
  * family serves both, which needs `keel approve <P> --rule degraded` per change. Families are Board
- * declarations in the signed routing and are always shown as "declared".
+ * declarations in the approved routing and are always shown as "declared".
  */
 export type Independence = "independent" | "degraded";
 
 /**
- * The declared engineer families and the reviewer family, carried by the land envelope, the routing
+ * The declared engineer families and the reviewer family, carried by the land approval record, the routing
  * snapshot and the receipt. `engineer` lists every engineer route the proposal uses: the build route and,
  * when a test task runs, the test route, so the reviewer's independence from both is recorded.
  */

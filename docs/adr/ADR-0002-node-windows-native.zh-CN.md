@@ -36,6 +36,7 @@ keel 还需要解析 YAML、校验 JSON Schema，并且必须在每个操作系�
 ## 后果
 
 - 依赖面是两个包加上它们的配套包，安装时不需要编译器。
+- 看板（dashboard）的前端库（React 和 TanStack）在包构建时编译为打包产物，不是运行时依赖（[ADR-0009](ADR-0009-tanstack-frontend.zh-CN.md)）；上述依赖面不变。
 - Windows 是一等的 CI 目标，因此仅在 Windows 上出现的失败会在每次变更时暴露出来。
 - 启动契约增加了按运行时的描述符字段（Windows 解析、提示词通道、退出码映射），这些字段必须经过探测并保持最新（[09-runtimes.zh-CN.md](../09-runtimes.zh-CN.md)）。
 - 派生的追溯索引依赖一个实验性的内置模块；失去它只需付出重建的代价，绝不会丢失数据。

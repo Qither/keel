@@ -10,7 +10,7 @@
 
 keel 的可追溯性、隔离、认领（claim）、快照、集成与落地（land）都需要版本控制原语。考虑过两个候选方案。
 
-- git 在 keel 运行的所有地方都可用，包括装有 Git for Windows 的原生 Windows，而且每个智能体 CLI 都期望一个 git 检出。它提供提交尾注（trailer）、只可创建的比较并交换（CAS）引用更新、支持稀疏检出（sparse checkout）的工作树（worktree）、`merge-tree --write-tree` 预览、临时索引快照以及 ssh 签名的数据。
+- git 在 keel 运行的所有地方都可用，包括装有 Git for Windows 的原生 Windows，而且每个智能体 CLI 都期望一个 git 检出。它提供提交尾注（trailer）、只可创建的比较并交换（CAS）引用更新、支持稀疏检出（sparse checkout）的工作树（worktree）、`merge-tree --write-tree` 预览以及临时索引快照。
 - jj（Jujutsu）增加了稳定的变更 id、操作日志、演化日志（evolution log）、一等公民的冲突、`jj run` 和 revset。它尚处于 1.0 之前。它的辅助工作区不是 git 检出，这会破坏需要 git 检出的智能体 CLI；并且截至 jj 0.45.1，`jj workspace add --colocate` 尚未发布（待探测验证（verify by probe））。
 
 保留操作检测必须在没有 jj 的情况下成立：一份早期草稿只通过 jj 操作日志检测引用移动，被一次评审否决。

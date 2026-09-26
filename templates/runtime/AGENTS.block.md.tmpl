@@ -33,7 +33,8 @@ hashed brief, and the Steward checks everything a seat hands in.
 - Do not run `keel new`, `keel run`, `keel land`, `keel sync`, `keel audit` or `keel approve`. They refuse
   inside a keel run, and approvals come only from a Board member at an interactive terminal.
 - Do not edit `.keel/**` or the files listed in `.keel/generated.lock.json` by hand. Governance files
-  change only through a Board signature; living specs and the architecture model change only at land.
+  change only through a Board approval made at a terminal; living specs and the architecture model change
+  only at land.
 - Never open provider, credential or shared runtime settings files, and never print environment values.
   keel stores environment variable names only. On an authentication error, ask; do not look for keys.
 - Use no permission-bypass flags and spawn no writing subagents.

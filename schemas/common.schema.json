@@ -145,7 +145,7 @@
       "pattern": "^IM-[0-9a-f]{12}$"
     },
     "approvalId": {
-      "description": "Board approval envelope AP-<sha12>.",
+      "description": "Board approval record AP-<sha12>.",
       "type": "string",
       "pattern": "^AP-[0-9a-f]{12}$"
     },
@@ -224,11 +224,6 @@
       "type": "string",
       "pattern": "^[^\\\\]+$"
     },
-    "sshFingerprint": {
-      "description": "OpenSSH SHA256 key fingerprint, as printed by ssh-keygen -l.",
-      "type": "string",
-      "pattern": "^SHA256:[A-Za-z0-9+/]{43}$"
-    },
     "checkId": {
       "description": "A gate check id <gate>.<name>, for example submit.scope or land.re-execution, as catalogued in docs/11-verification.md. The prefix is the gate; the namespace is separate from ledger event types.",
       "type": "string",
@@ -254,7 +249,7 @@
       "enum": ["anthropic-messages", "openai-chat", "openai-responses", "google"]
     },
     "family": {
-      "description": "Declared model family, a Board-signed routing declaration.",
+      "description": "Declared model family, a Board-approved routing declaration.",
       "enum": ["anthropic", "openai", "google", "alibaba", "moonshot", "zhipu", "other"]
     },
     "seat": {
@@ -366,7 +361,7 @@
       "anyOf": [{ "$ref": "#/$defs/roundTrailers" }, { "$ref": "#/$defs/governanceTrailers" }]
     },
     "governanceTrailers": {
-      "description": "Trailers of a Steward governance commit, which brings a Board-signed document to trunk.",
+      "description": "Trailers of a Steward governance commit, which brings a Board-approved document to trunk.",
       "type": "object",
       "properties": {
         "Keel-Doc": { "$ref": "#/$defs/repoPath" },

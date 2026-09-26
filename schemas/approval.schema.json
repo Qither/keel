@@ -1,95 +1,83 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/approval.schema.json",
-  "title": "keel approval envelope",
-  "description": "A Board approval: a detached, self-authenticating envelope committed at .keel/signatures/<blob-sha256>.<kind>.json (id AP-<sha12>). keel approve builds the payload, the Board signs its canonical JSON with ssh-keygen -Y sign -n keel-approval, and the Steward verifies it with ssh-keygen -Y verify against the allowed_signers blob at the last Board-signed trunk revision, never a working-tree copy. Any change to an approved artifact invalidates the approval. approve, dispatch and land exit 6 while any allowed signer key is agent-listed and is not a FIDO2 sk key.",
+  "title": "keel approval record",
+  "description": "A Board approval record: the explicit confirmation of one shown subject at one content version, committed at .keel/approvals/<record-sha256>.<kind>.json (id AP-<sha12>). keel approve shows the subject and its change, the Board confirms explicitly, and the Steward writes the record with the normalized content hash of every bound artifact, the declared approver and the local approval time, then appends the approval.recorded event under the ledger writer lock. An approval is valid only while every bound artifact still hashes to the recorded value; any change to approved content invalidates it and needs a fresh look and a fresh confirmation. The hash binds content, the approver is a declared local identity and the time is the local clock: none of them is a cryptographic identity or an anti-forgery proof (docs/14-trust-security.md). A record that keel approve did not write, and seat output or drops that claim approval, are never an approval.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M1b",
   "type": "object",
   "properties": {
-    "v": { "description": "Envelope format version.", "const": 1 },
-    "payload": { "$ref": "#/$defs/payload" },
-    "signature": { "$ref": "#/$defs/signature" }
+    "v": { "description": "Record format version.", "const": 1 },
+    "kind": { "$ref": "#/$defs/approvalKind" },
+    "stage": {
+      "description": "Set when kind is stage.",
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/approvalStage" }, { "type": "null" }]
+    },
+    "rule": {
+      "description": "Set when kind is rule.",
+      "anyOf": [{ "$ref": "#/$defs/rule" }, { "type": "null" }]
+    },
+    "subject": {
+      "description": "What is approved: a proposal or task id, a document path, a policy name, a question id or a record id. The confirmation applies to this subject at the recorded content version only.",
+      "type": "string",
+      "minLength": 1
+    },
+    "commit": {
+      "description": "Commit the artifacts were hashed at: keel/<P>/main for stages, trunk for documents.",
+      "$ref": "common.schema.json#/$defs/gitOid"
+    },
+    "artifacts": {
+      "description": "Every approved artifact with the sha256 of its normalized blob (src/core/normalize.ts). These hashes are what the approval covers: a change to any of them invalidates the approval; a change elsewhere does not. The record itself is never among them. Empty for a request record, whose bound content is the request text.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "contract_hash": {
+      "description": "Set for contract approvals.",
+      "anyOf": [{ "$ref": "intent.schema.json#/$defs/contractHash" }, { "type": "null" }]
+    },
+    "request": {
+      "description": "The verbatim request, for request records (keel new --policy).",
+      "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+    },
+    "land": {
+      "description": "Set for land approvals.",
+      "anyOf": [{ "$ref": "#/$defs/landBinding" }, { "type": "null" }]
+    },
+    "note": {
+      "description": "Optional Board commentary typed at confirmation (--note); shown in receipts and the trace output.",
+      "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+    },
+    "approver": { "$ref": "#/$defs/approver" },
+    "ledger_chain_head": {
+      "description": "Hash of the last ledger event when the record was written, for consistency checks: a later edit of events before this head is detectable. Null only when the ledger has no event yet (the first document approval after keel init).",
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/sha256" }, { "type": "null" }]
+    },
+    "approved_at": {
+      "description": "The local machine time at confirmation, as recorded by keel approve; not a trusted timestamp.",
+      "$ref": "common.schema.json#/$defs/isoDateTime"
+    }
   },
-  "required": ["v", "payload", "signature"],
+  "required": [
+    "v",
+    "kind",
+    "stage",
+    "rule",
+    "subject",
+    "commit",
+    "artifacts",
+    "contract_hash",
+    "request",
+    "land",
+    "note",
+    "approver",
+    "ledger_chain_head",
+    "approved_at"
+  ],
   "additionalProperties": false,
   "$defs": {
-    "payload": {
-      "description": "The signed payload.",
-      "type": "object",
-      "properties": {
-        "kind": { "$ref": "#/$defs/approvalKind" },
-        "stage": {
-          "description": "Set when kind is stage.",
-          "anyOf": [{ "$ref": "common.schema.json#/$defs/approvalStage" }, { "type": "null" }]
-        },
-        "rule": {
-          "description": "Set when kind is rule.",
-          "anyOf": [{ "$ref": "#/$defs/rule" }, { "type": "null" }]
-        },
-        "subject": {
-          "description": "What is approved: a proposal or task id, a document path, a policy name, a question id or a record id.",
-          "type": "string",
-          "minLength": 1
-        },
-        "commit": {
-          "description": "Commit the artifacts were hashed at: keel/<P>/main for stages, trunk for documents.",
-          "$ref": "common.schema.json#/$defs/gitOid"
-        },
-        "artifacts": {
-          "description": "Every approved artifact with its normalized blob hash; empty for a request envelope.",
-          "type": "array",
-          "items": { "$ref": "#/$defs/artifact" }
-        },
-        "contract_hash": {
-          "description": "Set for contract approvals.",
-          "anyOf": [{ "$ref": "intent.schema.json#/$defs/contractHash" }, { "type": "null" }]
-        },
-        "request": {
-          "description": "The verbatim request, for request envelopes (keel new --policy).",
-          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
-        },
-        "land": {
-          "description": "Set for land approvals.",
-          "anyOf": [{ "$ref": "#/$defs/landBinding" }, { "type": "null" }]
-        },
-        "quote": {
-          "description": "The quoted consent, with any Board commentary.",
-          "type": "string",
-          "minLength": 1
-        },
-        "approver": { "$ref": "#/$defs/approver" },
-        "ledger_chain_head": {
-          "description": "hash of the last ledger event when signing, so later ledger edits are detectable; null only in the trust-on-first-use envelope keel init writes before the ledger exists.",
-          "anyOf": [{ "$ref": "common.schema.json#/$defs/sha256" }, { "type": "null" }]
-        },
-        "ts": { "$ref": "common.schema.json#/$defs/isoDateTime" },
-        "nonce": {
-          "description": "256 random bits written as 64 lowercase hex characters.",
-          "$ref": "common.schema.json#/$defs/sha256"
-        }
-      },
-      "required": [
-        "kind",
-        "stage",
-        "rule",
-        "subject",
-        "commit",
-        "artifacts",
-        "contract_hash",
-        "request",
-        "land",
-        "quote",
-        "approver",
-        "ledger_chain_head",
-        "ts",
-        "nonce"
-      ],
-      "additionalProperties": false
-    },
     "approvalKind": {
-      "description": "stage: contract, plan, land or receipt checkpoint; doc: a governance document (charter, goals, routing, allowed_signers); policy: a standing policy; request: a policy-path change request; rule: a ruling; tofu: the first signer recorded by keel init.",
-      "enum": ["stage", "doc", "policy", "request", "rule", "tofu"]
+      "description": "stage: contract, plan, land or receipt checkpoint; doc: a governance document (charter, goals, routing); policy: a standing policy; request: a policy-path change request; rule: a ruling.",
+      "enum": ["stage", "doc", "policy", "request", "rule"]
     },
     "artifact": {
       "type": "object",
@@ -172,35 +160,16 @@
       "additionalProperties": false
     },
     "approver": {
+      "description": "The declared local identity of the Board member who confirmed: the approver name from the personal layer .keel/local.yaml (board.approver), or the name typed at confirmation when none is configured. A recorded name, not an authenticated one.",
       "type": "object",
       "properties": {
-        "principal": {
-          "description": "Principal as listed in .keel/board/allowed_signers.",
+        "name": {
           "type": "string",
-          "minLength": 1
-        },
-        "fingerprint": { "$ref": "common.schema.json#/$defs/sshFingerprint" },
-        "key_type": {
-          "description": "OpenSSH key type; FIDO2 sk key types are recommended on Windows.",
-          "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "maxLength": 200
         }
       },
-      "required": ["principal", "fingerprint", "key_type"],
-      "additionalProperties": false
-    },
-    "signature": {
-      "type": "object",
-      "properties": {
-        "namespace": { "const": "keel-approval" },
-        "format": { "const": "sshsig" },
-        "armored": {
-          "description": "The armored SSH SIGNATURE block over the canonical JSON of payload.",
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": ["namespace", "format", "armored"],
+      "required": ["name"],
       "additionalProperties": false
     }
   }

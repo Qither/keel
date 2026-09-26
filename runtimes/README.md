@@ -54,7 +54,7 @@ replaced inside its token. No placeholder ever expands to an endpoint, a key or 
 | `{allowed_tools}` | The tool allowlist derived from the seat contract and its execution class |
 | `{session_id}` | The session id keel minted or read from the stream |
 | `{seat}` | The seat id, for example `engineer` |
-| `{alias}` | The routing profile alias from the Board-signed `.keel/routing.yaml` |
+| `{alias}` | The routing profile alias from the Board-approved `.keel/routing.yaml` |
 | `{runtime_profile}` | The routing profile's `runtime_profile.profile` name (a name defined in the user's own runtime config) |
 | `{mode_argv}` | The selected mode's `argv` |
 | `{budget_argv}` | The descriptor's budget flags with the work order's limits |

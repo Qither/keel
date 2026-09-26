@@ -2,7 +2,7 @@
 # (schemas/workorder.schema.json), written by the planner seat and compiled into brief BR-9e4c1a7b2d05
 # for run RUN-01J9Z8Q4TKXW3M5N7P2R6S8V0A (workspace-root/_runs/). Hash values are illustrative.
 #
-# T2 is the build task on the signed engineer route (claude-code, anthropic-main, declared family
+# T2 is the build task on the approved engineer route (claude-code, anthropic-main, declared family
 # anthropic). Its frozen_tests were written by T1 on a different declared family and sit outside its
 # write_set. The ACC to command table below is fixed before the build and reappears in receipt.json.
 id: P-7F3K9Q.T2

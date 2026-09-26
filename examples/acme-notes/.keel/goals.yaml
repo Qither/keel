@@ -1,4 +1,4 @@
-# examples/acme-notes/.keel/goals.yaml (schemas/goals.schema.json). Board-owned; signed with
+# examples/acme-notes/.keel/goals.yaml (schemas/goals.schema.json). Board-owned; approved with
 # `keel approve --doc .keel/goals.yaml` (approval AP-3e5a7c9b1d4f in the ledger sample).
 # Goal progress is computed, never stored: requirements verified at head over the total per goal.
 charter_version: "1.0.0"

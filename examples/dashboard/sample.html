@@ -6,15 +6,17 @@
 <meta name="color-scheme" content="light dark">
 <title>keel dashboard mock: acme-notes</title>
 <!--
-examples/dashboard/sample.html: a static mock of the read-only keel dashboard (docs/08-dashboard.md) for the
-fictional project acme-notes (examples/acme-notes/). M0 ships only this mock; the real HTML shell and CSS
-arrive in M5 and render DashboardModel (src/dashboard/model.ts).
+examples/dashboard/sample.html: a hand-written static mock of the read-only keel dashboard
+(docs/08-dashboard.md) for the fictional project acme-notes (examples/acme-notes/). M0 ships only this mock;
+it stands in for the M5 page, a TanStack (React) application pre-rendered to static HTML and hydrated for
+interaction (revised P2, ADR-0009), which renders DashboardModel (src/dashboard/model.ts).
 
-Rules this mock follows (P2): native HTML elements and hand-written CSS only; light and dark custom-property
-tokens switched by prefers-color-scheme; a system font stack; no JavaScript, no external requests, no web
-fonts, no frameworks. Every colour has a text label. The overlay checkboxes work with CSS :has(); without it
-every overlay simply stays visible. Data is illustrative: P-7F3K9Q matches the golden example, the other
-proposals are invented for the mock.
+The markup and token rules this mock shows are the ones the headless TanStack application must reproduce:
+native HTML elements; light and dark custom-property tokens switched by prefers-color-scheme; a system font
+stack; no external requests; no UI kit, CDN or web font. Every colour has a text label. The mock itself has
+no JavaScript and predates the TanStack bundle. The overlay checkboxes work with CSS :has(); without it every
+overlay simply stays visible. Data is illustrative: P-7F3K9Q matches the golden example, the other proposals
+are invented for the mock.
 -->
 <style>
 :root {
@@ -298,14 +300,14 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
   </div>
 
   <h3>Board queue</h3>
-  <p class="muted">Each item says what to read and gives the command to run in a terminal. Nothing here signs anything.</p>
+  <p class="muted">Each item says what to read and gives the command to run in a terminal. Nothing here approves anything.</p>
 
   <details open>
     <summary>Approvals due <span class="count">(2)</span></summary>
     <p><strong>P-3W8C1D contract</strong> (feature, "Tag suggestions while typing", G-03). Read the frozen block of
     <code>intent.md</code> and the spec-delta diff; the spec lens (declared google) approved.</p>
     <code class="cmd">keel approve P-3W8C1D --stage contract</code>
-    <p><strong>P-6H0J2K land</strong> (patch, "Trim trailing spaces in note titles", origin board-signed request,
+    <p><strong>P-6H0J2K land</strong> (patch, "Trim trailing spaces in note titles", origin board-requested,
     policy quick-patch). Read <code>receipt.md</code>: red/green proof, policy lens set, one waived check.</p>
     <code class="cmd">keel approve P-6H0J2K --stage land</code>
   </details>
@@ -314,7 +316,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
     <summary>Open asks <span class="count">(1)</span></summary>
     <p><strong>Q-4b6d8f0a2c1e</strong> from P-9R2M4X.T2 (engineer), clause <code>P-9R2M4X#ACC-02</code>, routed to the
     Board: "Should a search term also match a note's tags, or only its title and body?"</p>
-    <code class="cmd">keel approve Q-4b6d8f0a2c1e --rule answer --quote "Title and body only for now."</code>
+    <code class="cmd">keel approve Q-4b6d8f0a2c1e --rule answer --note "Title and body only for now."</code>
   </details>
 
   <details>
@@ -342,12 +344,8 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
     <p>none</p>
   </details>
   <details>
-    <summary>Unsigned or expiring documents <span class="count">(1)</span></summary>
-    <p><code>.keel/policies/quick-patch.yaml</code> expires 2026-12-31 (98 days). All governance documents carry valid signatures.</p>
-  </details>
-  <details>
-    <summary>Signer keys loaded in an ssh-agent <span class="count">(0)</span></summary>
-    <p>none: no allowed signer key is agent-listed (the owner key is a FIDO2 sk key).</p>
+    <summary>Unapproved or expiring documents <span class="count">(1)</span></summary>
+    <p><code>.keel/policies/quick-patch.yaml</code> expires 2026-12-31 (98 days). Every governance document matches a valid approval record.</p>
   </details>
   <details>
     <summary>Reserved-operation alerts <span class="count">(0)</span></summary>
@@ -508,7 +506,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
     </dl>
     <h4>Change feed</h4>
     <ol class="feed">
-      <li>2026-09-23 land P-7F3K9Q "Note tags" (archive commit cd24b712d0dc; receipt signed AP-7a1c3e5f9b2d)</li>
+      <li>2026-09-23 land P-7F3K9Q "Note tags" (archive commit cd24b712d0dc; land approval AP-7a1c3e5f9b2d)</li>
       <li>2026-09-22 round P-7F3K9Q.T2.r1 (3f1c2e9bbe37): TagStore.addTag, normalizeTag; 3 files, +84 / -6</li>
       <li>2026-09-10 decision ADR-7KQ2B accepted (AP-6b8d0f2e4a7c)</li>
     </ol>
@@ -519,11 +517,11 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
 <!-- ========== 4. Org ========== -->
 <section class="view" id="org" aria-labelledby="h-org">
   <h2 id="h-org">Org</h2>
-  <p class="lede">Seats from the Board-signed routing. Families are declarations signed by the Board, never verified
+  <p class="lede">Seats from the Board-approved routing. Families are declarations the Board approved, never verified
   facts; the page labels them "declared".</p>
   <div class="scroll">
   <table>
-    <caption>Seats (routing.yaml signed by AP-4f6b8d0c2e5a)</caption>
+    <caption>Seats (routing.yaml approved by AP-4f6b8d0c2e5a)</caption>
     <thead><tr><th scope="col">Seat</th><th scope="col">Runtime</th><th scope="col">Alias (revision)</th><th scope="col">Declared family</th><th scope="col">Tier</th><th scope="col">Execution class</th></tr></thead>
     <tbody>
       <tr><th scope="row">product</th><td>claude-code</td><td>anthropic-main (1)</td><td>anthropic <span class="declared">declared</span></td><td>frontier</td><td>read-only</td></tr>
@@ -613,7 +611,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
       <li class="done">intake</li><li class="done">build</li><li class="done">verify</li>
       <li aria-current="step">land: awaiting approval</li><li>closed</li>
     </ol>
-    <p>Origin: board-signed request (AP-9d1f3b5a7c02) under policy quick-patch. Independence: engineer anthropic
+    <p>Origin: board-requested (AP-9d1f3b5a7c02) under policy quick-patch. Independence: engineer anthropic
     <span class="declared">declared</span>, reviewer google <span class="declared">declared</span>, independent.</p>
     <table>
       <caption>Gate results for P-6H0J2K</caption>
@@ -633,7 +631,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
       <li class="done">intake</li><li class="done">frame</li><li aria-current="step">contract: awaiting approval</li>
       <li>plan</li><li>build</li><li>verify</li><li>land</li><li>closed</li>
     </ol>
-    <p>Origin: contract-approved once signed. <code>frame.review</code> <span class="st pass">pass</span> (spec lens, declared google).</p>
+    <p>Origin: contract-approved once the Board confirms the contract. <code>frame.review</code> <span class="st pass">pass</span> (spec lens, declared google).</p>
   </article>
 
   <article id="p-7f3k9q">
@@ -743,7 +741,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
           <tr><th scope="row">opencode gemini-compat</th><td>scrubbed</td><td>none</td><td><span class="st exposed">exposed</span></td><td>partial</td></tr>
         </tbody>
       </table>
-      <p class="muted">Control plane exposed on native Windows: integrity rests on the hash chain, signatures, ingest capture and land re-execution.</p>
+      <p class="muted">Control plane exposed on native Windows: integrity rests on the hash chain, approval records, ingest capture and land re-execution.</p>
     </div>
   </div>
   <p>Inert architecture checks: none. The codegraph index is fresh at head, so <code>verify.arch</code> is active.</p>
@@ -798,7 +796,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 12px 16px 32px; color: var(
     <li>2026-09-22 09:43 round P-7F3K9Q.T2.r1 (3f1c2e9bbe37): el:notes.store</li>
     <li>2026-09-22 08:30 round P-7F3K9Q.T1.r1 (b9ccc3c4b0db): tests (unmapped)</li>
     <li>2026-09-10 15:20 decision ADR-7KQ2B accepted (AP-6b8d0f2e4a7c): el:notes.store, el:notes.web</li>
-    <li>2026-09-01 09:00 adoption: trace epoch 6411b381f395; charter, goals, routing and quick-patch signed</li>
+    <li>2026-09-01 09:00 adoption: trace epoch 6411b381f395; charter, goals, routing and quick-patch approved</li>
   </ol>
 </section>
 

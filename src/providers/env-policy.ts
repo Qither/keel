@@ -4,7 +4,7 @@
  * @packageDocumentation
  * This module and `src/direct/client.ts` are the only two modules allowed to reference provider
  * environment variable names or to unwrap an {@link OpaqueSecretHandle}; a CI lint enforces it from M2.
- * Everything else in keel handles profile variables by the names in the Board-signed routing, typed as
+ * Everything else in keel handles profile variables by the names in the Board-approved routing, typed as
  * plain `EnvVarName`.
  *
  * In M0 this module declares only the handle type. Its constants (the base OS variable allowlist, the

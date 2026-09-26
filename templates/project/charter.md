@@ -1,14 +1,11 @@
 ---
 # .keel/charter.md frontmatter (schemas/charter.schema.json). Budget: 6 KiB for the whole file.
 # The frontmatter holds every machine-read part; the body explains it for humans.
-# `keel init` fills the root signer; the Board replaces the remaining {{tokens}}, then signs:
+# The Board replaces the {{tokens}}, then approves the file after reading it:
 #   keel approve --doc .keel/charter.md
 charter_version: "1.0.0"
 # At most 200 characters.
 mission: "{{mission}}"
-# SHA256 fingerprint of the root Board signer's public key (as `ssh-keygen -l` prints it), pinned here
-# and recorded on first use by `keel init`.
-root_signer: "{{root_signer_fingerprint}}"
 invariants:
   - id: INV-01
     level: must                  # must | must_not
@@ -64,7 +61,8 @@ plan > task notes > model preference.
 
 ## Changing this charter
 
-Edit this file, then sign it with `keel approve --doc .keel/charter.md`. The Steward commits it to trunk as
+Edit this file, then approve it with `keel approve --doc .keel/charter.md`, which shows the diff and asks
+for your explicit confirmation. The Steward commits it to trunk as
 a governance commit. Bump `charter_version`: MAJOR when an invariant or boundary tightens or is removed,
 MINOR when one is added, PATCH for wording. The frame gate flags proposals that lag a MAJOR or MINOR
 change.

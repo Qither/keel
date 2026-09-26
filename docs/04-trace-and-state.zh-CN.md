@@ -4,7 +4,7 @@
 
 本文是 keel 中可追溯性与状态的唯一归属文档：每项事实存放在哪里、哈希链式账本（ledger）、id 方案、提交尾注（trailer）、追踪检查、RTM、落地（land）投影以及脱敏。其他文档链接到这里，而不是重复其内容。
 
-相关的归属文档：门禁（gate）目录见 [11-verification.zh-CN.md](11-verification.zh-CN.md)（包括证据（evidence）的源状态绑定和落地时的重新执行），签名审批见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)，签名密钥卫生与威胁模型见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)，git 与 jj 的机制见 [05-vcs.zh-CN.md](05-vcs.zh-CN.md)。将控制平面放在 git 公共目录中的决策见 [ADR-0003](adr/ADR-0003-control-plane-in-git-common-dir.zh-CN.md)。
+相关的归属文档：门禁（gate）目录见 [11-verification.zh-CN.md](11-verification.zh-CN.md)（包括证据（evidence）的源状态绑定和落地时的重新执行），董事会批准见 [02-alignment.zh-CN.md](02-alignment.zh-CN.md)，批准记录能证明什么以及威胁模型见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)，git 与 jj 的机制见 [05-vcs.zh-CN.md](05-vcs.zh-CN.md)。将控制平面放在 git 公共目录中的决策见 [ADR-0003](adr/ADR-0003-control-plane-in-git-common-dir.zh-CN.md)。
 
 ## 三个平面
 
@@ -13,7 +13,7 @@ keel 将状态保存在三个平面中，每项事实恰好有一个真相存储
 ```mermaid
 flowchart LR
   subgraph declared["声明平面：.keel/（已提交）"]
-    gov["章程、目标、路由、策略、<br/>board/allowed_signers、签名"]
+    gov["章程、目标、路由、策略、<br/>批准记录"]
     living["规格、决策、架构"]
     archive["archive/yyyy/P-slug/（投影）"]
   end
@@ -38,20 +38,20 @@ flowchart LR
 
 | 平面 | 位置 | 保存内容 | 写入方 |
 | --- | --- | --- | --- |
-| 声明平面 | 仓库中的 `.keel/` | 治理文档、现行规格、已晋升的 ADR、架构模型、已提交的签名信封、已归档的投影 | 董事会（Board）的编辑（经签名并由 Steward 治理提交落入后生效）；落地归档提交；席位（seat）仅能在提案分支上写入进行中的提案文件 |
+| 声明平面 | 仓库中的 `.keel/` | 治理文档、现行规格、已晋升的 ADR、架构模型、已提交的批准记录、已归档的投影 | 董事会（Board）的编辑（经批准并由 Steward 治理提交落入后生效）；落地归档提交；席位（seat）仅能在提案分支上写入进行中的提案文件 |
 | VCS 内嵌平面 | git 提交与引用 | Steward 提交上的提交尾注、认领（claim）锁、影子快照、可选的 git notes | 仅 Steward |
 | 本地控制平面 | `$(git rev-parse --git-common-dir)/keel/`（普通克隆中为 `.git/keel/`） | 账本、进行中的记录、已编译的简报（brief）、运行记录、一致性测评结果、派生缓存、锁 | 仅 Steward |
 
 ### 声明平面
 
-声明平面即 `.keel/`，它与代码一同提交，经过 schema 校验，并像代码一样接受评审。它包含 `config.yaml`、`charter.md`、`goals.yaml`、`routing.yaml`、`policies/`、`board/allowed_signers`、`signatures/`、`specs/`、`decisions/`、`arch/` 和 `archive/`。完整布局以及每个文件的 schema 见 [13-artifacts-schemas.zh-CN.md](13-artifacts-schemas.zh-CN.md)。
+声明平面即 `.keel/`，它与代码一同提交，经过 schema 校验，并像代码一样接受评审。它包含 `config.yaml`、`charter.md`、`goals.yaml`、`routing.yaml`、`policies/`、`approvals/`、`specs/`、`decisions/`、`arch/` 和 `archive/`。完整布局以及每个文件的 schema 见 [13-artifacts-schemas.zh-CN.md](13-artifacts-schemas.zh-CN.md)。
 
 写入规则：
 
 - 现行规格（`.keel/specs/<area>/spec.yaml`）、架构模型（`.keel/arch/`）和已晋升的 ADR（`.keel/decisions/`）只能通过落地归档提交变更。
-- 治理文档（章程（charter）、目标（goal）、路由、策略、允许的签名者）只能通过 Steward 治理提交进入主干（trunk），该提交在董事会签名后由 `keel approve --doc <path>` 生成。
-- 进行中的提案文件（`.keel/proposals/<P>-<slug>/...`）只存在于提案分支 `keel/<P>/main` 上，在规划工作树（worktree）中编写。审批绑定的是这些文件在该分支某个特定提交上的规范化 blob 哈希。
-- 签名信封一经签名就会被提交（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）：某个提案的契约、计划和请求信封及其裁定提交在 `keel/<P>/main` 上（随归档提交进入主干），文档、策略和回执信封提交在主干上，落地信封则放在归档提交中。
+- 治理文档（章程（charter）、目标（goal）、路由、策略）只能通过 Steward 治理提交进入主干（trunk），该提交在董事会查看差异并确认后由 `keel approve --doc <path>` 生成。
+- 进行中的提案文件（`.keel/proposals/<P>-<slug>/...`）只存在于提案分支 `keel/<P>/main` 上，在规划工作树（worktree）中编写。批准绑定的是这些文件在该分支某个特定提交上的规范化 blob 哈希。
+- 批准记录一经写出就会被提交（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）：某个提案的契约、计划和请求记录及其裁定提交在 `keel/<P>/main` 上（随归档提交进入主干），文档、策略和回执记录提交在主干上，落地记录则放在归档提交中。
 - 任务工作树和验证工作树都是稀疏的，并排除 `/.keel/proposals/`（见 [05-vcs.zh-CN.md](05-vcs.zh-CN.md)），因此席位工作树中没有提案文件。席位只能看到自己的已编译简报或评审包（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
 
 ### VCS 内嵌平面
@@ -86,7 +86,7 @@ flowchart LR
 - 它对 diff 和 jj 快照不可见，`git clean -fdx` 也不会触及它。
 - 它位于 Codex 的 workspace-write 可写根目录之外。然而，对于在没有操作系统级写入边界的运行时（runtime）上运行的席位，它是可写的；在原生 Windows 上，大多数运行时都属于这种情况。`keel doctor` 按运行时和操作系统报告 `control_plane_exposure`（`sandboxed` 或 `exposed`），每份回执（receipt）都携带该值。
 
-因此，完整性依赖于哈希链、已提交的签名、摄入时的捕获以及落地时的重新执行，而不是依赖席位无法访问该目录。[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md) 说明了其局限。
+因此，完整性依赖于哈希链、对照当前内容核对的已提交批准记录、摄入时的捕获以及落地时的重新执行，而不是依赖席位无法访问该目录。[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md) 说明了其局限。
 
 席位只能通过自己的递交通道（submit channel）写入（最终消息、MCP `keel_submit` 或运行 outbox；[ADR-0004](adr/ADR-0004-steward-commits-and-submit-channels.zh-CN.md)）。在任何内容进入账本之前，Steward 都会在摄入（ingest）时校验每一份投递。
 
@@ -135,7 +135,7 @@ flowchart LR
 | `prev` | 链中上一个事件的哈希。 |
 | `ts` | RFC 3339 时间戳。 |
 | `type` | 取自 schema 中联合类型的事件类型，例如 `proposal.created`、`track.decided`、`ack.recorded`、`ruling.made`、`question.asked`、`result.submitted`、`vcs.op`（Steward 做出的引用或提交变更）、`land.completed`。 |
-| `actor` | 行为者：`kind`（Board、Steward 或 seat），对于席位还包括席位、运行时、声明的模型家族（declared family）、配置档别名（profile alias）和运行。模型家族是路由中经董事会签名的声明，从来不是已验证的事实。 |
+| `actor` | 行为者：`kind`（Board、Steward 或 seat），对于席位还包括席位、运行时、声明的模型家族（declared family）、配置档别名（profile alias）和运行。模型家族是路由中经董事会批准的声明，从来不是已验证的事实。`board` 只出现在 `keel approve` 写入的事件上；单凭该字段不能让任何东西成为批准。 |
 | `subject` | 事件所关于的 id（`P`、`P.Tn`、`R-...`、`el:...` 等）。 |
 | `refs` | 哈希与版本绑定：简报、提示（PG）、契约哈希、章程版本、提交、树，以及启用 jj 时的 jj operation id。 |
 | `data` | 类型特定的载荷，受类型化字段白名单限制（见"脱敏与字段白名单"一节）。 |
@@ -154,17 +154,17 @@ flowchart LR
 
 锚点之所以重要，是因为单靠文件并不够：在原生 Windows 上，席位通常可以写入控制平面，而链的计算只是任何人都能延伸的无密钥 sha256。席位如果追加了一个格式正确的事件却没有移动锚点，下一次追加时的尾部检查就会失败。席位如果同时移动了锚点，就造成了一次引用变更，而 `refs/keel` 属于派生前的引用快照（[05-vcs.zh-CN.md](05-vcs.zh-CN.md)）。
 
-摄入时的窗口检查。席位运行期间，只有负责监督它的 Steward 进程（派生它的那个 `keel run` 进程；`keel run <P> --wave` 监督一个波次中的所有运行）向账本追加。其他会修改状态的命令要等待监督锁 `<git-common-dir>/keel/locks/supervisor.lock`，`keel approve` 除外，因为它的事件是能自我验证的董事会签名信封。监督进程在内存中保存自己所做追加的 id 和哈希。在每次运行的摄入阶段，席位的进程树结束之后，它逐一检查运行窗口期间追加的事件：每个事件都必须是它自己的追加，或者是信封验证通过的董事会签名审批。任何其他事件，以及任何对不上的锚点移动，都属于无法解释的变更：该次运行被置为 `blocked(reserved_op)`（`submit.reserved-op`），董事会会看到这些外来事件。因此，之后的进程信任的是在已验证窗口内、或在没有席位运行时追加的事件。
+摄入时的窗口检查。席位运行期间，只有负责监督它的 Steward 进程（派生它的那个 `keel run` 进程；`keel run <P> --wave` 监督一个波次中的所有运行）向账本追加。其他每一个会修改状态的动词，包括 `keel approve`，都要等待监督者锁 `<git-common-dir>/keel/locks/supervisor.lock`；没有例外，因为批准记录不再能自我验证。董事会成员在某个波次进行中运行 `keel approve` 时，会被告知哪个运行持有该锁，以及批准将在窗口结束后记录。监督进程在内存中保存自己所做追加的 id 和哈希。在每次运行的摄入阶段，席位的进程树结束之后，它逐一检查运行窗口期间追加的事件：每个事件都必须是它自己的追加。任何其他事件（包括 `approval.recorded`），以及任何对不上的锚点移动，都属于无法解释的变更：该次运行被置为 `blocked(reserved_op)`（`submit.reserved-op`），董事会会看到这些外来事件。因此，之后的进程信任的是在已验证窗口内、或在没有席位运行时追加的事件，而批准记录只有连同以这种方式追加的 `approval.recorded` 事件一起才构成权威（[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。
 
 崩溃进程遗留的锁如何恢复属于 M1a 的实现细节。它必须遵守的规则是：不对照锚点重新验证尾部就绝不追加。
 
 ### 哈希链能证明什么
 
 - `keel audit` 在默认检查中验证整条链。一个负对照（negative control）会修改一个事件，并且必须看到 `chain-break`。
-- 每个董事会信封都包含签名时的链头（`ledger_chain_head`，[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。因此，对已签名链头之前任何事件的修改都可以被检测到，即使有人重新计算了其后所有的哈希也一样，因为已签名的链头不再出现在链中。
-- 单靠哈希链不能阻止拥有文件访问权限的写入者在最后一个已签名链头之后追加伪造事件。锚点和摄入时的窗口检查为席位堵住了这条路；认领状态要重新推导并交叉核对，评审结论（verdict）在摄入时捕获，落地时重新执行验收而不是信任记录（[11-verification.zh-CN.md](11-verification.zh-CN.md)）。残余局限（比运行窗口活得更久的进程）见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)。
+- 每条批准记录都包含记录时的链头（`ledger_chain_head`，[02-alignment.zh-CN.md](02-alignment.zh-CN.md)）。因此，对已记录链头之前任何事件的修改，对于只重新计算其后哈希的人而言是可以被检测到的，因为已记录的链头不再出现在链中。这是一项一致性检查：连记录一起改写的写入者不会被检测到，而这样的行为者不在范围之内（[14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)）。
+- 单靠哈希链不能阻止拥有文件访问权限的写入者在最后一个已记录链头之后追加伪造事件。锚点和摄入时的窗口检查为席位堵住了这条路；认领状态要重新推导并交叉核对，评审结论（verdict）在摄入时捕获，落地时重新执行验收而不是信任记录（[11-verification.zh-CN.md](11-verification.zh-CN.md)）。残余局限（比运行窗口活得更久的进程）见 [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)。
 
-在 v1 中，账本仅存在于单台机器上。其他克隆能看到已提交的签名信封和落地投影；多机协作是一项待定决策（[17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md)）。
+在 v1 中，账本仅存在于单台机器上。其他克隆能看到已提交的批准记录和落地投影；多机协作是一项待定决策（[17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md)）。
 
 ## Id 表
 
@@ -201,13 +201,13 @@ flowchart LR
 | `VD` | 评审镜头（lens）结论 | 摄入时捕获的评审结论 |
 | `TR` | 分诊记录 | 规划席位的分诊记录 |
 | `IM` | 影响面（impact）记录 | 预测的或实际的影响面（[07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)） |
-| `AP` | 审批 | 董事会签名的信封 |
+| `AP` | 批准 | 由 `keel approve` 写出的批准记录 |
 | `AM` | 修订案（amendment） | 从 git 推导出的修订案记录 |
 | `OV` | 豁免（override） | 董事会豁免（waiver 也是一种豁免） |
 | `RL` | 裁定（ruling） | 席位或董事会的裁定 |
 | `Q` | 问题 | 一次提问 |
 
-不是 id 的哈希（`contract_hash`、`rev_hash`、`workorder_hash`、`source_tree`、`env_fp`、链哈希）都是完整的小写 sha256 值。签名信封存储为 `.keel/signatures/<blob-sha256>.<kind>.json`。
+不是 id 的哈希（`contract_hash`、`rev_hash`、`workorder_hash`、`source_tree`、`env_fp`、链哈希）都是完整的小写 sha256 值。批准记录存储为 `.keel/approvals/<record-sha256>.<kind>.json`。
 
 ## Steward 提交与提交尾注
 
@@ -217,7 +217,7 @@ flowchart LR
 | --- | --- | --- |
 | 轮次提交 | `keel/<P>/t/<n>`，每个递交轮次 `<P>.T<n>.r<k>` 一个 | 轮次提交尾注 |
 | 治理提交 | 主干，由 `keel approve --doc <path>` 生成 | `Keel-Doc`、`Keel-Approval` |
-| 归档提交 | 落地时位于 `keel/<P>/main`，随后进入主干 | `Keel-Doc`（已归档的 `receipt.md`）、`Keel-Approval`（落地审批；在按策略落地时为已签名的请求） |
+| 归档提交 | 落地时位于 `keel/<P>/main`，随后进入主干 | `Keel-Doc`（已归档的 `receipt.md`）、`Keel-Approval`（落地批准；在按策略落地时为已批准的请求） |
 
 轮次提交尾注：
 
@@ -276,7 +276,7 @@ Not-tested: Concurrent addTag calls on the same note (the store is single-writer
 在范围内，每个提交都必须是上述三种 Steward 提交之一。其他任何提交都是 `untraced-commit`。起点之后的人工提交需通过以下两种方式之一显式接纳：
 
 - 通过 patch 轨道，使该变更获得一个提案、一个轮次和提交尾注；或
-- 通过签名的 `keel approve <commit> --rule override --quote "..."`，它将该提交及理由记录在一条 `OV` 记录中。
+- 通过已批准的 `keel approve <commit> --rule override --note "..."`，它将该提交及理由记录在一条 `OV` 记录中。
 
 对范围内的每个需求，遍历路径如下：
 
@@ -291,14 +291,14 @@ flowchart RL
   evidence["head 处的 EV"] --> tests
   verdict["绑定到 commit + contract_hash 的 VD"] --> round
   element["架构元素 el:..."] -- "realized_in" --> req
-  approval["AP / OV / RL（签名、裁定）"] --> task
+  approval["AP / OV / RL（批准、裁定）"] --> task
 ```
 
 `keel trace <file:line|symbol|commit|R-...|G-...|P-...|el:...>` 从任意节点出发遍历同一张图：
 
 1. blame（`git blame`，jj 后端上为 `jj file annotate`；verify by probe（需通过探测验证））给出提交；
 2. 提交尾注给出轮次、任务、ACC 和需求，进而给出目标；
-3. 账本记录给出证据、评审结论、签名和裁定；
+3. 账本记录给出证据、评审结论、批准和裁定；
 4. 路径提升（path lift）给出架构元素、其所有者、义务和规则（[07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)）。
 
 示意输出（格式在 M1b 中确定）：
@@ -334,9 +334,9 @@ element   el:notes.store  owner storage  rules AR-3M8QD (proven)
 | `realization-mismatch` | 覆盖提交所触及的架构元素与该需求的 `realized_in` 不同 | 追踪检查失败；与架构漂移共用 |
 | `citation-drift` | ADR 的符号引用或锚点不再与代码匹配 | 该决策的接受状态失效，直至重新接受 |
 | `charter-lag` | 带有较旧 `charter_version` 标记的产物 | 框定门禁标记 MAJOR 或 MINOR 滞后 |
-| `unsigned-approval` | 没有有效信封的治理文档或检查点（checkpoint） | 派发或落地拒绝执行 |
+| `missing-approval` | 没有有效批准的治理文档或检查点（checkpoint）：没有记录、没有 `approval.recorded` 事件、主题不匹配、某个被绑定产物的当前哈希与记录不同、有取代它的修订案，或已过期 | 派发或落地拒绝执行；该事项连同所展示的变更一起返回董事会 |
 | `unacknowledged-receipt` | 董事会尚未确认其回执的按策略落地 | 阻塞下一个触及相同架构元素的变更；未映射时则阻塞触及相同路径 glob 的变更 |
-| `chain-break` | 账本链无法验证 | 成为董事会事项；签名链头不在已验证链上的审批均失败 |
+| `chain-break` | 账本链无法验证 | 成为董事会事项；所记录链头不在已验证链上的批准均失败 |
 
 前七个是会导致追踪检查失败的类别。对门禁的后果汇总在 [11-verification.zh-CN.md](11-verification.zh-CN.md) 中；架构漂移类别见 [07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)。
 
@@ -347,7 +347,7 @@ element   el:notes.store  owner storage  rules AR-3M8QD (proven)
 - 将 `spec.delta.yaml` 应用到现行规格，将 `arch.delta.yaml` 应用到架构模型；
 - 将已接受的提案 ADR 晋升到 `.keel/decisions/`；
 - 向 `.keel/arch/series.jsonl` 追加一个序列点（[07-architecture-intelligence.zh-CN.md](07-architecture-intelligence.zh-CN.md)）；
-- 将落地审批信封提交到 `.keel/signatures/` 下；
+- 将落地批准记录提交到 `.keel/approvals/` 下；
 - 将提案文件夹移动到 `.keel/archive/<yyyy>/<P>-<slug>/`，并在其旁写入投影。
 
 ```text
@@ -359,13 +359,13 @@ element   el:notes.store  owner storage  rules AR-3M8QD (proven)
   triage/                TR-<sha12>.json
   reports/               impact, drift and trace reports
   receipt.json           machine-readable receipt
-  receipt.md             the receipt the Board read and signed
+  receipt.md             the receipt the Board read and approved
 ```
 
 投影规则：
 
-- 它们是持久、可共享的历史，但从不被当作可信输入。签名从 `.keel/signatures/` 重新验证，证据重新执行，从不从归档中读回。
-- `receipt.md` 签名后从不修改。已签名的草稿写明集成提交和预期的主干末端；落地后的 sha 写入 `land.completed` 账本事件，从而避免回执需要写明自身所在的提交。
+- 它们是持久、可共享的历史，但从不被当作可信输入。批准从 `.keel/approvals/` 和账本重新核对，证据重新执行，从不从归档中读回。
+- `receipt.md` 在落地批准之后从不修改。已批准的草稿写明集成提交和预期的主干末端；落地后的 sha 写入 `land.completed` 账本事件，从而避免回执需要写明自身所在的提交。
 - 归档提交只触及 `.keel/**`，而源树哈希排除 `.keel/**`（[05-vcs.zh-CN.md](05-vcs.zh-CN.md)），因此写入它不会使在集成提交上获取的证据失效。
 
 投影门禁是落地门禁的 `projection` 检查。在写入归档提交之前，它扫描每个投影文件，拒绝除文档化占位符（带或不带 `/v1` 的 `https://provider.example.invalid`、回环 URL `http://127.0.0.1:<port>`、假密钥 `sk-fake-keel-*`）之外的任何形似 URL 或形似密钥的令牌。一次拒绝会阻塞落地，并指出文件和行号，但从不输出令牌本身。

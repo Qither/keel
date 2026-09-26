@@ -3,8 +3,8 @@
 #
 # Two waves, computed by the Steward from the work orders: wave 1 is T1 (test-first, declared family
 # zhipu), wave 2 is T2 (build, declared family anthropic; after T1). Each wave has width 1 and no route
-# deviates from the signed routing (routing.snapshot.yaml), so this feature needs no plan approval and
-# keeps two Board touches. The plan gate returned PASS after the cross-family verification-gap lens
+# deviates from the approved routing (routing.snapshot.yaml), so this feature needs no plan approval and
+# keeps two Board confirmations. The plan gate returned PASS after the cross-family verification-gap lens
 # (VD-8d0f2b4c6e71) approved the ACC to command table and the test task. Hash values are illustrative.
 proposal: P-7F3K9Q
 kind: standard

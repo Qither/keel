@@ -2,7 +2,7 @@
  * Dispatch requests, run records, canonical run events and outcomes.
  *
  * @packageDocumentation
- * Mirrors schemas/run.schema.json. `keel run` is the deterministic dispatcher: resolve signed routing,
+ * Mirrors schemas/run.schema.json. `keel run` is the deterministic dispatcher: resolve approved routing,
  * compatibility, the exposure rule and conformance status; claim; create the sparse worktree; snapshot
  * refs; compile the brief; spawn headless with per-run config; ingest submit channels; make Steward
  * commits. The route, the exposure profile and the conformance status are frozen into the run record.

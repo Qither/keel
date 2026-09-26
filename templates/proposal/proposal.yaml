@@ -10,15 +10,15 @@ goals:
 charter_version: "{{charter_version}}"
 created_at: "{{created_at}}"
 
-# board-signed: started with `keel new --policy <name>`; the Board signed the verbatim request.
+# board-requested: started with `keel new --policy <name>`; the Board approved the verbatim request.
 # contract-approved: started without a policy; becomes dispatchable at its contract approval.
 origin: "{{origin}}"
 request:
-  # The verbatim request given to `keel new`. On the policy path the Board signs exactly these bytes.
+  # The verbatim request given to `keel new`. On the policy path the Board approves exactly these bytes.
   text: "{{request_text}}"
   # Standing policy cited with --policy, or null.
   policy: null
-  # Id of the signed request envelope (AP-<sha12>) on the policy path, or null.
+  # Id of the request approval (AP-<sha12>) on the policy path, or null.
   approval: null
 
 # Track requested with `keel new --track`, or null. The classifier may raise it; only
