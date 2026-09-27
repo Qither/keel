@@ -22,6 +22,7 @@ keel 自身的设计 ADR（`docs/adr/ADR-0001` … `ADR-0009`）与 keel 为目�
 | 参考项目集与模型列表 | rtk 加入参考项目列表，Kiro 只参考公开文档（R1）；OpenCode 加入模型列表（R3）；git 为主，jj 为可选增强（R4）。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [16-sources-credits.zh-CN.md](16-sources-credits.zh-CN.md) |
 | 刷新纪律 | P4：00-mandate.zh-CN.md 第 4 节中的流程、参考项目登记表 `docs/reference-projects.yaml`，以及每个里程碑退出时的刷新评审。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
 | 设计迭代纪律 | P5：00-mandate.zh-CN.md 第 5 节中的流程、带有 schema 和 `issues` 检查的登记表 `docs/design-issues.yaml`、从 M0 起每个里程碑退出时的设计问题门禁；已知缺陷在修正任何一个之前先作为开放问题登记在那里。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
+| 模型提供方的值，条款 11（DI-01） | 设计问题 DI-01 的选项 1：条款 11 和 P1 行重述为 keel 从不打开保存模型提供方的值或凭据的文件或记录，从不持久化、打印、记录或哈希任何值，而在派生子进程时和直连通道调用时于进程内存中解引用具名环境变量是允许的；模型提供方不变量、KP-13 和 ADR-0006 是其可校验形式。按字面保留条款并删去别名映射与直连通道、由用户自有的启动器、推迟到 M2 这三项被否决。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [10-providers.zh-CN.md](10-providers.zh-CN.md), [ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md) |
 | 核心设计文档 | 所有者声明以 R1–R5、D1–D7、P1–P5 这些 id 逐字记录，其优先顺序高于其他所有文件。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 
 M0 范围规则（D1：只有设计文档和骨架，`scripts/validate.mjs` 是唯一的工具例外）以及常设偏好 P1–P5 在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中陈述，并在 [00-vision.zh-CN.md](00-vision.zh-CN.md) 中映射。
@@ -47,24 +48,6 @@ M0 范围规则（D1：只有设计文档和骨架，`scripts/validate.mjs` 是�
 | 13 | 看板（dashboard）的渲染与打包 | 构建时预渲染为静态 HTML，并在浏览器中水合（hydrate）；库在包构建时打包，绝不作为运行时依赖。 | 仅客户端的单页应用；对 React 的运行时依赖 | [ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md) |
 
 ## 真正开放
-
-### 条款 11 与模型提供方不变量的冲突（DI-01）
-
-所有者声明的条款 11 和 P1 行说 keel 从不读取任何模型提供方的值或凭据文件。[10-providers.zh-CN.md](10-providers.zh-CN.md)
-的精确不变量（I2）、[ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md) 和 KP-13 说 keel 恰好在两个模块中
-于内存内读取环境变量的值，时机是派生子进程时和直连通道调用时。下游文档无论怎样解读都无法让该条款成立，因此
-`docs/design-issues.yaml` 把它登记为 DI-01，类别 `mandate-conflict`。
-
-- 选项：(1) 由所有者用自己的话重述条款 11，使“从不读取模型提供方的值”意为 keel 从不打开保存这些值的文件或记录，
-  而在派生子进程时和直连通道调用时于进程内存中解引用一个具名环境变量是允许的，I2、KP-13 和 ADR-0006 作为其可校验
-  形式；(2) 按字面保留条款 11：任何模块都不解引用模型提供方的环境变量值，子运行时原样继承用户的环境，删去
-  `KEEL_PROFILE_*` 映射和直连通道；(3) 按字面保留条款 11，把所有解引用移入一个由用户拥有、keel 既不提供也不读取的
-  启动器，keel 只传递名称；(4) 推迟到构建环境策略和 lint 的 M2，在此之前按字面解读该条款。
-- 建议：选项 1。按 ADR-0006 和 KP-13 的记录，该条款保护的是端点、密钥和模型名称不进入 keel 的文件、记录、日志和
-  转录。R3 和按别名的路由都要求 keel 把它所存储名称背后的值交给子运行时或直连通道，而字面解读下没有任何模块可以
-  这样做。选项 2 和 3 保留了句子却失去按别名路由和直连通道，且选项 2 仍然通过子进程环境传递值。
-- 决定前的行为：条款 11 按原文执行；不改写任何下游文档。
-- 阻塞：M0 的退出（`mandate-conflict` 阻塞发现它的那个里程碑）。
 
 ### 包名与 CLI 名
 

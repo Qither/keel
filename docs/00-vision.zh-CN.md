@@ -77,7 +77,7 @@ R1 到 R5 是所有者的需求，D1 到 D7 是固定决策，P1 到 P5 是所�
 | D5 | 面向人的文档采用双语 | 英文规范版 `<name>.md`，简体中文镜像 `<name>.zh-CN.md`，标题层级相同，由 `validate --only i18n` 检查；标识符只用英文 | [README](README.zh-CN.md) |
 | D6 | 人类批准是对所显示变更的显式确认，连同主题、产物哈希、批准人和时间一起记录；对已批准内容的任何改动都会使其失效；席位输出不能批准；不存在 SSH、密钥或硬件身份 | `keel approve` 显示变更并接收确认词，写入已提交的批准记录及其账本事件，在确认之后和每道门禁处重新哈希，在运行内部拒绝执行；批准人是声明的、时钟是本地的，并如实说明 | [02](02-alignment.zh-CN.md)、[14](14-trust-security.zh-CN.md)、[ADR-0005](adr/ADR-0005-explicit-confirmation-approvals.zh-CN.md) |
 | D7 | MIT 许可证，“Copyright (c) 2026 Qither” | `LICENSE`；包 `@qither/keel` | [17](17-open-decisions.zh-CN.md) |
-| P1 | 模型提供方的端点、密钥和模型名称属于用户 | 仅含名称的 `routing.yaml`；值只在恰好两个模块中于内存里解引用；暴露规则没有董事会确认式的绕行路径；doctor 只打印 SET/UNSET 和 PRESENT/ABSENT；带伪密钥的回环伪提供方；协议 `anthropic-messages`、`openai-chat`、`openai-responses`、`google` | [10](10-providers.zh-CN.md)、[14](14-trust-security.zh-CN.md)、[ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md) |
+| P1 | 模型提供方的端点、密钥和模型名称属于用户；keel 只存储环境变量名，从不打开保存模型提供方的值或凭据的文件或记录，从不持久化、打印、记录或哈希任何值，只在派生子进程时和直连通道调用时于进程内存中解引用具名的环境变量 | 仅含名称的 `routing.yaml`；值只在恰好两个模块中于内存里解引用；暴露规则没有董事会确认式的绕行路径；doctor 只打印 SET/UNSET 和 PRESENT/ABSENT；带伪密钥的回环伪提供方；协议 `anthropic-messages`、`openai-chat`、`openai-responses`、`google` | [10](10-providers.zh-CN.md)、[14](14-trust-security.zh-CN.md)、[ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md) |
 | P2 | keel 交付的每个前端展示都用 TanStack 构建；这些库是无头（headless）的，因此标记仍是原生 HTML 元素加手写 CSS；不用 UI 套件、CDN 或 Web 字体 | 在 React 适配器上使用 TanStack，预渲染为不开 JavaScript 也可阅读的静态 HTML，然后水合（hydrate）；库在包构建时打包，绝不作为运行时依赖；单个自包含的只读文件，无外部请求 | [08](08-dashboard.zh-CN.md)、[ADR-0008](adr/ADR-0008-read-only-dashboard.zh-CN.md)、[ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md) |
 | P3 | 借鉴思想，而非依赖 | 不依赖 OpenSpec CLI；codegraph、SCIP 和 jj 都是可选适配器；不从 ELv2 或非开源来源复制文本或代码 | [16](16-sources-credits.zh-CN.md) |
 | P4 | 刷新纪律：每次重构评审时，把参考项目拉取到最新版本，分析其新增设计，并把 keel 当作初次设计一样对照它们重新检查和纠偏；在 GitHub 上搜索新的、设计良好的工作流，提示所有者把候选项目拉取到本地，并融合所采纳的思想 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 第 4 节中的流程；参考项目登记表 `docs/reference-projects.yaml`，由 `examples` 检查按 `schemas/reference-registry.schema.json` 校验（映射见 `schemas/examples.map.json`），并由 `references` 检查与纲领和致谢交叉核对；从 M1a 起每个里程碑的退出标准都包含一次刷新评审 | [00-mandate](00-mandate.zh-CN.md)、[15](15-roadmap.zh-CN.md)、[16](16-sources-credits.zh-CN.md) |
@@ -367,6 +367,9 @@ keel 不依赖 OpenSpec CLI，也不复制任何 ELv2 或非开源的代码或�
 | exposure rule | 暴露规则 | 只有当工具环境暴露为 scrubbed、且工具文件暴露为 none 或 blocked 时，才会派发可执行代码的席位 | [10](10-providers.zh-CN.md) |
 | exposure profile | 暴露面画像 | 按运行时和操作系统给出：`tool_env_exposure`、`tool_file_exposure`、`control_plane_exposure`、保留操作的阻止情况；由回执携带 | [14](14-trust-security.zh-CN.md) |
 | doctor | 诊断 | `keel doctor`：能力探测与报告；把变量名打印为 SET 或 UNSET，把路径打印为 PRESENT 或 ABSENT | [12](12-cli-api-mcp.zh-CN.md) |
+| provider value | 模型提供方的值 | 用户在自己的环境中设置的端点 URL、API 密钥或令牌、具体模型名称；keel 只在派生子进程时和直连通道调用时，以具名环境变量的值的形式在进程内存中处理它，从不持久化、打印、记录或哈希 | [10](10-providers.zh-CN.md) |
+| runtime credential | 运行时凭据 | 位于运行时众所周知的凭据路径下的文件，keel 在任何模式下都不打开它；其存在只通过 stat 报告，席位能否读取它构成该路由的文件暴露面 | [10](10-providers.zh-CN.md) |
+| direct-lane call time | 直连通道调用时 | 直连通道（由派发器像任何运行时一样启动的无工具子进程）内部的时点，直连客户端在此从 env-policy 解开不透明句柄以发送一次模型提供方请求 | [10](10-providers.zh-CN.md) |
 
 ### 验证
 

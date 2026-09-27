@@ -61,8 +61,8 @@ export type ProfileSlot = "base_url" | "api_key" | "model";
 
 /**
  * One mapping from the routed profile's variable to the runtime's native variable. Both are NAMES; the
- * value is read in memory by env-policy at spawn and never persisted, printed, logged, hashed or put in
- * argv.
+ * value is dereferenced in process memory by env-policy at spawn and never persisted, printed, logged,
+ * hashed or put in argv.
  */
 export interface ProfileEnvMapping {
   slot: ProfileSlot;

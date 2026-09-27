@@ -28,6 +28,7 @@ other file.
 | Reference set and model list | rtk joins the reference list, Kiro is public documentation only (R1); OpenCode joins the model list (R3); git primary, jj an optional enhancement (R4). | [00-mandate.md](00-mandate.md), [16-sources-credits.md](16-sources-credits.md) |
 | Refresh discipline | P4: the procedure in 00-mandate.md section 4, the registry `docs/reference-projects.yaml`, a refresh review at every milestone exit. | [00-mandate.md](00-mandate.md), [15-roadmap.md](15-roadmap.md) |
 | Design iteration discipline | P5: the procedure in 00-mandate.md section 5, the register `docs/design-issues.yaml` with its schema and the `issues` check, the design-issue gate at every milestone exit from M0; the known defects are filed there as open issues before any of them is fixed. | [00-mandate.md](00-mandate.md), [15-roadmap.md](15-roadmap.md) |
+| Provider values, clause 11 (DI-01) | Option 1 of the design issue DI-01: clause 11 and the P1 row are restated so that keel never opens a file or record that holds a provider value or a credential and never persists, prints, logs or hashes a value, while dereferencing a named environment variable in process memory at spawn and at direct-lane call time is permitted; the providers invariant, KP-13 and ADR-0006 are the verifiable form. Keeping the literal clause and dropping the profile mapping and the direct lane, a user-owned launcher, and a deferral to M2 were declined. | [00-mandate.md](00-mandate.md), [10-providers.md](10-providers.md), [ADR-0006](adr/ADR-0006-provider-values-by-reference.md) |
 | Core design document | The owner's statement is recorded verbatim with the ids R1–R5, D1–D7, P1–P5 and outranks every other file. | [00-mandate.md](00-mandate.md) |
 
 The M0 scope rule (D1: design documents and skeleton only, `scripts/validate.mjs` as the single tooling
@@ -56,30 +57,6 @@ exit criteria ([15-roadmap.md](15-roadmap.md)).
 | 13 | Dashboard rendering and packaging | Pre-render to static HTML at build and hydrate in the browser; libraries bundled at package build, never runtime dependencies. | A client-only single-page application; a runtime dependency on React | [ADR-0009](adr/ADR-0009-tanstack-frontend.md) |
 
 ## Truly open
-
-### Clause 11 against the providers invariant (DI-01)
-
-Clause 11 of the owner's statement and the P1 row say keel never reads a provider value or a credential
-file. The exact invariant of [10-providers.md](10-providers.md) (I2),
-[ADR-0006](adr/ADR-0006-provider-values-by-reference.md) and KP-13 say keel reads env values in memory in
-exactly two modules, at spawn and at direct-lane call time. No reading of the lower documents keeps the
-clause true, so `docs/design-issues.yaml` files it as DI-01, class `mandate-conflict`.
-
-- Options: (1) restate clause 11 in the owner's own words so that "never reads a provider value" means
-  keel never opens a file or record that holds one, while dereferencing a named environment variable in
-  process memory at spawn and at direct-lane call time is permitted, with I2, KP-13 and ADR-0006 as the
-  verifiable form; (2) keep clause 11 literally: no module dereferences a provider env value, a child
-  runtime inherits the user's environment untouched, and the `KEEL_PROFILE_*` mapping and the direct lane
-  are dropped; (3) keep clause 11 literally and move every dereference into a launcher the user owns and
-  keel neither ships nor reads, keel passing names only; (4) defer to M2, the milestone that builds the
-  env policy and the lint, with the clause read literally until then.
-- Recommendation: option 1. What the clause protects, as ADR-0006 and KP-13 record it, is that endpoints,
-  keys and model names stay outside keel's files, records, logs and transcripts. R3 and per-alias routing
-  need keel to hand a child runtime, or the direct lane, the value behind a name it stores, which no module
-  may do under the literal reading. Options 2 and 3 keep the sentence but lose per-alias routing and the
-  direct lane, and option 2 still passes values through the child environment.
-- Behaviour until decided: clause 11 as written; no lower document is reworded.
-- Blocks: the M0 exit (a `mandate-conflict` blocks the milestone in which it was found).
 
 ### Package and CLI name
 

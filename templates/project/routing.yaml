@@ -7,7 +7,8 @@
 #   KEEL_PROFILE_ANTHROPIC_MAIN_BASE_URL = https://provider.example.invalid
 #   (anthropic-messages: the host root; openai-chat and openai-responses: with /v1, see docs/10 section 5)
 #   KEEL_PROFILE_ANTHROPIC_MAIN_API_KEY  = <set-in-your-own-environment>
-# keel reads these values only in memory at spawn time, and never prints, logs, hashes or persists them.
+# keel dereferences these values only in process memory, at spawn and at direct-lane call time, and never
+# prints, logs, hashes or persists them.
 # `keel doctor --section providers` shows each name as SET or UNSET.
 #
 # The aliases below are placeholders: rename, add or remove them to match the providers you use.

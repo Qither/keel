@@ -2,7 +2,7 @@
 
 > 英文原文（规范版本）：[10-providers.md](10-providers.md)。本文是其简体中文镜像，两者不一致时以英文版为准。
 
-本文档是以下内容的归属文档（home）：keel 如何在从不持有任何模型提供方（provider）值的前提下，把席位（seat）路由到模型提供方——确切的不变量（invariant）、`.keel/routing.yaml` 与声明的模型家族（declared family）、内存中注入、暴露规则、协议类型、`keel doctor --section providers` 的输出以及回环假服务。该决策及被否决的备选方案记录在 [adr/ADR-0006-provider-values-by-reference.zh-CN.md](adr/ADR-0006-provider-values-by-reference.zh-CN.md) 中。
+本文档是以下内容的归属文档（home）：keel 如何只凭名称把席位（seat）路由到模型提供方，而值只在派生子进程时和直连通道调用时存在于进程内存中——确切的不变量（invariant）、`.keel/routing.yaml` 与声明的模型家族（declared family）、内存中注入、暴露规则、协议类型、`keel doctor --section providers` 的输出以及回环假服务。该决策及被否决的备选方案记录在 [adr/ADR-0006-provider-values-by-reference.zh-CN.md](adr/ADR-0006-provider-values-by-reference.zh-CN.md) 中。
 
 原则：所有值都归用户所有。端点、API 密钥和模型名称由用户在自己的环境中设置。keel 拥有的是名称、schema、对其自身已提交文件的校验、doctor 输出以及占位示例。
 
@@ -113,7 +113,7 @@ policy:
 
 ```mermaid
 flowchart LR
-  P[父进程环境<br/>值在别处从不读取] --> A[env-policy.ts]
+  P[父进程环境<br/>值只在此处和直连通道中解引用] --> A[env-policy.ts]
   S[已批准的路由：<br/>配置档名称] --> A
   D[描述符映射：<br/>原生名称] --> A
   A --> C[子进程环境允许列表]

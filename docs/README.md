@@ -28,7 +28,8 @@ designed interface, specified in [12-cli-api-mcp.md](12-cli-api-mcp.md).
    to judge.
 8. [14-trust-security.md](14-trust-security.md): what keel prevents, what it only detects, and what an
    approval record proves.
-9. [10-providers.md](10-providers.md): how to wire your own model endpoints without keel ever seeing a value.
+9. [10-providers.md](10-providers.md): how to wire your own model endpoints with names only, the values
+   dereferenced in process memory at spawn and never persisted.
 
 ### Implementer of keel
 

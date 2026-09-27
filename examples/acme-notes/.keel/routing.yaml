@@ -4,7 +4,8 @@
 #
 # NAMES ONLY. Every value below is a protocol id, a declared family, an auth mode or an environment
 # variable NAME. The acme-notes owner sets the endpoints, keys and model names in their own environment
-# (examples/providers.env.example lists the names). keel reads the values only in memory at spawn.
+# (examples/providers.env.example lists the names). keel dereferences the values only in process memory,
+# at spawn and at direct-lane call time.
 #
 # Declared families are the Board's declaration; receipts and the dashboard show them as "declared".
 

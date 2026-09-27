@@ -91,8 +91,9 @@ The Board alone does the following, all through `keel approve`:
 - **Sets every provider endpoint, key and model name** in its own environment, outside keel.
 
 The Board may not approve through an agent or a relayed message, approve an artifact whose current hash
-differs from the one presented (keel refuses to record such a confirmation), or expose provider values to
-keel or to any assistant. No seat reviews the Board; the auditor module reports unapproved, invalidated,
+differs from the one presented (keel refuses to record such a confirmation), or hand a provider value to
+any assistant, or to keel through any channel other than a named environment variable. No seat reviews the
+Board; the auditor module reports unapproved, invalidated,
 expired and stale items and unacknowledged receipts.
 
 ### Checkpoint stages
@@ -297,7 +298,8 @@ Every artifact and field has exactly one writer. Everything else reads.
 | Ledger, evidence, briefs, run records, claims, commits, trailers, `refs/keel/*` | Steward |
 | Archive projections `.keel/archive/**` | Steward (archive commit) |
 | keel-owned generated surfaces (managed `AGENTS.md` block, skill copies, keel agent files, `.keel/generated.lock.json`) | `keel sync` |
-| Shared runtime settings and provider values | The user only; keel never reads or writes them |
+| Shared runtime settings and credential files | The user only; keel never opens or writes them |
+| Provider values | The user only, through named environment variables; keel dereferences a value in process memory at spawn and at direct-lane call time and never persists, prints, logs or hashes it |
 
 The track, claim leases and heartbeats are ledger events, not file fields. `receipt.md` is never edited after
 the land approval.

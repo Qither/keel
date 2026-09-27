@@ -1,7 +1,7 @@
 # 10 Providers: names-only model provider configuration
 
-This document is the home of how keel routes seats to model providers without ever holding a provider
-value: the exact invariant, `.keel/routing.yaml` and declared families, in-memory injection, the exposure
+This document is the home of how keel routes seats to model providers with names only, a provider value
+existing in keel's process memory only at spawn and at direct-lane call time: the exact invariant, `.keel/routing.yaml` and declared families, in-memory injection, the exposure
 rule, the protocol types, the `keel doctor --section providers` output and the loopback fakes. The
 decision and its rejected alternatives are recorded in
 [adr/ADR-0006-provider-values-by-reference.md](adr/ADR-0006-provider-values-by-reference.md).
@@ -145,7 +145,7 @@ the parent environment minus some names.
 
 ```mermaid
 flowchart LR
-  P[parent env<br/>values never read elsewhere] --> A[env-policy.ts]
+  P[parent env<br/>values dereferenced only here and in the direct lane] --> A[env-policy.ts]
   S[approved routing:<br/>profile names] --> A
   D[descriptor mapping:<br/>native names] --> A
   A --> C[child env allowlist]

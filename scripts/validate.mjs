@@ -32,7 +32,7 @@ const DECISIONS_DOC = "docs/17-open-decisions.md";
 const GLOSSARY_DOC = "docs/00-vision.md";
 
 // ---------- repository files ----------
-const SKIP_DIRS = new Set([".git", "node_modules", "dist", "coverage", ".codegraph"]);
+const SKIP_DIRS = new Set([".git", ".claude", "node_modules", "dist", "coverage", ".codegraph"]);
 const IGNORED_FILE = /(^|\/)\.keel\/local\.yaml$/; // gitignored personal layer
 // P1: basenames of files that may hold provider values or credentials. Never opened.
 const NEVER_OPEN = [/^\.env(\..*)?$/, /^gateway\.json$/, /^\.credentials\.json$/, /^auth\.json$/, /^\.npmrc$/, /^\.netrc$/];

@@ -372,7 +372,7 @@ element   el:notes.store  owner storage  rules AR-3M8QD (proven)
 
 ## 脱敏与字段白名单
 
-keel 无法对它从未读取过的模型提供方（provider）值进行脱敏，因此设计从一开始就让这些值不进入记录（[10-providers.zh-CN.md](10-providers.zh-CN.md)）：
+模型提供方（provider）的值只在派生子进程时和直连通道调用时存在于 keel 的进程内存中，从不写出，因此设计从一开始就让这些值不进入记录，而不是事后脱敏（[10-providers.zh-CN.md](10-providers.zh-CN.md)）：
 
 - 记录只保存环境变量名称、配置档别名和 `${ENV:NAME}` 占位符。
 - `argv.redacted.json` 保留 `${ENV:NAME}` 占位符。没有任何路由会把模型名称、URL 或密钥放入 argv。

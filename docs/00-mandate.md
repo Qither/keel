@@ -41,8 +41,10 @@ design meets each requirement, and the home of every mechanism is in the single-
    mechanism, not by persuasion.
 9. M0 delivers a design document set and a repository skeleton only.
 10. Licence: MIT, "Copyright (c) 2026 Qither".
-11. Provider endpoints, keys and model names belong to the user; keel never reads a provider value or a
-    credential file.
+11. Provider endpoints, keys and model names belong to the user. keel never opens a file or record that
+    holds a provider value or a credential, and never persists, prints, logs or hashes a value; it
+    dereferences a named environment variable in process memory only at spawn, to build a child
+    runtime's environment, and at direct-lane call time.
 12. Borrow ideas, never dependencies or text.
 
 Standing instruction: at every refactor review, pull the latest version of each framework named above to a
@@ -77,7 +79,7 @@ each row is in [00-vision.md](00-vision.md).
 | D5 | Decision | Human-facing documents are bilingual: English canonical `<name>.md` with a Simplified Chinese mirror `<name>.zh-CN.md`; identifiers, file names, schemas, YAML, templates, skills and prompts are English only. | Clause 5 |
 | D6 | Decision | Human approval is explicit confirmation. At every node that needs a human decision, keel shows the specific subject and its change, and the user approves it explicitly after viewing it. The approval record binds the approval subject, the content hash of every approved artifact, the approver and the approval time; any change to approved content invalidates the earlier approval. AI seat output cannot produce a user approval. The mechanism depends on no SSH, key or hardware identity verification. | Clause 6 |
 | D7 | Decision | MIT licence, "Copyright (c) 2026 Qither". | Clause 10 |
-| P1 | Standing preference | Provider endpoints, keys and model names belong to the user; keel stores environment variable names only and never reads a provider value or credential file. | Clause 11 |
+| P1 | Standing preference | Provider endpoints, keys and model names belong to the user; keel stores environment variable names only, never opens a file or record that holds a provider value or a credential, never persists, prints, logs or hashes a value, and dereferences a named environment variable in process memory only at spawn and at direct-lane call time. | Clause 11 |
 | P2 | Standing preference | Every frontend display keel ships is built with TanStack. The libraries are headless, so the markup stays native HTML elements with hand-written CSS; no UI kit, CDN or web font. | Clause 7 |
 | P3 | Standing preference | Borrow ideas, never dependencies or text. | Clause 12 |
 | P4 | Standing preference | Refresh discipline: at every refactor review the reference projects are pulled to their latest version, their additions are analysed, and keel is re-checked and corrected against them as a first-time design; GitHub is searched for new, well-designed workflows; the owner is prompted to pull candidates locally; adopted ideas are merged. Section 4 is the procedure. | Standing instruction |
@@ -362,6 +364,7 @@ reason. When a mandate conflict is present it is listed first and on its own.
   negative controls from M1a.
 - An iteration is not a refresh review: it pulls no reference and adopts no idea. When a defect shows that
   a reference does something better, the candidate goes into the scouting record of section 4.
-- P1 and D2 hold: no provider value is read to reproduce an issue, and the D2 term list is not extended.
+- P1 and D2 hold: no file or record that holds a provider value or a credential is opened to reproduce an
+  issue, and the D2 term list is not extended.
 - The light mode never skips the walk, and the walk is a register entry, never a commit-message note.
 

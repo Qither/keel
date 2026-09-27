@@ -484,8 +484,9 @@ every projected file and refuses URL-shaped or key-shaped tokens other than the 
 
 ## Redaction and field whitelist
 
-keel cannot redact a provider value it never reads, so the design keeps values out of records in the first
-place ([10-providers.md](10-providers.md)):
+A provider value exists in keel only in process memory, at spawn and at direct-lane call time, and is never
+written, so the design keeps values out of records in the first place rather than redacting them
+([10-providers.md](10-providers.md)):
 
 - Records hold env var NAMES, profile aliases and `${ENV:NAME}` placeholders only.
 - `argv.redacted.json` keeps `${ENV:NAME}` placeholders. No route puts a model name, URL or key in argv.

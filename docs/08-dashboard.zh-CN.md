@@ -80,7 +80,7 @@ flowchart LR
 - `keel dashboard build [--out <file>]` 写出一个自包含文件，默认为 `<git-common-dir>/keel/cache/dashboard/index.html`。CSS 和客户端打包产物（在软件包构建时编译的 TanStack 与 React 代码）都内联。嵌入的数据是 `DashboardModel`，包括用于搜索的符号与架构元素列表，位于一个 `<script type="application/json">` 块中；它作为 `initialData` 填充页面的 Query 缓存。
 - serve 模式下，同一个 Query 缓存由 `/api/model` 填充，并在收到 server-sent events 时失效，因此从磁盘构建的页面和在回环地址上提供的页面通过同一份代码渲染同一个模型。
 - 页面头部带有新鲜度标记：head 提交、账本链头、索引提交和 `computed_at`。该标记只来自模型，从不来自构建时间戳。
-- 模型只保存名称：配置档别名、带 SET 或 UNSET 状态的环境变量名、声明的模型家族（declared family）。它从不保存模型提供方（provider）的值，因为 keel 从不读取这些值（[10-providers.zh-CN.md](10-providers.zh-CN.md)）。
+- 模型只保存名称：配置档别名、带 SET 或 UNSET 状态的环境变量名、声明的模型家族（declared family）。它从不保存模型提供方（provider）的值，因为构建它所用的记录都不含值：keel 从不持久化任何值（[10-providers.zh-CN.md](10-providers.zh-CN.md)）。
 - M5 的黄金测试要求其状态和分母与 `check --json` 和 `trace --json` 的黄金输出相同。
 
 ## 八个视图

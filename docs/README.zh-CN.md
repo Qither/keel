@@ -18,7 +18,7 @@
 6. [03-lifecycle.zh-CN.md](03-lifecycle.zh-CN.md)：轨道（track）、阶段和状态机。
 7. [11-verification.zh-CN.md](11-verification.zh-CN.md) 第 2、5、6 节：证据与 `not_run`、声明的独立性与一致性测评状态，以及发现项的裁决权，这正是落地检查点要你判断的内容。
 8. [14-trust-security.zh-CN.md](14-trust-security.zh-CN.md)：keel 能阻止什么、只能检测什么，以及一条批准记录能证明什么。
-9. [10-providers.zh-CN.md](10-providers.zh-CN.md)：如何接入你自己的模型端点，而 keel 永远看不到任何值。
+9. [10-providers.zh-CN.md](10-providers.zh-CN.md)：如何只用名称接入你自己的模型端点，值只在派生子进程时于进程内存中解引用，从不持久化。
 
 ### keel 的实现者
 

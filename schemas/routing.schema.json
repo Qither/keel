@@ -51,7 +51,7 @@
       "additionalProperties": false
     },
     "envNames": {
-      "description": "Environment variable NAMES. keel reads the values only in memory, at spawn, and never persists, prints, logs or hashes them.",
+      "description": "Environment variable NAMES. keel dereferences the values only in process memory, at spawn and at direct-lane call time, never opens a file or record that holds one, and never persists, prints, logs or hashes them.",
       "type": "object",
       "properties": {
         "base_url": {

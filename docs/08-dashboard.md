@@ -118,7 +118,8 @@ flowchart LR
 - The page header carries the freshness stamp: head commit, ledger chain head, index commit and
   `computed_at`. The stamp comes from the model alone, never from a build timestamp.
 - The model holds names only: profile aliases, env var names with SET or UNSET, declared families. It never
-  holds a provider value, because keel never reads one ([10-providers.md](10-providers.md)).
+  holds a provider value, because no record it is built from holds one: keel never persists a value
+  ([10-providers.md](10-providers.md)).
 - The M5 golden tests require the same states and denominators as the `check --json` and `trace --json`
   golden outputs.
 
