@@ -69,13 +69,11 @@ if (found.codex) {
       "--base-args", "exec", "--base-args=--json", "--base-args=--skip-git-repo-check",
       "--prompt-via", "stdin",
       "--model-args", "-m", "--model-args", "{model}",
-      "--version-args=--version",
-      ...(js ? [] : []),
+      ...(js ? ["--version-args", js] : []), "--version-args=--version",
       "--capability", "edit-files,json-output",
       "--identity-ref", "codex:login", "--channel", "cli-login",
       "--output-format", "json-lines", "--session-field", "thread_id",
     ],
-    versionPrefix: js ? [js] : [],
   });
 }
 if (found.opencode) {
@@ -117,16 +115,16 @@ const ctx = makeContext({
 
 try {
   for (const p of profiles) {
-    const reg = ctx.keel(["executor", "register", "--alias", p.alias, "--kind", "agent-cli", ...p.args, ...(p.versionPrefix?.length ? p.versionPrefix.flatMap((v) => ["--version-args", v]) : [])]);
+    const reg = ctx.keel(["executor", "register", "--alias", p.alias, "--kind", "agent-cli", ...p.args]);
     if (reg.code !== 0) {
       transcript.probes[p.alias] = { registered: false, error: reg.stdout || reg.stderr };
       continue;
     }
-    if (realInvocations + 2 > MAX_REAL_INVOCATIONS) {
+    if (realInvocations + 1 > MAX_REAL_INVOCATIONS) {
       transcript.probes[p.alias] = { registered: true, probed: false, reason: "invocation bound reached" };
       continue;
     }
-    realInvocations += 2; // version command + no-op prompt
+    realInvocations += 1; // the no-op prompt; the local version command invokes no model
     const probe = ctx.keel(["executor", "probe", p.alias, "--timeout-seconds", "120"]);
     transcript.probes[p.alias] = { registered: true, probed: probe.code === 0, observation: probe.json };
     process.stdout.write(`${p.alias}: ${probe.code === 0 ? `identity_ok=${probe.json.identity_ok} version=${probe.json.version} session_seen=${probe.json.session_seen} cost_seen=${probe.json.cost_seen} redactions=${probe.json.redactions}` : "probe failed: " + (probe.json?.error ?? probe.stderr)}\n`);
