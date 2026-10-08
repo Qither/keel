@@ -67,7 +67,7 @@ keel/
   .github/workflows/ci.yml          windows-latest and ubuntu-latest, Node 22.13 and 24
   scripts/validate.mjs              the declared D1 tooling exception
   docs/                             design documents, each with a .zh-CN.md mirror; docs/adr/
-  docs/reference-projects.yaml      reference registry for the refresh discipline (P4)
+  docs/reference-projects.yaml      product-review registry for the refresh discipline (P4)
   docs/design-issues.yaml           design-issue register for the design iteration discipline (P5)
   schemas/                          JSON Schema 2020-12 files and examples.map.json
   src/                              type-only TypeScript
@@ -112,7 +112,7 @@ keel/
 | --- | --- |
 | `docs/README.md`, `docs/README.zh-CN.md` | 阅读顺序、文档索引、单一归属表 |
 | `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | 所有者声明、约束性编号、优先顺序、刷新纪律、设计迭代纪律 |
-| `docs/reference-projects.yaml` | 参考项目登记表与搜寻记录（P4）；schema `reference-registry` |
+| `docs/reference-projects.yaml` | 产品审阅登记表与搜寻记录（P4）；schema `reference-registry` |
 | `docs/design-issues.yaml` | 设计问题登记表：问题、顺序图、走查矩阵与历史（P5）；schema `design-issues` |
 | `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | 定位、设计如何满足纲领、原则、术语表、端到端示例 |
 | `docs/00a-owner-guide.md`, `docs/00a-owner-guide.zh-CN.md` | 所有者的单页指南 |
@@ -412,7 +412,7 @@ node scripts/validate.mjs --only schemas,examples,strict,i18n,audit,manifest,ref
 | `i18n` | `docs/` 下的每个 `.md`、根目录 `README.md`、`runtimes/README.md` 以及 `test/README.md` 都有一个标题层级序列完全相同的 `.zh-CN.md` 镜像；没有孤立的镜像 | 翻译质量；其他 Markdown（模板、技能、智能体指南） |
 | `audit` | D2 术语列表（在路径和内容中）、P1 密钥形态标记、真实的模型提供方 API 主机、`docs/**`、`README*.md` 和 `AGENTS.md` 之外的非占位 URL 主机、禁止的凭据文件名；D1：`package.json` 中没有 `bin` 和 `dependencies`，且每个 `src/` 文件都只含纯类型语句 | 含义：一个错误但只使用了允许词汇的设计也会通过 |
 | `manifest` | 第 3 节标记表格中的每个路径都存在，并且除 `package-lock.json` 和 `*.zh-CN.md` 之外的每个仓库文件都被覆盖 | “用途”文本是否准确 |
-| `references` | 解析 `docs/reference-projects.yaml`；每个 `named_by_owner` 为 true 的项目都在 `docs/00-mandate.md` 和 `docs/16-sources-credits.md` 中被点名；`local_clone` 为 null 或仓库之外的相对路径，且从不被打开 | 评审是否真的发生过；上游状态 |
+| `references` | 解析 `docs/reference-projects.yaml`；每个 `named_by_owner` 为 true 的项目都在 `docs/00-mandate.md` 和 `docs/16-sources-credits.md` 中被点名；`local_clone` 是可为 null 的仓库外非权威位置提示；只检查形状，从不打开，也不用于决定审阅覆盖 | 评审是否真的发生过；上游状态 |
 | `issues` | 解析 `docs/design-issues.yaml`；编号连续；每个锚点都解析到存在的文件以及标题（Markdown）或指针（JSON、YAML）；锚点落在纲领第 1 或第 2 节的记录其类别强制为 `mandate-conflict`，该类问题必须在 `docs/17-open-decisions.md` 中被点名，且从不按建议决定；只有所有者能推迟；`exit_review` 设置期间，每个开放问题都已归类，且没有问题阻塞该里程碑或更早的里程碑；顺序图中没有环，也没有产物被其所在机器无法到达其存放位置的步骤所需要，除非该条目标记了一个开放的问题，且没有标记指向已关闭的问题；`docs/00-vision.md` 的术语表每个术语只有一行，包括已关闭问题保留和改名的术语；走查历史只追加且其格都能解析 | 走查是否彻底、陈述是否为真；行为（自 M1a 起由负对照证明） |
 
 `npm run typecheck`（`tsc --noEmit -p tsconfig.json`）覆盖 TypeScript：strict 模式、NodeNext 模块解析、`verbatimModuleSyntax` 和 `isolatedModules`。它与 `audit` 检查一起强制 `src/` 只包含 `import type`、`export type`、类型别名、接口、`export {}` 和注释。

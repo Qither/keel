@@ -1,15 +1,12 @@
-# docs/reference-projects.yaml: the canonical registry of keel's reference projects for the refresh
-# discipline (P4, docs/00-mandate.md section 4). Schema: schemas/reference-registry.schema.json.
-#
-# The construct map in docs/16-sources-credits.md says what keel took from each project; this file says
-# what was examined and when. Local clones live next to the keel checkout (local_clone is relative to the
-# repository root); keel never commits them and scripts/validate.mjs never opens them. named_by_owner marks
-# the projects in the owner's statement (clauses 1, 2 and 7); the others entered through keel's own
-# research. licence_class: oss | source-available | proprietary | unverified (treated as proprietary until the
-# licence file is read and the class recorded, at a refresh review or when an npm package is first added to
-# package.json). outcome: adopted | candidates | none | declined. A review entry
-# records the clone HEAD that was read, never a claim about upstream, and the branch when it is not the
-# upstream default.
+# docs/reference-projects.yaml: Keel's canonical product-review and scouting record for P4.
+# Schema: schemas/reference-registry.schema.json. Stable IDs and prior reviews are historical evidence.
+# Lab alone owns shared clone maintenance and current source/licence observations. local_clone remains
+# a required nullable schema-v1 field: an optional, non-authoritative location hint, never an update
+# instruction, review-coverage condition or dependency. scripts/validate.mjs never opens these paths.
+# Public upstream material at a pinned revision is sufficient without Lab access. Licence fields and
+# review HEADs/dates describe what was assessed, not latest upstream state. New review notes identify
+# the exact revision and licence evidence/date; preserve historical values. Source IDs do not rename
+# with clone directories. The construct map in docs/16-sources-credits.md records what Keel adopted.
 version: 1
 
 projects:
@@ -19,7 +16,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../OpenSpec
+    local_clone: ../keel-lab/references/OpenSpec
     role: Idea source for delta specs, compiled instruction envelopes and one-JSON agent contracts; never a dependency (P3)
     reviewed:
       - date: 2026-09-25
@@ -35,7 +32,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../codegraph
+    local_clone: ../keel-lab/references/codegraph
     role: Idea source for edge provenance, impact, freshness and loopback checks; optional IndexProvider backend, not vendored
     reviewed:
       - date: 2026-09-25
@@ -51,7 +48,7 @@ projects:
     licence: Elastic License 2.0
     licence_class: source-available
     named_by_owner: true
-    local_clone: ../edikt
+    local_clone: ../keel-lab/references/edikt
     role: Ideas only (deterministic core, obligations, journaled hooks, expiring overrides); shape audit in docs/16-sources-credits.md
     reviewed:
       - date: 2026-09-25
@@ -67,7 +64,7 @@ projects:
     licence: Elastic License 2.0
     licence_class: source-available
     named_by_owner: true
-    local_clone: ../keel
+    local_clone: ../keel-lab/references/keel
     role: One idea (post-compaction re-injection) and a counter-example (Claude-only enforcement); an unrelated project that shares the name
     reviewed:
       - date: 2026-09-25
@@ -83,7 +80,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../oh-my-claudecode
+    local_clone: ../keel-lab/references/oh-my-claudecode
     role: Idea source for amendment ledgers, decision trailers, receipts with risk registers, claim tokens, verdict files and prompt digests
     reviewed:
       - date: 2026-09-25
@@ -99,7 +96,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../oh-my-codex
+    local_clone: ../keel-lab/references/oh-my-codex
     role: Idea source for ACK readback, typed non-goals and boundaries, the hook capability matrix, the capabilities lockfile and dual review lanes
     reviewed:
       - date: 2026-09-25
@@ -115,7 +112,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../old-coder
+    local_clone: ../keel-lab/references/old-coder
     role: Idea source for quotable consent, evidence bound to source state, the fail-closed gauntlet, the blind verifier and honest "layers not run"
     reviewed:
       - date: 2026-09-25
@@ -131,7 +128,7 @@ projects:
     licence: Apache-2.0
     licence_class: oss
     named_by_owner: true
-    local_clone: ../rtk
+    local_clone: ../keel-lab/references/rtk
     role: Added to the reference list by the owner's statement of 2026-09-25; a command-output filter for coding agents, reviewed for ideas on tool-output budgets, honest measurement and per-agent hook installation
     reviewed:
       - date: 2026-09-25
@@ -148,7 +145,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../OpenHands
+    local_clone: ../keel-lab/references/OpenHands
     role: Idea source for the event-sourced run log, scripted-model tests, the HUMAN/AGENT receipt split and ACP as a later driver
     reviewed:
       - date: 2026-09-25
@@ -164,7 +161,7 @@ projects:
     licence: MIT (with a trademark notice for the BMad names)
     licence_class: oss
     named_by_owner: true
-    local_clone: ../BMAD-METHOD
+    local_clone: ../keel-lab/references/BMAD-METHOD
     role: Idea source for frozen intent, the intent-alignment auditor, covers maps, single-writer ownership, lens triage, the verification-gap lens and layered config
     reviewed:
       - date: 2026-09-25
@@ -180,7 +177,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: true
-    local_clone: ../superpowers
+    local_clone: ../keel-lab/references/superpowers
     role: Idea source for the ceremony ratchet, approval bound to the presented artifact, rulings with cost-if-wrong, the bounded fix loop and task-done discipline
     reviewed:
       - date: 2026-09-25
@@ -196,7 +193,7 @@ projects:
     licence: MIT
     licence_class: oss
     named_by_owner: false
-    local_clone: ../paperclip
+    local_clone: ../keel-lab/references/paperclip
     role: Idea source for goal ancestry, atomic checkout, budgets, the liveness invariant and the quiescence watchdog; entered through keel's own research
     reviewed:
       - date: 2026-09-25

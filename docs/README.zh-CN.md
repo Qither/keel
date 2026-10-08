@@ -10,7 +10,7 @@
 
 ### 所有者（董事会成员）
 
-1. [00-mandate.zh-CN.md](00-mandate.zh-CN.md)：你自己的声明（逐字原文与译文）、其他所有文档使用的编号 R1–R5、D1–D7、P1–P5，以及会请你参与的刷新纪律和设计迭代纪律。
+1. [00-mandate.zh-CN.md](00-mandate.zh-CN.md)：你授权的纲领（区分直接引文、重述与翻译）、其他所有文档使用的编号 R1–R5、D1–D7、P1–P5，以及会请你参与的刷新纪律和设计迭代纪律。
 2. [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md)：初始设置、五个日常命令、每种轨道需要你确认的次数、每个检查点（checkpoint）要读什么，以及工作受阻时去哪里看。
 3. [17-open-decisions.zh-CN.md](17-open-decisions.zh-CN.md)：你需要为 M0 退出而确认的“按建议采纳”清单，以及仍然待定的决策。
 4. [00-vision.zh-CN.md](00-vision.zh-CN.md)：起初读定位和术语表就足够了。
@@ -22,7 +22,7 @@
 
 ### keel 的实现者
 
-先读 [00-mandate.zh-CN.md](00-mandate.zh-CN.md)，然后按编号顺序阅读：[00](00-vision.zh-CN.md)、[01](01-org-model.zh-CN.md)、[02](02-alignment.zh-CN.md)、[03](03-lifecycle.zh-CN.md)、[04](04-trace-and-state.zh-CN.md)、[05](05-vcs.zh-CN.md)、[06](06-parallelism.zh-CN.md)、[07](07-architecture-intelligence.zh-CN.md)、[08](08-dashboard.zh-CN.md)、[09](09-runtimes.zh-CN.md)、[10](10-providers.zh-CN.md)、[11](11-verification.zh-CN.md)、[12](12-cli-api-mcp.zh-CN.md)、[13](13-artifacts-schemas.zh-CN.md)、[14](14-trust-security.zh-CN.md)、[15](15-roadmap.zh-CN.md)、[16](16-sources-credits.zh-CN.md)、[17](17-open-decisions.zh-CN.md)，然后阅读 [adr/](adr/) 中的 ADR。阅读时请始终打开 [13-artifacts-schemas.zh-CN.md](13-artifacts-schemas.zh-CN.md)，它是从产物到 schema、模板和示例的映射；同时打开作为参考项目登记表（P4）的 `reference-projects.yaml` 和作为设计问题登记表（P5）的 `design-issues.yaml`。
+先读 [00-mandate.zh-CN.md](00-mandate.zh-CN.md)，然后按编号顺序阅读：[00](00-vision.zh-CN.md)、[01](01-org-model.zh-CN.md)、[02](02-alignment.zh-CN.md)、[03](03-lifecycle.zh-CN.md)、[04](04-trace-and-state.zh-CN.md)、[05](05-vcs.zh-CN.md)、[06](06-parallelism.zh-CN.md)、[07](07-architecture-intelligence.zh-CN.md)、[08](08-dashboard.zh-CN.md)、[09](09-runtimes.zh-CN.md)、[10](10-providers.zh-CN.md)、[11](11-verification.zh-CN.md)、[12](12-cli-api-mcp.zh-CN.md)、[13](13-artifacts-schemas.zh-CN.md)、[14](14-trust-security.zh-CN.md)、[15](15-roadmap.zh-CN.md)、[16](16-sources-credits.zh-CN.md)、[17](17-open-decisions.zh-CN.md)，然后阅读 [adr/](adr/) 中的 ADR。阅读时请始终打开 [13-artifacts-schemas.zh-CN.md](13-artifacts-schemas.zh-CN.md)，它是从产物到 schema、模板和示例的映射；同时打开作为产品审阅登记表（P4）的 `reference-projects.yaml` 和作为设计问题登记表（P5）的 `design-issues.yaml`。
 
 ### 添加运行时或模型提供方家族
 
@@ -32,7 +32,7 @@
 
 | 文档 | 范围 |
 | --- | --- |
-| [00-mandate.zh-CN.md](00-mandate.zh-CN.md) | 所有者声明的逐字原文、约束性需求编号、优先顺序与修订规则、刷新纪律（P4）、设计迭代纪律（P5） |
+| [00-mandate.zh-CN.md](00-mandate.zh-CN.md) | 所有者授权的纲领及引文与重述边界、约束性需求编号、优先顺序与修订规则、刷新纪律（P4）、设计迭代纪律（P5） |
 | [00-vision.zh-CN.md](00-vision.zh-CN.md) | 定位与非目标、设计如何满足纲领、原则 KP-01 到 KP-16、术语表、端到端示例 |
 | [00a-owner-guide.zh-CN.md](00a-owner-guide.zh-CN.md) | 面向董事会的一页指南 |
 | [01-org-model.zh-CN.md](01-org-model.zh-CN.md) | 董事会、Steward 模块、五份席位契约、归属、升级、各轨道的人员配置 |
@@ -60,9 +60,9 @@
 
 | 概念 | 归属 |
 | --- | --- |
-| 所有者声明的逐字原文，以及 R1–R5、D1–D7、P1–P5 的约束性表述 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
+| 所有者授权的纲领及引文与重述边界，以及 R1–R5、D1–D7、P1–P5 的约束性表述 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 | 声明、原则、归属文档、ADR 与数据文件之间的优先顺序；修订规则 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
-| 刷新纪律（P4）：何时运行、登记表、流程、向所有者提出的问题、护栏 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
+| 刷新纪律（P4）：锁定来源版本的产品审阅、覆盖、Lab 维护归属、所有者决定与护栏 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 | 设计迭代纪律（P5）：何时运行、设计问题登记表（问题、顺序图、走查矩阵）、流程、向所有者提出的问题、护栏 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 | 定位、主张与非目标 | [00-vision.zh-CN.md](00-vision.zh-CN.md) |
 | 需求映射：设计如何满足 R1–R5、D1–D7、P1–P5 | [00-vision.zh-CN.md](00-vision.zh-CN.md) |
@@ -139,7 +139,7 @@
 | 规范钩子事件及其可阻断性 | `runtimes/hook-events.yaml` |
 | 上限与阈值，每项都附有理由 | `config/keel.defaults.yaml` |
 | 一致性测评场景 | `conformance/scenarios.yaml` |
-| 参考项目与搜寻记录 | `docs/reference-projects.yaml` |
+| 产品参考审阅与搜寻记录 | `docs/reference-projects.yaml` |
 | 设计问题、顺序图、走查矩阵与走查历史 | `docs/design-issues.yaml` |
 
 ## 本文档集使用的约定

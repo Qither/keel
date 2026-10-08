@@ -172,9 +172,15 @@ keel 借鉴的是思路，而不是依赖或文本（P3，KP-15）。本文档�
 
 ## 外部项目
 
-许可证读取自每个本地参考克隆的 `LICENSE` 文件，读取日期为 2026-09-25。没有本地克隆的项目在 M0 中未核实许可证；无论其许可证为何，keel 都把它们视为仅思路的来源，例外是 TanStack 和 React 这两个 npm 包家族：它们的许可证会在 M5 进入依赖清单之前从每个包中读取。[reference-projects.yaml](reference-projects.yaml) 是刷新纪律（P4）的机器可读参考项目登记表，保存每个项目的评审日期、HEAD、版本和结果。本表是它的人工摘要，并补充许可证依据。
+许可证表是历史评价快照：克隆许可证观察日期为 2026-09-25，审阅行保留其记录版本与日期。它不声称代表当前上游或
+最新许可证。Lab 维护共享来源观察；Keel 负责产品决策所用的许可证证据，也可以直接核验锁定版本的公开来源，
+无需访问 Lab。标为未核实的来源，在评价版本明确的许可证证据前，仍只通过公开文档贡献思想。TanStack 与 React
+包的许可证在 M5 首次引入前读取。
+[reference-projects.yaml](reference-projects.yaml) 保留 Keel 的审阅与采用记录；本地克隆提示不是证据或更新指令。
+新的 P4 审阅记录来源版本、许可证证据与日期、相关来源覆盖、有理由的排除及缺口。下表概括历史评价，不描述今天
+共享工作区的内容。
 
-| 项目 | 上游 | 本地克隆：版本、HEAD | 许可证 | 核实依据 | keel 如何使用 |
+| 项目 | 上游 | 已评价来源快照：版本、HEAD | 许可证 | 核实依据 | keel 如何使用 |
 | --- | --- | --- | --- | --- | --- |
 | OpenSpec | https://github.com/Fission-AI/OpenSpec | `@fission-ai/openspec` 1.12.0, `e062b95` | MIT | 本地 `LICENSE` | 思路；无 CLI 依赖 |
 | codegraph | https://github.com/colbymchenry/codegraph | `@colbymchenry/codegraph` 1.6.0, `ba3c21e` | MIT | 本地 `LICENSE` | 思路；可选的外部后端，不内置 |

@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://keel.invalid/schemas/reference-registry.schema.json",
   "title": "keel reference registry",
-  "description": "The canonical registry of reference projects for the refresh discipline (P4, docs/00-mandate.md section 4), docs/reference-projects.yaml. One entry per reference project with its upstream, licence, licence class, whether the owner named it, the relative path of its local clone and the review history; plus the scouting record (standing GitHub queries, last run, candidates). The construct map in docs/16-sources-credits.md says what keel took; this registry says what was examined and when.",
-  "$comment": "Not in the strict subset: the reason of a scouting candidate is optional. local_clone is a path relative to the repository root that must leave it (../); scripts/validate.mjs checks the shape and never opens the clone.",
+  "description": "Keel's product-review and scouting registry for P4, docs/reference-projects.yaml. Lab owns shared clone maintenance and current source observations; this registry preserves product assessment, attribution and adoption evidence at recorded revisions. local_clone is a non-authoritative hint, not an update policy or coverage condition. Public pinned upstream material is sufficient without Lab access.",
+  "$comment": "Shape unchanged at schema version 1. local_clone remains required and nullable: an optional location hint relative to this repository, outside it (../). scripts/validate.mjs checks the shape and never opens the clone. Licence and review values are assessment snapshots, not claims of current upstream state.",
   "x-keel-status": "stable",
   "x-keel-milestone": "M0",
   "type": "object",
@@ -47,7 +47,7 @@
         },
         "upstream": { "$ref": "#/$defs/upstream" },
         "licence": {
-          "description": "Licence as read from the clone or the public documentation, in words.",
+          "description": "Licence evidence used in the recorded product assessment, in words; a historical snapshot, not a claim of current upstream licence. New review notes identify revision, evidence and date.",
           "type": "string",
           "minLength": 1
         },
@@ -57,7 +57,7 @@
           "type": "boolean"
         },
         "local_clone": {
-          "description": "Path of the local clone relative to the repository root, always outside it (starts with ../), or null when nothing is cloned. Never committed and never opened by scripts/validate.mjs.",
+          "description": "Optional, non-authoritative local clone location hint relative to this repository, outside it (../), or null when no hint is provided. The field remains required for schema-v1 compatibility. Lab owns shared clone maintenance. Never opened by scripts/validate.mjs and never a condition for review coverage, installation, build or runtime.",
           "anyOf": [{ "type": "string", "pattern": "^\\.\\./" }, { "type": "null" }]
         },
         "role": {
@@ -75,16 +75,16 @@
       "additionalProperties": false
     },
     "review": {
-      "description": "One review pass. head is the clone HEAD that was read, never a claim about upstream.",
+      "description": "A product assessment or recorded coverage disposition. head identifies material actually examined, never a claim about latest upstream. Scope and notes distinguish examined sources, reasoned exclusions and missing required evidence; a missing required source does not complete review coverage.",
       "type": "object",
       "properties": {
         "date": { "$ref": "#/$defs/date" },
         "head": {
-          "description": "Abbreviated commit id of the clone at review time, or null without a clone.",
+          "description": "Source commit examined at review time, or null when no source commit was examined (including package/public-documentation-only assessment or a recorded coverage disposition). Preserve historical abbreviations; new notes identify the exact commit when applicable.",
           "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
         },
         "branch": {
-          "description": "Branch the clone was read on, recorded when it is not the upstream default branch; the next refresh review fetches and fast-forwards this branch.",
+          "description": "Branch observed for the examined source revision when relevant. Historical context only; it does not instruct Keel to fetch or advance any shared clone.",
           "type": "string",
           "minLength": 1
         },
@@ -98,7 +98,7 @@
           "minLength": 1
         },
         "outcome": {
-          "description": "adopted: constructs entered keel. candidates: proposals await the owner. none: nothing new. declined: examined and rejected.",
+          "description": "adopted: constructs entered Keel. candidates: proposals or unresolved required evidence await a decision. none: no new idea, or an explicit reasoned exclusion recorded in notes. declined: examined and rejected. Notes must distinguish these dispositions; missing required evidence is never a completed review.",
           "enum": ["adopted", "candidates", "none", "declined"]
         },
         "notes": { "type": "string", "minLength": 1 }
@@ -130,7 +130,7 @@
       "additionalProperties": false
     },
     "candidate": {
-      "description": "A project found by scouting. The owner decides whether it is pulled locally and, after analysis, whether it is adopted into the registry.",
+      "description": "A project found by scouting. The owner decides research and adoption; any shared-clone maintenance request belongs to Lab and is separate from Keel adoption.",
       "type": "object",
       "properties": {
         "name": { "type": "string", "minLength": 1 },

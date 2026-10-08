@@ -177,14 +177,18 @@ its home document is in the single-home table of [README.md](README.md).
 
 ## External projects
 
-Licences were read from the `LICENSE` file of each local reference clone on 2026-09-25. Projects without
-a local clone are not licence-verified in M0; keel treats them as ideas-only sources regardless of their
-licence, except the two npm package families TanStack and React, whose licences are read from each package
-before they enter the dependency list in M5. [reference-projects.yaml](reference-projects.yaml) is the
-machine-readable registry for the refresh discipline (P4): it holds each project's reviewed dates, HEADs,
-versions and outcomes. This table is its human summary and adds the licence evidence.
+The licence table is a historical assessment snapshot: clone licence observations date to 2026-09-25,
+and review rows retain their recorded revisions and dates. It is not a current upstream or licence claim.
+Lab maintains the shared source observations; Keel owns the licence evidence used in its product decisions
+and can verify a pinned public source directly without Lab access. Sources marked unverified remain
+ideas-only public-documentation sources until revision-specific licence evidence is assessed. TanStack and
+React package licences are read before first inclusion in M5.
+[reference-projects.yaml](reference-projects.yaml) preserves Keel's review and adoption record; local clone
+hints are not evidence or update instructions. New P4 reviews record source revision, licence evidence and
+date, relevant-source coverage, justified exclusions and gaps. The table below summarizes the historical
+assessment, not the contents of today's shared workspace.
 
-| Project | Upstream | Local clone: version, HEAD | Licence | Verified from | How keel uses it |
+| Project | Upstream | Assessed source snapshot: version, HEAD | Licence | Verified from | How keel uses it |
 | --- | --- | --- | --- | --- | --- |
 | OpenSpec | https://github.com/Fission-AI/OpenSpec | `@fission-ai/openspec` 1.12.0, `e062b95` | MIT | Local `LICENSE` | Ideas; no CLI dependency |
 | codegraph | https://github.com/colbymchenry/codegraph | `@colbymchenry/codegraph` 1.6.0, `ba3c21e` | MIT | Local `LICENSE` | Ideas; optional external backend, not vendored |

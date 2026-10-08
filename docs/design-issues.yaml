@@ -845,6 +845,23 @@ order:
       doc: { file: docs/12-cli-api-mcp.md, heading: "5. MCP (two read tools, one write tool)" }
       after: [ steward.run.spawn ]
       runs_in: agent-api
+    - id: p4.select-evidence
+      doc: &a1
+        file: docs/00-mandate.md
+        heading: 4.3 Procedure
+      after: []
+      runs_in: local
+    - id: p4.assess-evidence
+      doc: *a1
+      after:
+        - p4.select-evidence
+      runs_in: local
+    - id: p4.record-review
+      doc: *a1
+      after:
+        - p4.assess-evidence
+      runs_in: local
+
   artifacts:
     - id: proposal-dir
       doc: { file: docs/03-lifecycle.md, heading: Phase 0 Intake }
@@ -1561,6 +1578,20 @@ order:
       produced_by: steward.land.reexecute
       required_by: [ gate.land.re-execution, steward.land.draft-receipt, steward.land.archive-commit ]
       where: git-common-dir
+    - id: p4-review-materials
+      doc: &a1
+        file: docs/00-mandate.md
+        heading: 4.3 Procedure
+      produced_by: p4.select-evidence
+      required_by:
+        - p4.assess-evidence
+      where: working-tree
+    - id: p4-review-record
+      doc: *a1
+      produced_by: p4.record-review
+      required_by: []
+      where: working-tree
+
   locks:
     - id: lock.claim
       doc: { file: docs/06-parallelism.md, heading: The lock }
@@ -13633,6 +13664,159 @@ issues:
         restack"
       recorded_in: [ docs/11-verification.md ]
 
+  - id: DI-20
+    title: Reference maintenance ownership and review coverage
+    statement: P4 gives Keel responsibility for updating shared reference clones and keys milestone review
+      coverage to local_clone. The owner-authorized repository separation assigns shared clone maintenance and
+      current source observations to Lab, while Keel must retain versioned product review, attribution and
+      adoption without requiring access to a non-open-source repository. A clone location must not determine
+      whether relevant evidence is reviewed.
+    status: decided
+    found_by: owner
+    found_on: 2026-10-08
+    root_cause: rule-tightened
+    anchors:
+      - file: docs/00-mandate.md
+        heading: 1. The owner's statement
+      - file: docs/00-mandate.md
+        heading: 4.3 Procedure
+      - file: docs/15-roadmap.md
+        heading: Measures
+      - file: schemas/reference-registry.schema.json
+        pointer: "#/$defs/project/properties/local_clone"
+    class: mandate-conflict
+    higher:
+      file: docs/00-mandate.md
+      heading: 1. The owner's statement
+    lower:
+      file: docs/00-mandate.md
+      heading: 4.3 Procedure
+    blocks: M0
+    walk:
+      producers:
+        - precondition: Reference review has source identity, exact revision and licence evidence before ideas are assessed.
+          producer:
+            file: docs/00-mandate.md
+            heading: 4.3 Procedure
+          position: before
+          sufficient: true
+          reason: Lab supplies a versioned research packet; an independent contributor can obtain the same pinned public
+            upstream material without a Lab clone. Missing or stale evidence stays incomplete.
+        - precondition: The owner authorizes the responsibility change before dependent rule changes.
+          producer:
+            file: docs/17-open-decisions.md
+            heading: Resolved by the owner
+          position: before
+          sufficient: true
+          reason: The current owner instruction on 2026-10-08 explicitly says PLEASE IMPLEMENT THIS PLAN and includes
+            Lab sole ownership, optional clone hints and review coverage independent of clone presence. This
+            authorizes the document adjustment, not upstream refresh, a commit, a release or constitutional
+            adoption.
+      consumers:
+        - anchor:
+            file: docs/00-mandate.md
+            heading: 4.3 Procedure
+          actor: board-at-terminal
+          outcome: changed
+          reason: Read pinned material, compare and decide; do not update Lab-managed clones. Gaps are resolved by
+            supplying evidence or recording a reasoned exclusion, not by silently passing.
+        - anchor:
+            file: AGENTS.md
+            heading: House rules
+          actor: board-at-terminal
+          outcome: changed
+          reason: Direct agents to the single product-review procedure; CLAUDE.md inherits AGENTS.md unchanged.
+        - anchor:
+            file: docs/00-vision.md
+            heading: Requirement mapping R1–R5 / D1–D7 / P1–P5
+          actor: board-at-terminal
+          outcome: changed
+          reason: P4 traceability restates the owner-authorized responsibility split.
+        - anchor:
+            file: docs/15-roadmap.md
+            heading: Measures
+          actor: board-at-terminal
+          outcome: changed
+          reason: Every relevant source is covered or explicitly excluded with a reason; missing required evidence
+            leaves the refresh review incomplete.
+        - anchor:
+            file: docs/16-sources-credits.md
+            heading: External projects
+          actor: board-at-terminal
+          outcome: changed
+          reason: Historical licence observations retain dates and versions; they do not claim current upstream licence
+            verification.
+        - anchor:
+            file: docs/13-artifacts-schemas.md
+            heading: 6. validate coverage and the D1 tooling exception
+          actor: ci-fresh-clone
+          outcome: changed
+          reason: Documentation describes local_clone as a nullable, non-authoritative hint; schema shape and validator
+            remain unchanged and never open external paths.
+        - anchor:
+            file: schemas/reference-registry.schema.json
+            pointer: "#/$defs/project/properties/local_clone"
+          actor: ci-fresh-clone
+          outcome: unchanged
+          reason: Existing references shape and cross-reference checks need no external repository; npm run check
+            validates the independent checkout.
+      places:
+        - artifact: p4-review-materials
+          where: working-tree
+          reachable_from:
+            - local
+        - artifact: p4-review-record
+          where: working-tree
+          reachable_from:
+            - local
+      readers:
+        - field: local_clone
+          readers:
+            - Optional human location hint; validator checks null or external relative-path shape without
+              opening the path.
+        - field: upstream and reviewed.head/version/date/scope/notes
+          readers:
+            - P4 reviewer compares pinned evidence and preserves historical product review.
+            - Milestone reviewer checks relevant-source coverage and unresolved gaps.
+        - field: licence and licence_class
+          readers:
+            - P3 attribution and use decision at the recorded source revision; no claim of latest source
+              observation.
+      tally: []
+    terms:
+      - name: local_clone
+        uses:
+          - anchor:
+              file: schemas/reference-registry.schema.json
+              pointer: "#/$defs/project/properties/local_clone"
+            meaning: Optional clone location hint in a required nullable schema-v1 field.
+            demands: No ownership of clone maintenance and no dependency on a private workspace.
+        kept:
+          meaning: Non-authoritative location hint; null is valid.
+          provides: Schema compatibility and convenience only.
+        renamed: []
+    options:
+      - Lab owns shared clone maintenance and source observations; Keel owns product review and adoption using
+        pinned material, with public upstream access as an independent path.
+      - Keep a separate Keel-owned clone workspace and refresh policy, avoiding shared ownership through
+        duplicated workspaces.
+    recommendation: Option 1, explicitly selected by the owner-approved implementation plan. Preserve IDs and
+      historical review data; change only the responsibilities, coverage rule and location hints.
+    decision:
+      by: owner
+      date: 2026-10-08
+      option: "Option 1. Source: current conversation, owner request PLEASE IMPLEMENT THIS PLAN on 2026-10-08. Exact
+        owner excerpt (Chinese): 同步修改 P4 及其文档消费者，使 Lab 负责来源维护、Keel 负责产品相关审阅和采纳。审阅义务不再由“本机是否有克隆”决定，缺少资料应明确记录。
+        English translation: Update P4 and its document consumers together, assigning source maintenance to Lab
+        and product-related review and adoption to Keel. Review obligations no longer depend on whether this
+        machine has a clone; missing material must be explicitly recorded. The current mandate uses an
+        authorized English restatement of this instruction, not a verbatim transcript. This entry remains
+        decided until the required closing commit; no runtime, release or constitutional-adoption claim is
+        made."
+      recorded_in:
+        - docs/17-open-decisions.md
+        - docs/00-mandate.md
+
 walkthroughs:
   - date: 2026-09-27
     trigger: baseline
@@ -13897,3 +14081,15 @@ walkthroughs:
       - DI-19
     notes: "604 findings in 136 cells, every one tagged with the issue it reproduces; DI-11 to DI-19 filed from
       the document walk"
+  - date: 2026-10-08
+    trigger: owner
+    scope: P4 responsibility split, nullable clone hints, pinned evidence and milestone review coverage. This is a
+      document-only walk, not an upstream refresh or runtime test.
+    cells: []
+    outcome: issues
+    issues:
+      - DI-20
+    notes: Producer, consumer, place and reader inspection covers AGENTS, CLAUDE inheritance, mandate/vision,
+      schema and registry, credits, roadmap, manifest descriptions, documentation navigation and owner decisions
+      in both languages. The ordinary product lifecycle and approval counts remain unchanged. Closure and
+      release are not claimed.

@@ -15,6 +15,11 @@ design meets each requirement, and the home of every mechanism is in the single-
 
 ## 1. The owner's statement
 
+This section states the current owner-authorized mandate. Unless explicitly marked as a direct quotation,
+its English clauses are authorized restatements, not a verbatim conversation transcript. Original owner
+wording and decision sources are preserved in the applicable decision record; translations of quotations
+are identified as translations. Restatement does not authorize a change in the owner's meaning.
+
 1. A brand-new, independently designed workflow that borrows from existing workflows: OpenSpec, codegraph,
    edikt, keel (the unrelated dcsg/keel, credited as keel-other), oh-my-claudecode, oh-my-codex, old-coder,
    rtk, OpenHands, BMAD-METHOD, superpowers, and other well-designed workflows, absorbing their design
@@ -47,11 +52,14 @@ design meets each requirement, and the home of every mechanism is in the single-
     runtime's environment, and at direct-lane call time.
 12. Borrow ideas, never dependencies or text.
 
-Standing instruction: at every refactor review, pull the latest version of each framework named above to a
-local clone, analyse what they added, and check and correct the current workflow design as if it were being
-designed for the first time. At every refactor, also search GitHub for new, well-designed workflow designs
-that could be merged into the current workflow; prompt the owner to pull them locally for analysis, and
-merge them into the current workflow. Translate the above into the core design document.
+Standing instruction: Lab alone maintains the shared reference clones and current source and licence
+observations. At every refactor or milestone review, keel assesses the relevant reference sources at
+identified revisions, records justified exclusions and missing evidence, and re-derives its design as if
+for the first time. Review obligations do not depend on whether a local clone exists. Keel preserves its
+own review, attribution and adoption history and consumes versioned research material; public upstream
+material at an exact revision is a sufficient independent access path. Scout new workflow ideas and put
+candidate research and adoption to the owner. Keel remains an open-source product whose installation,
+build, checks and use require no access to the non-open-source Lab or constitution repositories.
 
 Standing instruction (design iteration): for the design problems that a review of keel finds, design the
 core workflow's design iteration steps and append them to this core design document; do not set out to
@@ -82,7 +90,7 @@ each row is in [00-vision.md](00-vision.md).
 | P1 | Standing preference | Provider endpoints, keys and model names belong to the user; keel stores environment variable names only, never opens a file or record that holds a provider value or a credential, never persists, prints, logs or hashes a value, and dereferences a named environment variable in process memory only at spawn and at direct-lane call time. | Clause 11 |
 | P2 | Standing preference | Every frontend display keel ships is built with TanStack. The libraries are headless, so the markup stays native HTML elements with hand-written CSS; no UI kit, CDN or web font. | Clause 7 |
 | P3 | Standing preference | Borrow ideas, never dependencies or text. | Clause 12 |
-| P4 | Standing preference | Refresh discipline: at every refactor review the reference projects are pulled to their latest version, their additions are analysed, and keel is re-checked and corrected against them as a first-time design; GitHub is searched for new, well-designed workflows; the owner is prompted to pull candidates locally; adopted ideas are merged. Section 4 is the procedure. | Standing instruction |
+| P4 | Standing preference | Lab alone maintains shared reference clones and current source observations. At each refactor or milestone review, keel reviews relevant sources at identified revisions, records justified exclusions and missing evidence independent of clone presence, re-derives its design, scouts candidates and records its own attribution and adoption. Public upstream evidence is an independent access path. Section 4 is the procedure. | Standing instruction |
 | P5 | Standing preference | Design iteration discipline: a defect found in keel's own documents, schemas, templates or tables is filed, classified, walked, routed and closed by the procedure of section 5 before it is fixed; a conflict with the statement is put to the owner and never reconciled by rewording a lower document; no rule is introduced, tightened or loosened without its walk; open issues gate milestone exits. Section 5 is the procedure. | Standing instruction (design iteration) |
 
 ## 3. Precedence and amendment
@@ -127,64 +135,71 @@ references as they evolve, and that the design is judged afresh each time rather
 
 ### 4.2 The reference registry
 
-`docs/reference-projects.yaml` is the canonical registry, validated by
-`schemas/reference-registry.schema.json`. It holds one entry per reference project: upstream, licence and
-licence class, whether the owner named it, where its local clone sits relative to this repository, and the
-review history (date, HEAD, branch when it is not the upstream default, version, scope, outcome). It also
-holds the scouting record: the standing GitHub queries, the last run, and every candidate with its status.
-The construct map in [16-sources-credits.md](16-sources-credits.md) says what keel took; the registry says
-what was examined and when. Local clones sit next to the keel checkout; keel never commits them, and
-`scripts/validate.mjs` never opens them.
+`docs/reference-projects.yaml` is keel's canonical product-review and scouting registry, validated by
+`schemas/reference-registry.schema.json`. Stable project IDs, upstream identity, reviewed revisions,
+dates, outcomes and attribution remain Keel records. Licence fields describe the evidence used for those
+assessments, not a claim about the latest upstream licence. New reviews identify the exact source revision,
+licence evidence and its date in their notes; historical snapshots retain their original values.
+
+Lab owns the shared clone workspace, source registry, update policy and current licence observations.
+The schema-v1 `local_clone` field remains required and nullable for compatibility, but its value is only
+an optional, non-authoritative location hint relative to this repository; it grants no update authority
+and does not determine review coverage. Keel never commits or updates those clones, and
+`scripts/validate.mjs` never opens them. Contributors may assess the pinned public repository or published
+material directly without Lab access. The construct map in [16-sources-credits.md](16-sources-credits.md)
+says what Keel adopted; Lab research alone does not adopt anything into Keel.
 
 ### 4.3 Procedure
 
-1. **Pull.** For every registry entry with a local clone, fetch and fast-forward the branch recorded for the
-   entry (the upstream default branch when none is recorded), and record the new HEAD, date and version. A
-   clone that is missing, or whose licence file changed, is reported before anything else is read. An
-   owner-named entry that has an upstream but no local clone (arch-viewer, Sourcegraph) is put to the owner
-   in step 5 with a request to pull it at the next review; once cloned, its licence file is read and its
-   `licence_class` recorded. For a reference consumed as npm packages (TanStack, and React with it), record
-   the latest published version and the version pinned in `package-lock.json`, read the changelog between
-   them, and treat a major-version move as a design element for step 3; the first such review is the M5
-   exit, with the lockfile version and `head: null`. The licence file of each such package is read and its
-   `licence_class` recorded when the package is first added to `package.json`, before that first review,
-   so no package is bundled while the guardrail of section 4.5 still classes it as unverified.
-2. **Diff.** Read what changed since the last reviewed HEAD: release notes, changed documentation, new
-   commands, schemas, hooks and workflows. Note each new design element in one line with a pointer into the
-   clone.
-3. **Re-derive.** Treat keel as a first-time design. For each principle KP-01 to KP-16 and each construct
-   row in [16-sources-credits.md](16-sources-credits.md), ask whether the new evidence confirms it, refines
-   it or contradicts it. A contradiction is a correction: a home-document change, plus a superseding ADR when
-   a recorded decision flips. It is never patched around. A contradiction that is internal to keel's own
-   documents, rather than between keel and a reference, is filed as a design issue under section 5 and
-   corrected through that procedure.
-4. **Scout.** Search GitHub for workflows and agent-orchestration designs published or substantially changed
-   since the last review, using the registry's standing queries. A candidate qualifies when it is open
-   source or has public documentation, has a licence keel may learn from, shows evidence of real use, and
-   offers a mechanism keel lacks or does worse. Record every candidate with upstream, licence, what keel
-   might take and why.
-5. **Prompt the owner.** Present the candidates in the form of section 4.4 and stop. The owner pulls the
-   candidates to local clones, or approves the pull. Nothing is adopted from a candidate before that.
-6. **Merge.** For each adopted idea: a construct row in [16-sources-credits.md](16-sources-credits.md) with
-   its permitted source, the change to the affected home document, a registry entry, and a superseding ADR
-   when a recorded decision changes. P3 and D2 apply throughout: ideas, never text or code; no forbidden
-   term; ELv2 and non-OSS sources contribute ideas only.
-7. **Record.** Append the review to each entry's history and to the scouting record, then run
-   `npm run check`.
+1. **Select evidence and coverage.** Identify every source relevant to the refactor or milestone, including
+   owner-named sources. Consume a versioned Lab research packet or obtain the same public upstream material
+   at an exact revision. Record source identity, revision, evidence locations, licence file or public
+   licence evidence and observation date. Check licence changes against the previous assessed revision
+   before borrowing. Record a reason for each excluded source; absent clones are not a reason. Missing
+   required material leaves the review incomplete and is reported for an evidence or scope decision. Do
+   not fetch, pull, reset or clean Lab-managed clones from this procedure. For TanStack and React packages,
+   review the latest published and lockfile-pinned versions and their changelog from M5; read each package's
+   licence before first addition to `package.json`. The package version is recorded with `head: null`.
+2. **Diff.** Compare the selected revision with the last reviewed revision: release notes, documentation,
+   commands, schemas, hooks and workflows. Record design elements with repository-relative source paths
+   and commit references; a local path alone is not evidence of what was read.
+3. **Re-derive.** Treat keel as a first-time design. For KP-01 to KP-16 and each construct row in
+   [16-sources-credits.md](16-sources-credits.md), determine whether evidence confirms, refines or
+   contradicts the design. Change the home document and supersede an ADR when an accepted decision flips.
+   Internal contradictions follow the design-issue procedure in section 5 rather than a silent patch.
+4. **Scout.** Use the registry's standing GitHub queries to seek new or substantially changed workflows.
+   Record public source identity, licence evidence, the proposed benefit and limitations. A candidate must
+   offer a relevant mechanism with assessable evidence; unfamiliar licence status stays unverified.
+5. **Present decisions.** Use section 4.4 for candidate research, exclusions, evidence gaps and proposed
+   adoption. Existing authorization covers routine investigation; it does not silently authorize adoption.
+   If a new shared clone or update is wanted, route that request to Lab's maintenance process. Unaffected
+   authorized review may continue while a specific decision is pending.
+6. **Integrate.** For an authorized adopted idea, record the permitted source in
+   [16-sources-credits.md](16-sources-credits.md), update affected home documents, preserve the product
+   review record and supersede an ADR when needed. Review the actual public contribution and applicable
+   integration evidence. Lab research, fake data and disposable shells are not product dependencies.
+   P3 and D2 remain in force: no copied text or code from ELv2 or non-OSS sources.
+7. **Record.** Append the product assessment and scouting results and run `npm run check`. Use scope and
+   notes to distinguish material actually examined from a reasoned exclusion or missing evidence; record
+   `head: null` when no source commit was examined. Do not convert an evidence gap into a completed review
+   or update historical dates and revisions to look current. The milestone measure in
+   [15-roadmap.md](15-roadmap.md) assesses coverage, not clone availability.
 
 ### 4.4 What the owner is asked
 
-One message with one table: candidate, upstream, licence, what it does in one line, what keel might take,
-and the question whether to pull it to a clone next to the keel checkout for analysis. The same message
-lists, for the existing references, each HEAD move and the design elements found in it. The owner answers
-per candidate: pull, decline (recorded in the registry with the reason), or defer.
+Present one table with the candidate or source, public upstream, assessed revision and licence evidence,
+proposed benefit, unresolved question and requested decision: authorize research, adopt, decline or defer.
+Show relevant revision changes, justified exclusions and missing required evidence. A request to create or
+refresh a shared clone is explicitly a Lab maintenance request; it is separate from Keel adoption.
+Independent public evidence remains sufficient when Lab is unavailable. The decision and its scope are
+recorded; lack of a reply does not approve adoption.
 
 ### 4.5 Guardrails
 
 - Licence classes decide the use: open source contributes ideas that keel re-implements; source-available
   licences such as ELv2 contribute ideas only and get a shape audit; proprietary products contribute
   through public documentation only; an unverified licence is treated as proprietary until its licence file
-  has been read and the class recorded, at a refresh review or, for an npm package, when it is first added
+  has been read and the class recorded, from revision-specific public or Lab evidence at a refresh review or, for an npm package, when it is first added
   to `package.json` (step 1 of section 4.3).
 - A refresh review never extends the D2 term list on its own; new forbidden names come from the owner.
 - P1 holds during a review: examining a reference never involves reading the owner's provider or credential
@@ -323,7 +338,7 @@ deferred or dismissed, and on every open issue that has no class yet.
    the home document and its mirror, every consumer on the walk marked changed or unchanged with a reason,
    the glossary rows, the schemas, templates, examples and type-only code that implement it, the ADR, the
    entry in [17-open-decisions.md](17-open-decisions.md), and [15-roadmap.md](15-roadmap.md) when a scope
-   or an exit criterion changes; sections 1 and 2 only from the owner's own words. A cycle is red before
+   or an exit criterion changes; sections 1 and 2 only from a recorded owner instruction, quoted or identified as an authorized restatement. A cycle is red before
    green: it is reproduced in the order map, tagged with its issue, before it is removed. Every sentence
    that introduces a wait names what releases it; every sentence that introduces a precondition names what
    produces it and where it lives.
@@ -345,8 +360,8 @@ other defects; then `gap`; then `cost`. A `cycle` is never deferred by a maintai
 One message per iteration with one table: the issue id and class, the statements that cannot both hold,
 each quoted with its home document and heading, the options, the recommendation and what the issue blocks.
 The owner answers per issue: an option, deferral to a named milestone, the clause restated in the owner's
-own words (section 1 is then rewritten in place from those words, under section 3), or dismissal with a
-reason. When a mandate conflict is present it is listed first and on its own.
+own words (section 1 is then rewritten in place from the recorded instruction, with any restatement
+identified, under section 3), or dismissal with a reason. When a mandate conflict is present it is listed first and on its own.
 
 ### 5.5 Guardrails
 

@@ -57,10 +57,12 @@ and architecture intelligence.
 - **Frontend is TanStack (P2).** Any frontend keel ships uses TanStack libraries on the React
   adapter, headless over native markup with hand-written CSS tokens, pre-rendered then hydrated, bundled at
   package build and never a runtime dependency (ADR-0009).
-- **Refresh discipline (P4).** At every refactor or milestone-exit review run the procedure in
-  `docs/00-mandate.md` section 4: pull the reference clones to their latest version, diff, re-derive keel
-  as a first-time design, scout GitHub for new workflows, prompt the owner to pull candidates locally, merge
-  adopted ideas with credits, record in the registry.
+- **Refresh discipline (P4).** At every refactor or milestone-exit review follow
+  `docs/00-mandate.md` section 4. Lab alone maintains shared reference clones and current source
+  observations. Keel consumes identified revisions from a research packet or public upstream material,
+  assesses relevant sources regardless of clone presence, records exclusions and missing evidence,
+  re-derives its design and preserves its own attribution and adoption history. Do not update shared
+  clones from Keel. Its installation, build, checks and use require no access to Lab or the constitution.
 - **Design iteration discipline (P5).** When two statements cannot both hold, a chain cannot complete, a
   term carries two meanings or a field has no reader, file it in `docs/design-issues.yaml` before fixing
   anything. Before introducing, tightening or loosening a rule, write the rule's walk (producers,

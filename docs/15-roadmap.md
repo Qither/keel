@@ -40,7 +40,7 @@ Scope:
 
 - the design documents in `docs/` (English canonical, Simplified Chinese mirrors) and the nine design
   ADRs in `docs/adr/` (ADR-0001 to ADR-0009);
-- the owner's mandate (`docs/00-mandate.md`), which records the owner's statement verbatim and owns the
+- the owner's mandate (`docs/00-mandate.md`), which records the owner-authorized mandate with quotation and restatement boundaries and owns the
   refresh discipline (P4) and the design iteration discipline (P5);
 - the reference registry (`docs/reference-projects.yaml`, validated against
   `schemas/reference-registry.schema.json` by the `examples` check via `schemas/examples.map.json` and
@@ -69,7 +69,7 @@ Exit criteria:
   that settles them is recorded in [00-mandate.md](00-mandate.md). The decisions still open in
   [17-open-decisions.md](17-open-decisions.md) do not block M0, except a design issue of class
   `mandate-conflict`, which blocks the exit of the milestone in which it was found.
-- The owner's statement is recorded verbatim in [00-mandate.md](00-mandate.md), every R, D and P row of
+- The owner-authorized mandate, with direct quotations distinguished from restatements and translations, is recorded in [00-mandate.md](00-mandate.md), every R, D and P row of
   [00-vision.md](00-vision.md) maps to it, and the reference registry validates against its schema (`examples`
   check) and its owner-named projects are cross-referenced (the `references` check passes).
 - The design-issue register validates against its schema (`examples` check) and the `issues` check passes
@@ -295,7 +295,7 @@ its denominator.
 | Hook coverage | Hook outcomes journaled per runtime, fired / expected | Hook journal | M2 |
 | Liveness orphans | 0 | `keel audit` | M3 |
 | Index freshness | `index_commit` distance from head | Index status | M4 |
-| Refresh review currency | Every project entry with a local clone has a review whose scope names the milestone being exited (for example "M1a exit review"), and `scouting.last_run` is dated at or after the previous milestone exit | `docs/reference-projects.yaml` | M1a |
+| Refresh review currency | Each relevant source has a revision-specific review scoped to the exiting milestone; every exclusion has a recorded reason independent of clone presence; required missing evidence leaves the review incomplete. `scouting.last_run` is at or after the previous exit | `docs/reference-projects.yaml` scope and notes; P4 evidence coverage | M1a |
 | Design issue currency | At every milestone exit no issue that blocks that or an earlier milestone is open, every open issue has a class, and a walkthrough whose scope names the exit is recorded; between exits, the count of open issues per class and per blocked milestone | `docs/design-issues.yaml` (the `issues` check with `exit_review` set) | M0 |
 | Dashboard size | Under 2 MB for a 5k-file repository | Build output | M5 |
 | Dashboard JavaScript | Under 600 KB minified, inline | Build output | M5 |

@@ -75,7 +75,7 @@ keel/
   .github/workflows/ci.yml          windows-latest and ubuntu-latest, Node 22.13 and 24
   scripts/validate.mjs              the declared D1 tooling exception
   docs/                             design documents, each with a .zh-CN.md mirror; docs/adr/
-  docs/reference-projects.yaml      reference registry for the refresh discipline (P4)
+  docs/reference-projects.yaml      product-review registry for the refresh discipline (P4)
   docs/design-issues.yaml           design-issue register for the design iteration discipline (P5)
   schemas/                          JSON Schema 2020-12 files and examples.map.json
   src/                              type-only TypeScript
@@ -128,7 +128,7 @@ section 6 cross-check them.
 | --- | --- |
 | `docs/README.md`, `docs/README.zh-CN.md` | Reading order, document index, single-home table |
 | `docs/00-mandate.md`, `docs/00-mandate.zh-CN.md` | The owner's statement, binding ids, precedence, refresh discipline, design iteration discipline |
-| `docs/reference-projects.yaml` | Reference registry and scouting record (P4); schema `reference-registry` |
+| `docs/reference-projects.yaml` | Product-review registry and scouting record (P4); schema `reference-registry` |
 | `docs/design-issues.yaml` | Design-issue register: issues, order map, walkthrough matrix and history (P5); schema `design-issues` |
 | `docs/00-vision.md`, `docs/00-vision.zh-CN.md` | Positioning, how the design meets the mandate, principles, glossary, end-to-end example |
 | `docs/00a-owner-guide.md`, `docs/00a-owner-guide.zh-CN.md` | The owner's one-page guide |
@@ -459,7 +459,7 @@ arguments.
 | `i18n` | Every `.md` under `docs/`, the root `README.md`, `runtimes/README.md` and `test/README.md` has a `.zh-CN.md` mirror with the identical sequence of heading levels; no orphan mirrors | Translation quality; other Markdown (templates, skills, agent guides) |
 | `audit` | The D2 term list (in paths and contents), P1 key-shaped tokens, real provider API hosts, non-placeholder URL hosts outside `docs/**`, `README*.md` and `AGENTS.md`, forbidden credential file names; D1: no `bin` and no `dependencies` in `package.json`, and type-only statements in every `src/` file | Meaning: a design that is wrong but uses allowed words passes |
 | `manifest` | Every path in the marked tables of section 3 exists, and every repository file except `package-lock.json` and `*.zh-CN.md` is covered | Whether the "Purpose" text is accurate |
-| `references` | Parses `docs/reference-projects.yaml`; every project with `named_by_owner` true is named in `docs/00-mandate.md` and `docs/16-sources-credits.md`; `local_clone` is null or a relative path outside the repository and is never opened | Whether a review actually happened; upstream state |
+| `references` | Parses `docs/reference-projects.yaml`; every project with `named_by_owner` true is named in `docs/00-mandate.md` and `docs/16-sources-credits.md`; `local_clone` is a nullable non-authoritative location hint outside the repository; its shape is checked but it is never opened or used to determine review coverage | Whether a review actually happened; upstream state |
 | `issues` | Parses `docs/design-issues.yaml`; ids are sequential; every anchor resolves to an existing file and heading (Markdown) or pointer (JSON, YAML); an anchor in section 1 or 2 of the mandate forces class `mandate-conflict`, which must be named in `docs/17-open-decisions.md` and is never decided by recommendation; only the owner defers; while `exit_review` is set, every open issue is classified and none blocks that or an earlier milestone; the order map has no cycle and no artifact required from a machine that cannot reach its place unless the entry is tagged with an open issue, and no tag names a closed issue; the glossary of `docs/00-vision.md` has one row per term, including the kept and renamed terms of closed issues; walkthroughs are append-only and their cells resolve | Whether a walk was thorough or a statement is true; behaviour (negative controls from M1a) |
 
 `npm run typecheck` (`tsc --noEmit -p tsconfig.json`) covers the TypeScript: strict mode, NodeNext module

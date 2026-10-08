@@ -20,10 +20,10 @@ keel 自身的设计 ADR（`docs/adr/ADR-0001` … `ADR-0009`）与 keel 为目�
 | 技术栈 | Node ≥ 22.13 上的 TypeScript，原生 Windows，核心设计中不使用 tmux、WSL、Docker、bash 或 python（D3）。 | [ADR-0002](adr/ADR-0002-node-windows-native.zh-CN.md) |
 | 前端技术栈 | React 上的 TanStack，以无头（headless）方式覆盖原生标记，预渲染并打包（P2）。不使用任何库的原生 HTML 加原生 JavaScript 被否决。 | [ADR-0009](adr/ADR-0009-tanstack-frontend.zh-CN.md), [08-dashboard.zh-CN.md](08-dashboard.zh-CN.md) |
 | 参考项目集与模型列表 | rtk 加入参考项目列表，Kiro 只参考公开文档（R1）；OpenCode 加入模型列表（R3）；git 为主，jj 为可选增强（R4）。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [16-sources-credits.zh-CN.md](16-sources-credits.zh-CN.md) |
-| 刷新纪律 | P4：00-mandate.zh-CN.md 第 4 节中的流程、参考项目登记表 `docs/reference-projects.yaml`，以及每个里程碑退出时的刷新评审。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
+| 刷新纪律 | P4：Lab 独占共享参考克隆与当前来源观察的维护职责；Keel 使用锁定版本的 Lab 材料或可独立访问的公开来源，保存产品审阅、归因与采用记录。覆盖依据相关性，记录有理由的排除和明确缺口，不以克隆存在为条件。DI-20 记录所有者授权的文档变更，不代表采用外部宪法。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md)、[15-roadmap.zh-CN.md](15-roadmap.zh-CN.md)、`docs/design-issues.yaml` |
 | 设计迭代纪律 | P5：00-mandate.zh-CN.md 第 5 节中的流程、带有 schema 和 `issues` 检查的登记表 `docs/design-issues.yaml`、从 M0 起每个里程碑退出时的设计问题门禁；已知缺陷在修正任何一个之前先作为开放问题登记在那里。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [15-roadmap.zh-CN.md](15-roadmap.zh-CN.md) |
 | 模型提供方的值，条款 11（DI-01） | 设计问题 DI-01 的选项 1：条款 11 和 P1 行重述为 keel 从不打开保存模型提供方的值或凭据的文件或记录，从不持久化、打印、记录或哈希任何值，而在派生子进程时和直连通道调用时于进程内存中解引用具名环境变量是允许的；模型提供方不变量、KP-13 和 ADR-0006 是其可校验形式。按字面保留条款并删去别名映射与直连通道、由用户自有的启动器、推迟到 M2 这三项被否决。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md), [10-providers.zh-CN.md](10-providers.zh-CN.md), [ADR-0006](adr/ADR-0006-provider-values-by-reference.zh-CN.md) |
-| 核心设计文档 | 所有者声明以 R1–R5、D1–D7、P1–P5 这些 id 逐字记录，其优先顺序高于其他所有文件。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
+| 核心设计文档 | 所有者授权的纲领区分直接引文、获准重述与翻译，定义 R1–R5、D1–D7、P1–P5，其优先顺序高于其他所有文件。 | [00-mandate.zh-CN.md](00-mandate.zh-CN.md) |
 
 M0 范围规则（D1：只有设计文档和骨架，`scripts/validate.mjs` 是唯一的工具例外）以及常设偏好 P1–P5 在 [00-mandate.zh-CN.md](00-mandate.zh-CN.md) 中陈述，并在 [00-vision.zh-CN.md](00-vision.zh-CN.md) 中映射。
 
