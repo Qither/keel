@@ -68,4 +68,4 @@ Everything lives under the state directory: content-hashed document versions, on
 
 ## Status
 
-Stage A is a bounded validation under the research topic SA-01. Its adoption into the product and any public release are separate owner decisions that have not been made. Licence: to be chosen at the first public release.
+Stage A was validated under the research topic SA-01 and adopted by the owner on 2026-10-09; the product's conformance claim is [docs/ADOPTION.md](docs/ADOPTION.md) and nothing else. Stage B (substitution of session, executor and channel) is under bounded validation (SB-01) and is not claimed. Public release is a separate decision not yet taken. Licence: to be chosen at the first public release.
