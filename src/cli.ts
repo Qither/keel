@@ -65,7 +65,7 @@ const USAGE = `keel — Stage A control plane for one unit of work
 
   keel work create --spec <file.json> [--state-dir <dir>]
   keel grant [<workitem>] --allow <exec|write>:<pattern>... --attempts <n> --elapsed-seconds <s>
-             [--confirm <first 8 hash chars> --approver <name>]
+             [--confirm <first 8 hash chars> --approver <name>] [--prompt]
   keel run [<workitem>] [--session-ref <ref>]
   keel stop [<workitem>] [--window-seconds <s>]
   keel recover [<workitem>] [--retry] [--abandon]
@@ -134,7 +134,7 @@ async function main(argv: string[]): Promise<number> {
           elapsed_seconds: num(args, "elapsed-seconds", 60),
           approver: str(args, "approver"),
           confirm: str(args, "confirm"),
-          interactive: Boolean(process.stdin.isTTY) && !json,
+          interactive: (Boolean(process.stdin.isTTY) || bool(args, "prompt")) && !json,
         });
         break;
       }
@@ -229,6 +229,8 @@ async function main(argv: string[]): Promise<number> {
   }
 }
 
+// Until main settles, the exit code is 5: a command that never resolves must not look like success.
+process.exitCode = EXIT.AUTHORITY;
 main(process.argv.slice(2)).then(
   (code) => {
     process.exitCode = code;

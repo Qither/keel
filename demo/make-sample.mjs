@@ -2,14 +2,17 @@
 // product can be tried by hand without typing JSON on the command line.
 // Usage: node demo/make-sample.mjs   then follow the printed commands.
 import { spawnSync } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "out", "sample");
 const ws = join(root, "ws");
-rmSync(root, { recursive: true, force: true });
+// Clear the contents rather than the directory itself: on Windows a directory
+// that is some shell's current directory cannot be removed.
+mkdirSync(root, { recursive: true });
+for (const entry of readdirSync(root)) rmSync(join(root, entry), { recursive: true, force: true });
 mkdirSync(ws, { recursive: true });
 
 const git = (args) => {
@@ -28,7 +31,9 @@ const spec = {
   acceptance: {
     criteria: [
       { id: "c1", statement: "artifacts/hello.txt exists", required: true, evidence_mode: "artifact-exists", path: "artifacts/hello.txt" },
-      { id: "c2", statement: "step s1 exits 0", required: true, evidence_mode: "command-exit-status", step: "s1" },
+      // The exit-status criterion names s2, not s1: after `run --crash-after-effect s1` the
+      // product dies before s1's status is recorded, so a criterion on s1 could only be `inferred`.
+      { id: "c2", statement: "step s2 exits 0", required: true, evidence_mode: "command-exit-status", step: "s2" },
     ],
   },
   task: {

@@ -57,11 +57,31 @@ export async function grant(store: Store, workitemId: string, opts: GrantOptions
   };
 
   let typed = opts.confirm;
+  let approver = opts.approver;
   if (!typed && opts.interactive) {
     process.stdout.write(JSON.stringify(shown, null, 2) + "\n");
-    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    // Lines are read through the iterator, not `question`, so that piped input
+    // (several lines arriving at once, then end of input) cannot lose an answer
+    // or leave the process hanging; end of input before an answer is an abort.
+    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: Boolean(process.stdin.isTTY) });
+    const lines = rl[Symbol.asyncIterator]();
+    const ask = async (question: string): Promise<string | null> => {
+      process.stdout.write(question);
+      const next = await lines.next();
+      if (!process.stdin.isTTY) process.stdout.write("\n");
+      return next.done ? null : next.value.trim();
+    };
     try {
-      typed = (await rl.question("Confirm by retyping the first 8 hash characters (empty to abort): ")).trim();
+      const answer = await ask("Confirm by retyping the first 8 hash characters (empty to abort): ");
+      if (answer === null) throw new Waiting("grant aborted: input ended before a confirmation was typed; nothing recorded", "HC-03 s2", shown);
+      typed = answer;
+      if (typed && (typed.length < 8 || !hash.startsWith(typed))) {
+        throw new UsageError(`typed prefix ${JSON.stringify(typed)} does not match the shown hash ${hash.slice(0, 8)}…; nothing recorded`);
+      }
+      if (typed && !approver) {
+        const name = await ask("Approver name (declared, not authenticated): ");
+        approver = name || undefined;
+      }
     } finally {
       rl.close();
     }
@@ -72,7 +92,7 @@ export async function grant(store: Store, workitemId: string, opts: GrantOptions
   if (typed.length < 8 || !hash.startsWith(typed)) {
     throw new UsageError(`typed prefix ${JSON.stringify(typed)} does not match the shown hash ${hash.slice(0, 8)}…; nothing recorded`);
   }
-  if (!opts.approver) throw new UsageError("--approver <name> is required with --confirm (the approver is declared, not authenticated)");
+  if (!approver) throw new UsageError("--approver <name> is required with --confirm (the approver is declared, not authenticated)");
 
   const grantId = wi.grant_ref?.id ?? `grant-${wi.id}`;
   const at = now();
@@ -80,7 +100,7 @@ export async function grant(store: Store, workitemId: string, opts: GrantOptions
     const doc: Grant = {
       id: grantId,
       ...proposal,
-      confirmed_by: opts.approver!,
+      confirmed_by: approver,
       confirmed_at: at,
       confirmed_subject: { workitem_version: wi.version, grant_content_hash: hash },
     } as Grant;
@@ -92,10 +112,10 @@ export async function grant(store: Store, workitemId: string, opts: GrantOptions
       workitem_version: wi.version,
       grant_content_hash: hash,
       typed_prefix: typed,
-      approver: opts.approver,
+      approver,
       confirmed_at: at,
       doc_hash: ref.hash,
     });
-    return { grant_id: grantId, version: ref.version, grant_content_hash: hash, approver: opts.approver, confirmed_at: at, note: "the approver is declared, not authenticated" };
+    return { grant_id: grantId, version: ref.version, grant_content_hash: hash, approver, confirmed_at: at, note: "the approver is declared, not authenticated" };
   });
 }
