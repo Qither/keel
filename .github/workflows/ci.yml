@@ -1,0 +1,26 @@
+# Source: OWNER 2026-10-08 (design 6.7): the owner's native platform plus one
+# Linux runner, so the event-log and hash behavior is shown independent of
+# line endings.
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm test
+      - run: npm run demo
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage-a-transcript-${{ matrix.os }}
+          path: demo/out/

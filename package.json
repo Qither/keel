@@ -1,0 +1,18 @@
+{
+  "name": "keel",
+  "version": "0.1.0-stage-a",
+  "description": "Keel Stage A: a command-line control plane for one authorized, evidence-bound, recoverable unit of work.",
+  "private": true,
+  "type": "module",
+  "bin": { "keel": "dist/cli.js" },
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "demo": "npm run build && node demo/run-demo.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "typescript": "5.9.2"
+  }
+}
