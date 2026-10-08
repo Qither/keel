@@ -11,7 +11,9 @@ import type {
   DecisionRequest,
   Evidence,
   Grant,
+  Route,
   RunState,
+  SessionRef,
   Task,
   WorkItem,
 } from "./model.js";
@@ -34,6 +36,13 @@ export interface RunView {
   pid: number | null;
   process_alive: boolean;
   session_ref: string | null;
+  /** Stage B: the session the executor reported for this Run, if any. */
+  session: (SessionRef & { origin: string; resumed: boolean | null }) | null;
+  /** Stage B: the Route recorded before the first step. */
+  route: (Route & { origin: string }) | null;
+  grant_content_hash: string | null;
+  acceptance_version: number | null;
+  workitem_version: number | null;
   context_pack_ref: string | null;
   usage: { attempts_used: number; elapsed_seconds: number | "unknown"; cost: unknown };
   started_at: string;
@@ -84,10 +93,12 @@ export interface View {
   events: LogEvent[];
 }
 
-export function grantProposalHash(grant: Pick<Grant, "workitem_ref" | "allowed_operations" | "budget" | "decision_classes">): string {
+export function grantProposalHash(grant: Pick<Grant, "workitem_ref" | "allowed_operations" | "budget" | "decision_classes"> & { allowed_executors?: string[] }): string {
   return hashObject({
     workitem_ref: grant.workitem_ref,
     allowed_operations: grant.allowed_operations,
+    // Stage B: the executor list is part of what the owner confirmed. Absent on Stage A grants.
+    ...(grant.allowed_executors ? { allowed_executors: grant.allowed_executors } : {}),
     budget: grant.budget,
     decision_classes: grant.decision_classes,
   });
@@ -160,6 +171,8 @@ export function deriveView(store: Store, workitemId: string): View {
       elapsed_seconds: "unknown",
       cost: "unknown",
     };
+    const routeEv = events.find((x) => x.type === "run.route" && x.data["run_id"] === runId) ?? null;
+    const sessionEv = events.findLast((x) => x.type === "run.session" && x.data["run_id"] === runId) ?? null;
     runs.push({
       id: runId,
       task_ref: d["task_ref"] as string,
@@ -170,6 +183,11 @@ export function deriveView(store: Store, workitemId: string): View {
       pid,
       process_alive: alive,
       session_ref: (d["session_ref"] as string | null | undefined) ?? null,
+      session: sessionEv ? { ...(sessionEv.data["session"] as SessionRef), resumed: (sessionEv.data["resumed"] as boolean | null | undefined) ?? null, origin: `event ${sessionEv.id}` } : null,
+      route: routeEv ? { ...(routeEv.data["route"] as Route), origin: `event ${routeEv.id}` } : null,
+      grant_content_hash: (d["grant_content_hash"] as string | undefined) ?? null,
+      acceptance_version: ((d["acceptance_ref"] as { version?: number } | undefined)?.version) ?? null,
+      workitem_version: (d["workitem_version"] as number | undefined) ?? null,
       context_pack_ref: (d["context_pack_ref"] as string | undefined) ?? null,
       usage,
       started_at: e.at,

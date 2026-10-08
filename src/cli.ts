@@ -12,6 +12,7 @@ import { resolveWorkItem } from "./verbs/common.js";
 import { contextAdd } from "./verbs/context.js";
 import { decide, listDecisions } from "./verbs/decide.js";
 import { evidenceSubmit } from "./verbs/evidence.js";
+import { executorProbe, executorRegister, listExecutors } from "./verbs/executor.js";
 import { grant } from "./verbs/grant.js";
 import { logCheck } from "./verbs/logcheck.js";
 import { recover } from "./verbs/recover.js";
@@ -64,11 +65,17 @@ function num(args: Args, key: string, fallback: number): number {
 const USAGE = `keel — Stage A control plane for one unit of work
 
   keel work create --spec <file.json> [--state-dir <dir>]
-  keel grant [<workitem>] --allow <exec|write>:<pattern>... --attempts <n> --elapsed-seconds <s>
+  keel grant [<workitem>] --allow <exec|write>:<pattern>... [--executor <alias>|*]... --attempts <n> --elapsed-seconds <s>
              [--confirm <first 8 hash chars> --approver <name>] [--prompt]
-  keel run [<workitem>] [--session-ref <ref>]
+  keel run [<workitem>] [--executor <alias>] [--model <alias>] [--session-ref <ref>]
   keel stop [<workitem>] [--window-seconds <s>]
-  keel recover [<workitem>] [--retry] [--abandon]
+  keel recover [<workitem>] [--executor <alias>] [--retry] [--abandon]
+  keel executor register --alias <a> --kind agent-cli --program <cmd> --prompt-args <arg>... [--base-args ...]
+             [--model-args ...] [--resume-args ...] [--version-args ...] [--capability <c,...>]
+             [--identity-ref <r>] [--channel cli-login|api-key-env|unknown] [--output-format json|json-lines|text]
+             [--session-field <f>] [--cost-field <f> --cost-unit <u>] [--result-field <f>]
+  keel executor probe <alias> [--timeout-seconds <s>]
+  keel executor list
   keel decide [<decision> --option <key> --approver <name>]
   keel verify [<workitem>]
   keel accept [<workitem>]
@@ -130,6 +137,7 @@ async function main(argv: string[]): Promise<number> {
         const wi = resolveWorkItem(store, sub);
         result = await grant(store, wi, {
           allow: args.flags.get("allow") ?? [],
+          executors: args.flags.get("executor") ?? [],
           attempts: num(args, "attempts", 1),
           elapsed_seconds: num(args, "elapsed-seconds", 60),
           approver: str(args, "approver"),
@@ -141,7 +149,13 @@ async function main(argv: string[]): Promise<number> {
       case "run": {
         const store = Store.open(stateDir);
         const wi = resolveWorkItem(store, sub);
-        result = await run(store, wi, { session_ref: str(args, "session-ref"), crash_after_effect: str(args, "crash-after-effect") });
+        result = await run(store, wi, {
+          session_ref: str(args, "session-ref"),
+          crash_after_effect: str(args, "crash-after-effect"),
+          executor: str(args, "executor"),
+          model: str(args, "model"),
+          resume_session: undefined,
+        });
         break;
       }
       case "stop": {
@@ -151,7 +165,13 @@ async function main(argv: string[]): Promise<number> {
       }
       case "recover": {
         const store = Store.open(stateDir);
-        result = await recover(store, resolveWorkItem(store, sub), { retry: bool(args, "retry"), abandon: bool(args, "abandon"), session_ref: str(args, "session-ref") });
+        result = await recover(store, resolveWorkItem(store, sub), {
+          retry: bool(args, "retry"),
+          abandon: bool(args, "abandon"),
+          session_ref: str(args, "session-ref"),
+          executor: str(args, "executor"),
+          model: str(args, "model"),
+        });
         break;
       }
       case "decide": {
@@ -202,6 +222,42 @@ async function main(argv: string[]): Promise<number> {
           human: bool(args, "human"),
           approver: str(args, "approver"),
         });
+        break;
+      }
+      case "executor": {
+        // Stage B (SB-01). Source: HC-02 s1–s2; harness §2; stage-b 4.1, 4.2.
+        // A registration may be the first write into a state directory.
+        const store = Store.open(stateDir, sub === "register");
+        if (sub === "register") {
+          result = executorRegister(store, {
+            alias: str(args, "alias"),
+            kind: str(args, "kind"),
+            program: str(args, "program"),
+            capability: args.flags.get("capability") ?? [],
+            identity_ref: str(args, "identity-ref"),
+            channel: str(args, "channel"),
+            session_support: str(args, "session-support"),
+            cost_field: str(args, "cost-field"),
+            cost_unit: str(args, "cost-unit"),
+            base_args: args.flags.get("base-args") ?? [],
+            prompt_args: args.flags.get("prompt-args") ?? [],
+            model_args: args.flags.get("model-args") ?? [],
+            resume_args: args.flags.get("resume-args") ?? [],
+            version_args: args.flags.get("version-args") ?? [],
+            output_format: str(args, "output-format"),
+            session_field: str(args, "session-field"),
+            result_field: str(args, "result-field"),
+            prompt_via: str(args, "prompt-via"),
+          });
+        } else if (sub === "probe") {
+          const alias = rest[0];
+          if (!alias) throw new UsageError("usage: keel executor probe <alias>");
+          result = await executorProbe(store, alias, num(args, "timeout-seconds", 60));
+        } else if (sub === "list") {
+          result = listExecutors(store);
+        } else {
+          throw new UsageError("usage: keel executor register|probe|list");
+        }
         break;
       }
       case "rule": {

@@ -47,6 +47,9 @@ export function checkStep(step: Step, grant: Grant, extraAllowed: Grant["allowed
   if (step.kind === "exec") {
     const ok = allowed.some((op) => op.kind === "exec" && matchesPattern(op.pattern, program));
     if (!ok) violations.push({ kind: "exec-not-allowed", detail: `exec of \`${program}\` matches no allowed exec pattern` });
+  } else if (step.kind === "agent") {
+    // An agent step's program is the executor, governed by Grant.allowed_executors (route.ts);
+    // only its declared writes are checked here. Source: HC-02 s1; stage-b 3.3, 3.4.
   } else {
     const ok = allowed.some((op) => op.kind === step.kind);
     if (!ok) violations.push({ kind: "operation-kind", detail: `operation kind \`${step.kind}\` is not allowed` });

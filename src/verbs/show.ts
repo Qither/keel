@@ -9,6 +9,7 @@ import { faultActive } from "../faults.js";
 import { type Store } from "../store.js";
 import { deriveView } from "../derive.js";
 import { headRevision } from "../workspace.js";
+import { listExecutors } from "./executor.js";
 
 export function show(store: Store, workitemId: string): Record<string, unknown> {
   if (faultActive("show-trusts-projection")) {
@@ -38,6 +39,7 @@ export function show(store: Store, workitemId: string): Record<string, unknown> 
       : { id: wi.grant_ref?.id ?? null, version: 0, valid: false, reason: "no grant", origin: "event log" },
     acceptance: { id: view.acceptance.id, version: view.acceptance.version, criteria: view.acceptance.criteria.map((c) => c.id), origin: `acceptance ${view.acceptance.id} v${view.acceptance.version}` },
     workspace: { path: view.task.workspace, revision: headRevision(view.task.workspace), origin: "git rev-parse HEAD", freshness: "now" },
+    executors: listExecutors(store),
     runs: view.runs.map((r) => ({
       id: r.id,
       generation: r.generation,
@@ -45,9 +47,13 @@ export function show(store: Store, workitemId: string): Record<string, unknown> 
       reason: r.reason,
       superseded: r.generation < latestGen,
       executor: r.executor_alias,
+      route: r.route,
+      session: r.session,
       pid: r.pid,
       process_alive: r.process_alive,
       session_ref: r.session_ref,
+      grant_content_hash: r.grant_content_hash,
+      acceptance_version: r.acceptance_version,
       usage: r.usage,
       started_at: r.started_at,
       ended_at: r.ended_at,

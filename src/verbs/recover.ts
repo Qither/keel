@@ -1,25 +1,34 @@
-// `recover`: reloads authority, reconciles every IntentRecord without an
-// outcome against the workspace, never repeats the operation, and starts a new
-// generation only when every effect is reconciled. Uncertain effects wait for
-// an explicit human abandonment.
-// Source: HC-06 s1–s2; HC-01 s2; W-04; harness §4.3; design 4.5.
+// `recover`: reloads authority, reconciles every IntentRecord without a
+// settled outcome against the workspace, never repeats the operation, and
+// starts a new generation only when every effect is reconciled. Uncertain
+// effects wait for an explicit human abandonment. Stage B: the new generation
+// may run on another executor; the WorkItem version, Grant content hash and
+// Acceptance version must be those the crashed Run recorded, and a session is
+// resumed only by the same executor.
+// Source: HC-06 s1–s2; HC-01 s2; HC-02 s1; W-02; W-04; harness §4.3; design 4.5; stage-b 4.5.
 import { AuthorityError, Refused, Waiting } from "../errors.js";
 import { faultActive } from "../faults.js";
+import type { SessionRef } from "../model.js";
+import { loadProfile } from "../route.js";
 import { newId, now, type Store } from "../store.js";
-import { deriveView, type IntentView } from "../derive.js";
+import { deriveView, grantProposalHash, type IntentView } from "../derive.js";
 import { artifactHash, headRevision } from "../workspace.js";
-import { run, type RunResult } from "./run.js";
+import { resumable, run, type RunResult } from "./run.js";
 
 export interface RecoverOptions {
   retry: boolean;
   abandon: boolean;
   session_ref: string | undefined;
+  /** Stage B: executor for the new generation; absent means the crashed Run's executor. */
+  executor: string | undefined;
+  model: string | undefined;
 }
 
 export interface RecoverResult {
-  crashed_runs: { run_id: string; generation: number; session_ref: string | null; session_resolution: string }[];
+  crashed_runs: { run_id: string; generation: number; executor: string; session_ref: string | null; session_resolution: string; session: (SessionRef & { resumable: boolean }) | null }[];
   reconciliations: { intent_id: string; step: string; outcome: "reconciled" | "uncertain" | "abandoned"; artifacts: { path: string; sha256: string | null }[] }[];
-  reloaded: { grant: string | null; acceptance: string; source_revision: string; budget_attempts_used: number };
+  reloaded: { grant: string | null; grant_content_hash: string | null; acceptance: string; source_revision: string; budget_attempts_used: number };
+  continuity: { workitem_version: boolean; grant_content_hash: boolean; acceptance_version: boolean } | null;
   new_run: RunResult | null;
   claim: string;
 }
@@ -33,6 +42,9 @@ export async function recover(store: Store, workitemId: string, opts: RecoverOpt
   // An intent is unreconciled while it has no outcome or its last outcome is `uncertain`.
   const openIntents = view.intents.filter((i) => crashedIds.has(i.run_ref) && (i.outcome === null || i.outcome.outcome === "uncertain"));
 
+  const targetAlias = opts.executor ?? crashed.at(-1)?.executor_alias ?? undefined;
+  const targetProfile = targetAlias ? loadProfile(store, targetAlias, view.events) : null;
+
   const sessions = crashed.map((r) => {
     const resolution =
       r.session_ref === null
@@ -41,11 +53,15 @@ export async function recover(store: Store, workitemId: string, opts: RecoverOpt
     if (r.session_ref !== null && faultActive("recover-trusts-session")) {
       throw new AuthorityError(`session ${r.session_ref} cannot be resumed; state lost`, "FAULT recover-trusts-session");
     }
-    return { run_id: r.id, generation: r.generation, session_ref: r.session_ref, session_resolution: resolution };
+    const session = r.session
+      ? { executor_alias: r.session.executor_alias, external_id: r.session.external_id, transport: r.session.transport, resumable: targetProfile ? resumable(r.session, targetProfile) : false }
+      : null;
+    return { run_id: r.id, generation: r.generation, executor: r.executor_alias, session_ref: r.session_ref, session_resolution: resolution, session };
   });
 
   const reloaded = {
     grant: view.grant ? `${view.grant.id} v${view.grant.version}${view.grant_valid ? "" : " (invalid: " + view.grant_invalid_reason + ")"}` : null,
+    grant_content_hash: view.grant ? grantProposalHash(view.grant) : null,
     acceptance: `${view.acceptance.id} v${view.acceptance.version}`,
     source_revision: headRevision(task.workspace),
     budget_attempts_used: view.runs.filter((r) => r.task_ref === task.id).length,
@@ -68,7 +84,7 @@ export async function recover(store: Store, workitemId: string, opts: RecoverOpt
     for (const r of crashed) {
       store.append("run.ended", { run_id: r.id, state: "abandoned", reason: "abandoned by the owner after an unreconciled outcome", usage: r.usage });
     }
-    return { crashed_runs: sessions, reconciliations, reloaded, new_run: null, claim: "abandoned; no completion is claimed" };
+    return { crashed_runs: sessions, reconciliations, reloaded, continuity: null, new_run: null, claim: "abandoned; no completion is claimed" };
   }
 
   let anyUncertain = false;
@@ -95,10 +111,30 @@ export async function recover(store: Store, workitemId: string, opts: RecoverOpt
   }
 
   if (crashed.length === 0 && !opts.retry) {
-    return { crashed_runs: [], reconciliations: [], reloaded, new_run: null, claim: "nothing to recover" };
+    return { crashed_runs: [], reconciliations: [], reloaded, continuity: null, new_run: null, claim: "nothing to recover" };
   }
-  const new_run = await run(store, workitemId, { session_ref: opts.session_ref, crash_after_effect: undefined });
-  return { crashed_runs: sessions, reconciliations, reloaded, new_run, claim: `new generation ${new_run.generation} started after reconciliation; acceptance is decided by \`keel verify\`` };
+
+  // Stage B continuity: the resumed work keeps the WorkItem, Grant and Acceptance the crashed Run recorded.
+  const last = crashed.at(-1) ?? null;
+  let continuity: RecoverResult["continuity"] = null;
+  if (last) {
+    continuity = {
+      workitem_version: last.workitem_version === null || last.workitem_version === view.workitem.version,
+      grant_content_hash: last.grant_content_hash === null || last.grant_content_hash === reloaded.grant_content_hash,
+      acceptance_version: last.acceptance_version === null || last.acceptance_version === view.acceptance.version,
+    };
+    const broken = Object.entries(continuity).filter(([, ok]) => !ok).map(([k]) => k);
+    if (broken.length > 0 && !faultActive("recover-ignores-grant-hash")) {
+      throw new Refused(
+        `recover refused to start a new generation: ${broken.join(", ")} changed since run ${last.id} (generation ${last.generation}); the effects are reconciled, so run \`keel run\` under the current Grant instead`,
+        "HC-02 s1",
+        { continuity, crashed_run: last.id },
+      );
+    }
+  }
+  const resumeSession = last?.session ? { executor_alias: last.session.executor_alias, external_id: last.session.external_id, transport: last.session.transport } : undefined;
+  const new_run = await run(store, workitemId, { session_ref: opts.session_ref, crash_after_effect: undefined, executor: targetAlias, model: opts.model, resume_session: resumeSession });
+  return { crashed_runs: sessions, reconciliations, reloaded, continuity, new_run, claim: `new generation ${new_run.generation} started on ${new_run.executor} after reconciliation; acceptance is decided by \`keel verify\`` };
 }
 
 function reconcile(intent: IntentView, workspace: string): { outcome: "reconciled" | "uncertain"; artifacts: { path: string; sha256: string | null }[] } {

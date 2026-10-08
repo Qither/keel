@@ -58,6 +58,18 @@ node dist/cli.js help
 
    Every verb accepts `--json` and `--state-dir <dir>` (default `./.keel`). When exactly one WorkItem exists its id may be omitted.
 
+   Stage B (candidate, see [docs/STAGE-B.md](docs/STAGE-B.md)): register an agent command line as an executor, probe it, allow it on the Grant, and name it on each run:
+
+   ```bash
+   keel executor register --alias stub --kind agent-cli --program node --base-args test/fixtures/stub-agent.mjs --prompt-args=--prompt --prompt-args {prompt} --resume-args=--resume --resume-args {session} --version-args test/fixtures/stub-agent.mjs --version-args=--version --capability edit-files,resume-session,json-output --output-format json-lines --session-field session_id
+   keel executor probe stub
+   keel grant --allow write:artifacts/** --executor local-process --executor stub --attempts 3 --elapsed-seconds 60   # then --confirm … --approver …
+   keel run --executor stub
+   keel recover --executor stub      # continue a crashed run on another executor; state and acceptance must be unchanged
+   ```
+
+   A step of `"kind": "agent"` carries a `prompt` instead of `argv`. `npm run demo:real` registers the CLIs installed on this machine (`claude`, `codex`, `opencode`), probes them under your own logins and performs one substitution; it is never part of `npm test` or CI and makes at most six real invocations.
+
 3. When something goes wrong: `keel stop` requests cancellation; `keel recover` reconciles an interrupted run against the workspace before anything is repeated, and `keel recover --abandon` records an explicit abandonment; `keel decide` lists and resolves decision requests raised when a step would exceed the Grant or a budget; `keel context add` records facts, decisions, inferences or summaries for the next run; `keel evidence submit` delivers a late result or a human confirmation.
 
 Exit statuses: `0` done · `1` a check or acceptance failed · `2` usage · `3` refused by a rule (the message names the rule's source) · `4` waiting on a human decision · `5` an authoritative record is missing or inconsistent.

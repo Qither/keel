@@ -11,6 +11,8 @@ import { now, type Store } from "../store.js";
 
 export interface GrantOptions {
   allow: string[];
+  /** Stage B: executor aliases, or "*"; absent means local-process only. Source: HC-02 s1; stage-b 3.3. */
+  executors: string[];
   attempts: number;
   elapsed_seconds: number;
   approver: string | undefined;
@@ -42,9 +44,12 @@ export async function grant(store: Store, workitemId: string, opts: GrantOptions
   if (!Number.isInteger(opts.attempts) || opts.attempts < 1) throw new UsageError("--attempts must be a positive integer");
   if (!Number.isFinite(opts.elapsed_seconds) || opts.elapsed_seconds <= 0) throw new UsageError("--elapsed-seconds must be positive");
   const budget: Budget = { attempts: opts.attempts, elapsed_seconds: opts.elapsed_seconds, cost: "unknown" };
+  const executors = opts.executors.flatMap((e) => e.split(",")).map((e) => e.trim()).filter(Boolean);
+  for (const e of executors) if (e !== "*" && !/^[a-z][a-z0-9-]{0,39}$/.test(e)) throw new UsageError(`invalid executor alias in --executor: ${e}`);
   const proposal = {
     workitem_ref: { id: wi.id, version: wi.version },
     allowed_operations: parseAllow(opts.allow),
+    ...(executors.length > 0 ? { allowed_executors: executors } : {}),
     budget,
     decision_classes: DECISION_CLASSES,
   };

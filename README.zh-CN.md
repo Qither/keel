@@ -58,6 +58,18 @@ node dist/cli.js help
 
    每个动词都接受 `--json` 和 `--state-dir <dir>`（默认 `./.keel`）。只存在一个 WorkItem 时可省略其 id。
 
+   Stage B（候选，见 [docs/STAGE-B.zh-CN.md](docs/STAGE-B.zh-CN.md)）：把一个代理命令行注册为执行器，探测它，在 Grant 上允许它，并在每次运行时指定它：
+
+   ```bash
+   keel executor register --alias stub --kind agent-cli --program node --base-args test/fixtures/stub-agent.mjs --prompt-args=--prompt --prompt-args {prompt} --resume-args=--resume --resume-args {session} --version-args test/fixtures/stub-agent.mjs --version-args=--version --capability edit-files,resume-session,json-output --output-format json-lines --session-field session_id
+   keel executor probe stub
+   keel grant --allow write:artifacts/** --executor local-process --executor stub --attempts 3 --elapsed-seconds 60   # 然后 --confirm … --approver …
+   keel run --executor stub
+   keel recover --executor stub      # 在另一执行器上续跑崩溃的运行；状态与验收必须不变
+   ```
+
+   `"kind": "agent"` 的步骤带 `prompt` 而不是 `argv`。`npm run demo:real` 注册本机已安装的 CLI（`claude`、`codex`、`opencode`），在你自己的登录下探测它们并做一次替换；它从不属于 `npm test` 或 CI，最多发起六次真实调用。
+
 3. 出问题时：`keel stop` 请求取消；`keel recover` 在重复任何操作之前对照工作区核对被中断的运行，`keel recover --abandon` 记录明确放弃；`keel decide` 列出并处置步骤将超出 Grant 或预算时提出的决策请求；`keel context add` 为下一次运行记录事实、决定、推断或摘要；`keel evidence submit` 交付迟到结果或人工确认。
 
 退出状态：`0` 完成 · `1` 检查或验收失败 · `2` 用法错误 · `3` 被规则拒绝（消息注明规则来源）· `4` 等待人类决定 · `5` 权威记录缺失或不一致。

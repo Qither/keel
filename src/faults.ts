@@ -21,6 +21,17 @@ export const FAULTS = [
   "show-trusts-projection",
   "verify-ignores-revision",
   "verify-trusts-summary",
+  // Stage B twins (SB-01)
+  "cost-parsed-from-text",
+  "probe-not-recorded",
+  "probe-skips-redaction",
+  "recover-ignores-grant-hash",
+  "recover-resumes-foreign-session",
+  "route-not-recorded",
+  "run-ignores-allowed-executors",
+  "run-ignores-identity",
+  "run-picks-route",
+  "session-not-recorded",
 ] as const;
 
 export type Fault = (typeof FAULTS)[number];

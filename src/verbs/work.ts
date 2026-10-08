@@ -40,9 +40,15 @@ function readSpec(path: string): WorkSpec {
     if (c.evidence_mode === "command-exit-status" && !c.step) throw new UsageError(`criterion ${c.id} needs a step`);
   }
   for (const s of spec.task.steps) {
-    if (!s.id || !Array.isArray(s.argv) || s.argv.length === 0) throw new UsageError(`step ${JSON.stringify(s.id)} needs id and a non-empty argv`);
     if (!s.kind) s.kind = "exec";
     if (!Array.isArray(s.writes)) s.writes = [];
+    if (s.kind === "agent") {
+      // Stage B: an agent step carries a prompt; its program is the executor. Source: stage-b 3.4.
+      if (!s.id || typeof s.prompt !== "string" || s.prompt.length === 0) throw new UsageError(`agent step ${JSON.stringify(s.id)} needs id and a prompt`);
+      if (!Array.isArray(s.argv)) s.argv = [];
+    } else if (!s.id || !Array.isArray(s.argv) || s.argv.length === 0) {
+      throw new UsageError(`step ${JSON.stringify(s.id)} needs id and a non-empty argv`);
+    }
   }
   return spec;
 }

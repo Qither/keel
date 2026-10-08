@@ -4,8 +4,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CASES, makeContext } from "./cases.mjs";
+import { CASES_B } from "./cases-b.mjs";
 
-for (const c of CASES) {
+for (const c of [...CASES, ...CASES_B]) {
   test(`[${c.id}] ${c.title} (${c.scenario})`, () => {
     const ctx = makeContext();
     try {

@@ -9,7 +9,11 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { platform, release, arch } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { CASES, makeContext, PRODUCT_ROOT } from "../test/cases.mjs";
+import { CASES as CASES_A, makeContext, PRODUCT_ROOT } from "../test/cases.mjs";
+import { CASES_B } from "../test/cases-b.mjs";
+
+// Stage A (adopted) and Stage B (candidate under SB-01) cohorts, each counted in its own record.
+const CASES = [...CASES_A, ...CASES_B];
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outDir = resolve(here, "out");
